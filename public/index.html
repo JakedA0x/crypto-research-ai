@@ -4,86 +4,103 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#0b0d10">
-<title>Crypto Research AI — Terminal</title>
+<meta name="theme-color" content="#090d14">
+<meta name="application-name" content="BlobSignal">
+<meta name="description" content="BlobSignal — Crypto Market Terminal for futures technical analysis and market research.">
+<link rel="icon" type="image/png" href="/mascot.png">
+<title>BlobSignal — Crypto Market Terminal</title>
+
 <style>
-:root {
+:root{
   color-scheme:dark;
-  --bg:#0b0d10;
-  --surface:#111419;
-  --surface2:#171b21;
-  --border:#252a32;
-  --text:#e7eaf0;
-  --muted:#858d9b;
+  --bg:#090d14;
+  --surface:#101722;
+  --surface2:#172131;
+  --border:#253347;
+  --text:#edf4ff;
+  --muted:#8998ad;
   --green:#45d6a0;
   --red:#f16d7a;
-  --blue:#8ba8ff;
+  --blue:#54c8ff;
   --amber:#e8bd69;
 }
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-button,input,select{font:inherit}
-button,select{cursor:pointer}
-button:focus-visible,select:focus-visible{outline:1px solid var(--green);outline-offset:2px}
-button:disabled{opacity:.5;cursor:wait}
+body{
+  margin:0;background:var(--bg);color:var(--text);
+  font:13px/1.6 Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif
+}
+button,select{font:inherit;cursor:pointer}
+button:focus-visible,select:focus-visible{outline:1px solid var(--blue);outline-offset:2px}
+button:disabled{opacity:.55;cursor:wait}
 a{color:inherit;text-decoration:none}
-.topbar{height:58px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 24px;gap:20px;background:#0d0f12;position:sticky;top:0;z-index:5}
-.brand{display:flex;align-items:center;gap:11px;font-size:14px;font-weight:750;letter-spacing:-.3px;white-space:nowrap}
-.brand-mark{height:27px;width:27px;border:1px solid #3c7964;border-radius:7px;display:grid;place-items:center;color:var(--green);font-size:15px}
-.brand small{font-size:10px;font-weight:500;color:var(--muted);letter-spacing:1px;margin-left:5px}
+.topbar{
+  min-height:66px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 24px;gap:18px;background:#0b111b;
+  position:sticky;top:0;z-index:5
+}
+.brand{display:flex;align-items:center;gap:11px;min-width:0}
+.brand-mascot{
+  width:42px;height:42px;object-fit:contain;
+  border-radius:11px;flex-shrink:0
+}
+.brand-copy{display:flex;flex-direction:column;gap:1px}
+.brand-name{font-size:19px;line-height:1.2;font-weight:800;letter-spacing:-.7px}
+.brand-name span{color:var(--blue)}
+.brand-subtitle{font-size:9px;letter-spacing:1.6px;color:var(--muted)}
 .top-right,.inline,.actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .status{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:7px}
 .dot{width:7px;height:7px;border-radius:50%;background:var(--amber);display:inline-block;flex-shrink:0}
 .dot.ok{background:var(--green)}
 .dot.bad{background:var(--red)}
 .clock{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
-.layout{max-width:1600px;margin:auto;padding:22px 24px 40px}
-.page-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;margin-bottom:20px}
-.eyebrow{font-size:10px;color:var(--green);letter-spacing:1.8px;text-transform:uppercase;font-weight:700}
-h1{font-size:23px;letter-spacing:-.8px;margin:5px 0 3px;font-weight:680}
+.layout{max-width:1600px;margin:auto;padding:24px 24px 42px}
+.page-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;margin-bottom:22px}
+.eyebrow{font-size:10px;color:var(--blue);letter-spacing:1.8px;text-transform:uppercase;font-weight:750}
+h1{font-size:25px;letter-spacing:-.8px;margin:5px 0 3px;font-weight:750}
 .sub{color:var(--muted);font-size:12px}
 .pill{display:inline-flex;align-items:center;gap:7px;padding:6px 9px;border:1px solid var(--border);border-radius:5px;color:var(--muted);font-size:10px;white-space:nowrap}
-.ticker{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border:1px solid var(--border);border-radius:7px;overflow:hidden;margin-bottom:20px}
-.ticker-item{padding:14px 17px;border-right:1px solid var(--border);min-width:0}
+.ticker{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border:1px solid var(--border);border-radius:9px;overflow:hidden;margin-bottom:22px;background:var(--surface)}
+.ticker-item{padding:16px 18px;border-right:1px solid var(--border);min-width:0}
 .ticker-item:last-child{border-right:0}
 .ticker-top{display:flex;justify-content:space-between;gap:8px;align-items:center}
-.ticker-name{font-size:11px;font-weight:650}
+.ticker-name{font-size:11px;font-weight:700}
 .ticker-symbol{font-size:10px;color:var(--muted);margin-left:5px}
-.ticker-price{font-size:20px;font-weight:650;letter-spacing:-.5px;margin-top:8px;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+.ticker-price{font-size:21px;font-weight:700;letter-spacing:-.5px;margin-top:8px;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
 .ticker-source{font-size:10px;color:var(--muted);margin-top:3px}
 .green{color:var(--green)!important}
 .red{color:var(--red)!important}
 .muted{color:var(--muted)}
 .section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
-.section-title{font-size:13px;font-weight:650}
+.section-title{font-size:13px;font-weight:700}
 .section-note{font-size:10px;color:var(--muted)}
-.workspace{border:1px solid var(--border);border-radius:7px;overflow:hidden;margin-bottom:18px}
-.toolbar{padding:14px 16px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.workspace{border:1px solid var(--border);border-radius:9px;overflow:hidden;margin-bottom:22px}
+.toolbar{padding:15px 17px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
 .controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-select{background:#0d1014;color:var(--text);border:1px solid #303641;border-radius:5px;padding:9px 29px 9px 10px;min-width:94px}
-.btn{border:1px solid #303641;background:#191e25;color:var(--text);border-radius:5px;padding:9px 13px;font-size:11px;font-weight:600}
-.btn:hover{border-color:#697485}
-.btn-primary{background:var(--green);border-color:var(--green);color:#08130f}
-.btn-primary:hover{background:#62e2b2}
+select{background:#0c121c;color:var(--text);border:1px solid #304057;border-radius:6px;padding:9px 29px 9px 10px;min-width:94px}
+.btn{border:1px solid #304057;background:#182333;color:var(--text);border-radius:6px;padding:9px 13px;font-size:11px;font-weight:650}
+.btn:hover{border-color:var(--blue)}
+.btn-primary{background:var(--blue);border-color:var(--blue);color:#06111a}
+.btn-primary:hover{background:#7bd6ff}
 .btn-quiet{background:transparent}
 .workspace-body{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(265px,.8fr)}
-.chart-side{padding:17px;border-right:1px solid var(--border);min-width:0}
+.chart-side{padding:18px;border-right:1px solid var(--border);min-width:0}
 .chart-meta{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px}
-.asset-title{font-size:15px;font-weight:700}
+.asset-title{font-size:15px;font-weight:750}
 .asset-sub{font-size:10px;color:var(--muted);margin-top:3px}
-.last-price{text-align:right;font-size:20px;font-weight:650;font-variant-numeric:tabular-nums}
+.last-price{text-align:right;font-size:20px;font-weight:700;font-variant-numeric:tabular-nums}
 .last-price small{display:block;color:var(--muted);font-size:10px;font-weight:400;margin-top:2px}
-.chart-box{height:240px;position:relative;background:linear-gradient(180deg,#11161c,#0e1116);border:1px solid #20252c;border-radius:5px;overflow:hidden}
+.chart-box{height:280px;position:relative;background:linear-gradient(180deg,#111c2b,#0c121c);border:1px solid #253347;border-radius:7px;overflow:hidden}
 .chart-box svg{width:100%;height:100%;display:block}
 .chart-placeholder{position:absolute;inset:0;display:grid;place-items:center;color:var(--muted);font-size:11px;text-align:center;padding:20px}
 .chart-legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:12px;color:var(--muted);font-size:10px}
 .legend-dot{display:inline-block;width:7px;height:7px;border-radius:2px;margin-right:5px}
-.side-panel{padding:17px;min-width:0}
-.signal-card{border:1px solid var(--border);border-radius:6px;padding:15px;background:#12161b}
+.side-panel{padding:18px;min-width:0}
+.signal-card{border:1px solid var(--border);border-radius:8px;padding:15px;background:#111a27}
 .signal-top{display:flex;justify-content:space-between;align-items:center;gap:8px}
 .signal-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
-.signal-value{font-size:25px;font-weight:750;letter-spacing:-.7px;margin:12px 0 4px}
-.signal-desc{font-size:11px;color:var(--muted);line-height:1.7}
+.signal-value{font-size:25px;font-weight:800;letter-spacing:-.7px;margin:12px 0 4px}
+.signal-desc{font-size:11px;color:var(--muted);line-height:1.8}
 .signal-tag{font-size:10px;border-radius:4px;padding:4px 7px;background:#222831;color:var(--muted)}
 .signal-tag.long{background:#15352b;color:var(--green)}
 .signal-tag.short{background:#3a2027;color:var(--red)}
@@ -93,26 +110,26 @@ select{background:#0d1014;color:var(--text);border:1px solid #303641;border-radi
 .fact:last-child{border-bottom:0}
 .fact span:first-child{color:var(--muted)}
 .fact strong{text-align:right;font-weight:600;overflow-wrap:anywhere}
-.data-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:18px 0}
-.metric{padding:13px;border:1px solid var(--border);border-radius:6px;background:var(--surface);min-width:0}
+.data-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:18px 0 23px}
+.metric{padding:14px;border:1px solid var(--border);border-radius:7px;background:var(--surface);min-width:0}
 .metric-label{color:var(--muted);font-size:10px}
-.metric-value{font-size:17px;font-weight:650;margin-top:7px;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+.metric-value{font-size:17px;font-weight:700;margin-top:7px;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
 .metric-note{font-size:10px;color:var(--muted);margin-top:4px}
 .lower-grid{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:16px}
-.panel{border:1px solid var(--border);border-radius:7px;overflow:hidden;min-width:0}
+.panel{border:1px solid var(--border);border-radius:8px;overflow:hidden;min-width:0}
 .panel-head{padding:13px 15px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--surface)}
 .panel-content{padding:15px}
 .data-table{width:100%;border-collapse:collapse;font-size:11px}
 .data-table th{text-align:left;color:var(--muted);font-weight:500;font-size:10px;padding:9px 8px;border-bottom:1px solid var(--border)}
-.data-table td{padding:10px 8px;border-bottom:1px solid #20252c;overflow-wrap:anywhere}
+.data-table td{padding:10px 8px;border-bottom:1px solid #202b3b;overflow-wrap:anywhere}
 .data-table tr:last-child td{border-bottom:0}
 .data-table td:last-child,.data-table th:last-child{text-align:right}
 .table-scroll{overflow-x:auto}
 .key{color:var(--muted)}
 .val{font-variant-numeric:tabular-nums;text-align:right}
-.badge{font-size:10px;border-radius:4px;padding:3px 6px;display:inline-block;background:#222831;color:var(--muted)}
-.disclaimer{margin-top:18px;border:1px solid var(--border);border-radius:6px;padding:13px 15px;color:var(--muted);font-size:10px;line-height:1.8}
-footer{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:20px 0 0;color:#646c78;font-size:10px}
+.badge{font-size:10px;border-radius:4px;padding:3px 6px;display:inline-block;background:#222e40;color:var(--muted)}
+.disclaimer{margin-top:18px;border:1px solid var(--border);border-radius:7px;padding:13px 15px;color:var(--muted);font-size:10px;line-height:1.9;background:#0e141e}
+footer{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:20px 0 0;color:#64738a;font-size:10px}
 .loading{color:var(--muted);padding:18px 0;font-size:11px}
 .error-text{color:var(--red)}
 .small-btn{padding:5px 8px;font-size:10px}
@@ -120,14 +137,16 @@ footer{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;paddin
  .workspace-body{grid-template-columns:minmax(0,1.3fr) minmax(245px,.8fr)}
  .data-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
  .layout{padding:18px 15px 30px}
- .topbar{padding:0 15px}
+ .topbar{padding:10px 15px}
 }
 @media(max-width:700px){
- .topbar{height:auto;min-height:56px;padding:12px 14px;align-items:flex-start}
- .brand{font-size:12px}
- .brand small{display:none}
+ .topbar{min-height:58px;padding:10px 12px}
+ .brand-mascot{width:36px;height:36px}
+ .brand-name{font-size:16px}
+ .brand-subtitle{font-size:8px;letter-spacing:1px}
  .top-right{justify-content:flex-end;gap:8px}
  .clock{display:none}
+ .status{font-size:10px}
  .layout{padding:18px 12px 25px}
  .page-heading{align-items:flex-start}
  h1{font-size:21px}
@@ -138,7 +157,7 @@ footer{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;paddin
  .workspace-body{grid-template-columns:1fr}
  .chart-side{border-right:0;border-bottom:1px solid var(--border);padding:12px}
  .side-panel{padding:12px}
- .chart-box{height:210px}
+ .chart-box{height:230px}
  .toolbar{padding:12px}
  .controls{width:100%}
  .controls select{flex:1;min-width:0}
@@ -152,12 +171,16 @@ footer{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;paddin
 }
 </style>
 </head>
+
 <body>
 <header class="topbar">
-  <div class="brand">
-    <span class="brand-mark">₿</span>
-    <span>CRYPTO <span style="color:var(--green)">RESEARCH</span><small>TERMINAL</small></span>
-  </div>
+  <a class="brand" href="/" aria-label="BlobSignal Home">
+    <img src="/mascot.png" alt="BlobSignal mascot" class="brand-mascot">
+    <span class="brand-copy">
+      <span class="brand-name">Blob<span>Signal</span></span>
+      <span class="brand-subtitle">CRYPTO MARKET TERMINAL</span>
+    </span>
+  </a>
   <div class="top-right">
     <div class="status"><span class="dot" id="apiDot"></span><span id="connection">Connecting to data...</span></div>
     <span class="clock" id="clock">--:--:-- UTC</span>
@@ -167,11 +190,11 @@ footer{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;paddin
 <main class="layout">
   <section class="page-heading">
     <div>
-      <div class="eyebrow">Market intelligence</div>
-      <h1>Market Terminal</h1>
-      <div class="sub">Spot overview and perpetual futures technical analysis.</div>
+      <div class="eyebrow">BLOBSIGNAL INTELLIGENCE</div>
+      <h1>Crypto Market Terminal</h1>
+      <div class="sub">Read the market. Manage the risk. Technical analysis for crypto futures.</div>
     </div>
-    <div class="pill"><span class="dot ok"></span> Research workspace</div>
+    <div class="pill"><span class="dot ok"></span> Live research workspace</div>
   </section>
 
   <section class="ticker" id="market">
@@ -219,14 +242,15 @@ footer{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;paddin
           <div class="last-price" id="lastPrice">—<small id="lastTime">Waiting for candles</small></div>
         </div>
         <div class="chart-box" id="chartBox">
-          <div class="chart-placeholder" id="chartPlaceholder">Run analysis to load futures candle data.</div>
+          <div class="chart-placeholder" id="chartPlaceholder">Loading MEXC Futures candle data...</div>
         </div>
         <div class="chart-legend">
           <span><i class="legend-dot" style="background:var(--green)"></i>Price movement</span>
           <span><i class="legend-dot" style="background:var(--blue)"></i>Latest price</span>
-          <span>Illustrative line chart · OHLC candles provided by API</span>
+          <span>Historical closing-price line · not a candlestick chart</span>
         </div>
       </div>
+
       <aside class="side-panel">
         <div class="section-head">
           <div class="section-title">Technical bias</div>
@@ -238,7 +262,7 @@ footer{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;paddin
             <span class="signal-tag wait" id="signalTag">WAIT</span>
           </div>
           <div class="signal-value" id="signalValue">WAIT</div>
-          <div class="signal-desc" id="signalDesc">Run analysis to calculate the current indicator bias.</div>
+          <div class="signal-desc" id="signalDesc">Loading available technical indicators.</div>
           <div class="signal-facts">
             <div class="fact"><span>Last close</span><strong id="factPrice">—</strong></div>
             <div class="fact"><span>RSI (14)</span><strong id="factRsi">—</strong></div>
@@ -248,7 +272,7 @@ footer{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;paddin
           </div>
         </div>
         <div class="disclaimer" style="margin-top:12px">
-          Bias is a transparent indicator rule, not an AI prediction or guaranteed trade signal. Confirm structure, fees, funding and liquidation risk before trading.
+          Bias is a transparent indicator rule, not an AI prediction or guaranteed trade signal. Confirm market structure, fees, funding and liquidation risk before trading.
         </div>
       </aside>
     </div>
@@ -282,6 +306,7 @@ footer{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;paddin
         </table>
       </div>
     </div>
+
     <div class="panel">
       <div class="panel-head">
         <span class="section-title">Market data status</span>
@@ -298,7 +323,7 @@ footer{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;paddin
           </tbody>
         </table>
         <div id="limitations" class="muted" style="font-size:10px;line-height:1.8;margin-top:13px">
-          Data availability and endpoint limitations will appear here.
+          Funding, open interest and liquidation feeds are not connected.
         </div>
       </div>
     </div>
@@ -306,12 +331,12 @@ footer{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;paddin
 
   <section class="disclaimer">
     <strong style="color:var(--text)">Risk disclosure</strong><br>
-    Crypto Research AI is a research and educational interface, not financial advice. Indicator calculations are historical and can lag sudden market moves. The displayed bias does not account for every market condition, trading fees, funding, slippage, leverage or liquidation price. Verify exchange data independently before making a decision.
+    BlobSignal is a research and educational interface, not financial advice. Technical indicators are calculated from historical data and may lag sudden market moves. The displayed bias does not account for every market condition, trading fees, funding, slippage, leverage or liquidation price. Verify exchange data independently before making trading decisions.
   </section>
 
   <footer>
-    <span>Crypto Research AI · Independent research terminal</span>
-    <span id="footerUpdate">Market data: CoinMarketCap · Futures: MEXC</span>
+    <span>BlobSignal · Crypto Market Terminal</span>
+    <span id="footerUpdate">Market: CoinMarketCap · Futures: MEXC</span>
   </footer>
 </main>
 
@@ -388,7 +413,6 @@ async function loadMarket() {
   }
 }
 
-/* Read values from nested API response objects without assuming one exact schema. */
 function flatten(obj, prefix, out, depth) {
   out = out || [];
   depth = depth || 0;
@@ -442,7 +466,7 @@ function drawChart(candles) {
   const valid = candles.map(c => ({c, close:candleClose(c), time:candleTime(c)}))
     .filter(x => x.close !== null).slice(-100);
   if (valid.length < 2) {
-    box.innerHTML = '<div class="chart-placeholder">Candle series is unavailable in the API response.<br>Technical values may still be displayed.</div>';
+    box.innerHTML = '<div class="chart-placeholder">Closing-price series is unavailable in the API response.<br>Technical values may still be displayed.</div>';
     return;
   }
   const values = valid.map(x => x.close);
@@ -460,17 +484,17 @@ function drawChart(candles) {
   const grid = [0,1,2,3,4].map(i => {
     const y = top + plotH * i / 4;
     const v = max - (max-min) * i/4;
-    return `<line x1="${left}" y1="${y}" x2="${W-right}" y2="${y}" stroke="#242a32" stroke-dasharray="3 5"/>
-      <text x="${W-right+8}" y="${y+4}" fill="#858d9b" font-size="11">${fmt(v, Math.abs(v)<1?5:2)}</text>`;
+    return `<line x1="${left}" y1="${y}" x2="${W-right}" y2="${y}" stroke="#253347" stroke-dasharray="3 5"/>
+      <text x="${W-right+8}" y="${y+4}" fill="#8998ad" font-size="11">${fmt(v, Math.abs(v)<1?5:2)}</text>`;
   }).join("");
   const first = valid[0].time ? valid[0].time.toLocaleString("id-ID") : "Earlier";
   const last = valid[valid.length-1].time ? valid[valid.length-1].time.toLocaleString("id-ID") : "Latest";
   box.innerHTML = `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="Historical closing-price line chart">
     ${grid}
-    <polyline points="${points}" fill="none" stroke="#45d6a0" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
-    <circle cx="${left+plotW}" cy="${top+((max-values[values.length-1])/(max-min))*plotH}" r="4" fill="#8ba8ff" stroke="#0e1116" stroke-width="2"/>
-    <text x="${left}" y="${H-5}" fill="#858d9b" font-size="10">${first}</text>
-    <text x="${W-right}" y="${H-5}" text-anchor="end" fill="#858d9b" font-size="10">${last}</text>
+    <polyline points="${points}" fill="none" stroke="#54c8ff" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+    <circle cx="${left+plotW}" cy="${top+((max-values[values.length-1])/(max-min))*plotH}" r="4" fill="#45d6a0" stroke="#0e1116" stroke-width="2"/>
+    <text x="${left}" y="${H-5}" fill="#8998ad" font-size="10">${first}</text>
+    <text x="${W-right}" y="${H-5}" text-anchor="end" fill="#8998ad" font-size="10">${last}</text>
   </svg>`;
 }
 
@@ -577,7 +601,6 @@ async function loadTechnicals() {
   button.disabled = true;
   button.textContent = "Analyzing...";
   $("technicalUpdated").textContent = "Requesting candle data...";
-  $("chartPlaceholder").textContent = "Loading MEXC Futures candles...";
   $("assetTitle").textContent = symbol.replace("_", " / ");
   $("chartSubtitle").textContent = "MEXC perpetual · " + interval;
   try {
