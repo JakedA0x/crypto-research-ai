@@ -1,0 +1,368 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#090d18">
+  <title>Crypto Research AI</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #090d18;
+      --panel: #111827;
+      --border: #253047;
+      --text: #eef2ff;
+      --muted: #8e9ab2;
+      --green: #37d99a;
+      --red: #ff647c;
+      --blue: #7c9cff;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Inter, system-ui, Arial, sans-serif;
+    }
+
+    header {
+      padding: 22px max(20px, calc((100% - 1100px) / 2));
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .brand {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -.5px;
+    }
+
+    .brand span { color: var(--green); }
+
+    .status {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .status::before {
+      content: "";
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      margin-right: 7px;
+    }
+
+    main {
+      max-width: 1100px;
+      padding: 38px 20px 60px;
+      margin: auto;
+    }
+
+    .hero { margin-bottom: 28px; }
+
+    .eyebrow {
+      color: var(--green);
+      font-size: 11px;
+      letter-spacing: 2px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      font-size: clamp(28px, 5vw, 42px);
+      letter-spacing: -1.5px;
+      margin: 12px 0;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      line-height: 1.7;
+      max-width: 650px;
+      font-size: 14px;
+    }
+
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin: 28px 0 16px;
+    }
+
+    .toolbar h2 {
+      font-size: 17px;
+      margin: 0;
+    }
+
+    button {
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      background: #172238;
+      color: var(--text);
+      padding: 10px 15px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    button:hover { border-color: var(--green); }
+    button:disabled { opacity: .6; cursor: wait; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .card {
+      padding: 22px;
+      border: 1px solid var(--border);
+      border-radius: 15px;
+      background: linear-gradient(145deg, #141e30, #0f1523);
+      min-width: 0;
+    }
+
+    .coin-head {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .coin-icon {
+      display: grid;
+      place-items: center;
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: #202b42;
+      font-weight: 800;
+      color: var(--green);
+    }
+
+    .coin-name { font-weight: 700; }
+    .coin-symbol { color: var(--muted); font-size: 12px; margin-top: 4px; }
+
+    .price-label {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 25px;
+    }
+
+    .price {
+      font-size: clamp(22px, 3vw, 30px);
+      font-weight: 750;
+      margin: 8px 0;
+      overflow-wrap: anywhere;
+    }
+
+    .change {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 6px 9px;
+      border-radius: 6px;
+      background: #172b2a;
+      color: var(--green);
+    }
+
+    .change.negative {
+      background: #351c29;
+      color: var(--red);
+    }
+
+    .message {
+      color: var(--muted);
+      font-size: 13px;
+      padding: 22px 0;
+      line-height: 1.7;
+    }
+
+    .error { color: var(--red); }
+
+    .panel {
+      margin-top: 22px;
+      padding: 22px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: var(--panel);
+    }
+
+    .panel h2 { font-size: 16px; margin-top: 0; }
+    .panel p {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.8;
+      margin-bottom: 0;
+    }
+
+    footer {
+      max-width: 1100px;
+      margin: auto;
+      padding: 20px;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.8;
+    }
+
+    @media (max-width: 760px) {
+      .grid { grid-template-columns: 1fr; }
+      main { padding-top: 28px; }
+      .card { padding: 19px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">CRYPTO <span>RESEARCH AI</span></div>
+    <div class="status" id="connection">Memeriksa koneksi API...</div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="eyebrow">Digital Asset Intelligence</div>
+      <h1>Crypto Market Dashboard</h1>
+      <p class="subtitle">
+        Pantau harga aset digital dari satu dashboard sederhana.
+        Data pasar diambil melalui backend Crypto Research AI
+        yang terhubung dengan CoinMarketCap.
+      </p>
+    </section>
+
+    <section>
+      <div class="toolbar">
+        <h2>Market Overview <span style="color:#8e9ab2;font-size:12px">/ USD</span></h2>
+        <button id="refresh" onclick="loadMarket()">↻ Refresh Data</button>
+      </div>
+
+      <div id="market" class="grid">
+        <div class="message">Memuat data pasar...</div>
+      </div>
+      <div id="updated" class="message">Menunggu data pertama...</div>
+    </section>
+
+    <section class="panel">
+      <h2>Research Workspace</h2>
+      <p>
+        Dashboard dasar sudah terhubung ke API pasar. Indikator teknikal,
+        analisis futures, dan rangkuman berbasis AI belum diaktifkan.
+        Data harga saja tidak cukup untuk menentukan keputusan trading.
+      </p>
+    </section>
+
+    <section class="panel">
+      <h2>Catatan Risiko</h2>
+      <p>
+        Informasi ini ditujukan untuk riset dan edukasi, bukan rekomendasi
+        investasi. Harga aset kripto sangat volatil. Lakukan verifikasi
+        data dan pengelolaan risiko secara mandiri.
+      </p>
+    </section>
+  </main>
+
+  <footer>
+    Crypto Research AI · Data provider: CoinMarketCap melalui backend API.<br>
+    Harga dapat mengalami keterlambatan atau berubah sewaktu-waktu.
+  </footer>
+
+  <script>
+    const API_URL =
+      "https://crypto-research-ai.mhd-aldirahman-56.workers.dev/api/market";
+
+    const coinIcons = {
+      BTC: "₿",
+      ETH: "Ξ",
+      SOL: "◎"
+    };
+
+    function formatPrice(value) {
+      if (value === null || value === undefined || !Number.isFinite(Number(value))) {
+        return "Tidak tersedia";
+      }
+
+      return new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "USD",
+        minimumFractionDigits: 2,
+        maximumFractionDigits: Number(value) < 1 ? 6 : 2
+      }).format(Number(value));
+    }
+
+    function renderCoins(coins) {
+      const market = document.getElementById("market");
+
+      if (!Array.isArray(coins) || coins.length === 0) {
+        throw new Error("Data pasar kosong.");
+      }
+
+      market.innerHTML = coins.map((coin) => {
+        const symbol = coin.symbol || "—";
+        const price = formatPrice(coin.price_usd);
+
+        return `
+          <article class="card">
+            <div class="coin-head">
+              <div class="coin-icon">${coinIcons[symbol] || symbol.slice(0, 3)}</div>
+              <div>
+                <div class="coin-name">${coin.name || symbol}</div>
+                <div class="coin-symbol">${symbol}</div>
+              </div>
+            </div>
+            <div class="price-label">Harga terakhir · USD</div>
+            <div class="price">${price}</div>
+            <div class="coin-symbol">Sumber: CoinMarketCap</div>
+          </article>
+        `;
+      }).join("");
+    }
+
+    async function loadMarket() {
+      const button = document.getElementById("refresh");
+      const market = document.getElementById("market");
+      const connection = document.getElementById("connection");
+      const updated = document.getElementById("updated");
+
+      button.disabled = true;
+      button.textContent = "Memuat...";
+      connection.textContent = "Menghubungkan...";
+      market.innerHTML = '<div class="message">Mengambil data pasar...</div>';
+
+      try {
+        const response = await fetch(API_URL, { cache: "no-store" });
+        const result = await response.json();
+
+        if (!response.ok || result.success !== true) {
+          throw new Error(result.error || "Permintaan data gagal.");
+        }
+
+        renderCoins(result.data);
+
+        connection.textContent = "API terhubung";
+        updated.textContent =
+          "Pembaruan data: " +
+          new Date(result.timestamp || Date.now()).toLocaleString("id-ID") +
+          " · Provider: " + (result.provider || "Tidak diketahui");
+      } catch (error) {
+        connection.textContent = "Koneksi bermasalah";
+        market.innerHTML =
+          '<div class="message error">Gagal memuat data pasar. Periksa koneksi API dan coba refresh kembali.</div>';
+        updated.textContent = "Detail: " + error.message;
+      } finally {
+        button.disabled = false;
+        button.textContent = "↻ Refresh Data";
+      }
+    }
+
+    loadMarket();
+  </script>
+</body>
+</html>
