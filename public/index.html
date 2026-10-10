@@ -1,1336 +1,648 @@
 
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" data-theme="light">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#0b1020">
-  <meta name="description" content="BlobSignal — Crypto Futures Market Explorer, live market data, candlestick charts and technical analysis.">
-  <title>BlobSignal — Crypto Futures Intelligence</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#f4f7fb">
+<meta name="description" content="BlobSignal Crypto Futures Intelligence Dashboard">
+<title>BlobSignal | Crypto Futures Intelligence</title>
 
-  <link rel="icon" href="/mascot.png">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/lightweight-charts@4.2.2/dist/lightweight-charts.standalone.production.js"></script>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lightweight-charts@4.2.2/dist/lightweight-charts.standalone.production.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
-  <style>
-    :root {
-      color-scheme: dark;
-      --bg: #090d18;
-      --panel: #111827;
-      --panel2: #151e30;
-      --line: #253047;
-      --muted: #8490a8;
-      --text: #e8edf7;
-      --blue: #7295ff;
-      --green: #29dba0;
-      --red: #ff667f;
-    }
+<style>
+:root,[data-theme="light"]{
+ color-scheme:light;--bg:#f4f7fb;--panel:#fff;--panel2:#f0f4fa;
+ --border:#dfe6f0;--muted:#69788e;--text:#182338;
+ --green:#0b9b70;--red:#dc4058;--blue:#4169e1;
+}
+[data-theme="dark"]{
+ color-scheme:dark;--bg:#090d16;--panel:#101725;--panel2:#141d2d;
+ --border:#263247;--muted:#91a0b8;--text:#edf3ff;
+ --green:#35d49a;--red:#ff657a;--blue:#6688ff;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;transition:background .15s,color .15s}
+button,input,select{font:inherit}button{cursor:pointer}button:disabled{opacity:.45;cursor:not-allowed}
+.app{min-height:100vh}
+.sidebar{width:250px;position:fixed;inset:0 auto 0 0;background:var(--panel);border-right:1px solid var(--border);padding:23px 15px;display:flex;flex-direction:column;z-index:30}
+.main{margin-left:250px;min-height:100vh}
+.topbar{height:76px;position:sticky;top:0;z-index:20;background:var(--bg);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 30px;gap:14px}
+.content{padding:28px 30px 48px;max-width:1800px;margin:auto}
+.brand{display:flex;align-items:center;gap:11px}
+.brand img{width:39px;height:39px;object-fit:contain}
+.brand-name{font-size:19px;font-weight:800;letter-spacing:-.5px}
+.brand-sub{font-size:10px;color:var(--muted);letter-spacing:1.7px}
+.nav-label{color:var(--muted);font-size:10px;letter-spacing:1.5px;font-weight:800;padding:0 12px;margin:30px 0 10px}
+.nav-btn{width:100%;display:flex;align-items:center;gap:12px;padding:12px;margin:3px 0;border-radius:10px;border:1px solid transparent;color:var(--muted);background:transparent;text-align:left;font-size:13px}
+.nav-btn i{width:18px;text-align:center}
+.nav-btn:hover{background:var(--panel2);color:var(--text)}
+.nav-btn.active{background:color-mix(in srgb,var(--blue) 12%,var(--panel));color:var(--blue);border-color:color-mix(in srgb,var(--blue) 30%,var(--border))}
+.side-bottom{margin-top:auto}
+.api-pill,.status-pill{display:inline-flex;align-items:center;gap:7px;font-size:11px;padding:6px 9px;border-radius:30px;border:1px solid var(--border);color:var(--muted)}
+.dot{width:7px;height:7px;border-radius:50%;background:#7d8aa1;display:inline-block}
+.dot.ok{background:var(--green)}.dot.error{background:var(--red)}.dot.loading{background:#e8ad45}
+.page-title{font-size:27px;font-weight:750;letter-spacing:-.8px}
+.subtitle{color:var(--muted);font-size:13px;margin-top:6px;line-height:1.6}
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:15px;padding:19px;min-width:0}
+.panel-title{font-size:14px;font-weight:700}.panel-note{font-size:11px;color:var(--muted);margin-top:5px}
+.muted{color:var(--muted)}.small{font-size:12px}.tiny{font-size:10px}
+.stat-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:15px}
+.stat-card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:18px}
+.stat-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.stat-label{color:var(--muted);font-size:12px}
+.stat-icon{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:color-mix(in srgb,var(--blue) 10%,var(--panel));color:var(--blue)}
+.stat-value{font-size:25px;font-weight:750;margin-top:17px;overflow-wrap:anywhere}
+.stat-foot{color:var(--muted);font-size:11px;margin-top:6px}
+.green{color:var(--green)!important}.red{color:var(--red)!important}.blue{color:var(--blue)}
+.toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.field{color:var(--text);background:var(--bg);border:1px solid var(--border);border-radius:9px;padding:10px 12px;outline:none;min-height:39px;max-width:100%}
+.field:focus{border-color:var(--blue)}
+.field::placeholder{color:var(--muted)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--border);border-radius:9px;padding:10px 13px;background:var(--panel2);color:var(--text);font-size:12px;font-weight:650;transition:.15s}
+.btn:hover{filter:brightness(.96)}
+.btn-primary{background:#4169e1;border-color:#4169e1;color:#fff}
+.btn-primary:hover{background:#3156c7}
+.btn-quiet{background:transparent}
+.grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.mt{margin-top:20px}.mb{margin-bottom:20px}
+.flex-between{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.table-wrap{width:100%;overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:12px;white-space:nowrap}
+th{color:var(--muted);font-size:10px;font-weight:750;text-transform:uppercase;letter-spacing:.7px;text-align:right;padding:13px 12px;border-bottom:1px solid var(--border)}
+td{padding:13px 12px;text-align:right;border-bottom:1px solid var(--border)}
+th:first-child,td:first-child{text-align:left}
+tbody tr:hover{background:var(--panel2)}
+tbody tr:last-child td{border-bottom:0}
+.coin-cell{display:flex;align-items:center;gap:10px;text-align:left}
+.coin-icon{width:30px;height:30px;display:grid;place-items:center;border-radius:50%;background:var(--panel2);color:var(--blue);overflow:hidden;font-size:10px;font-weight:800;flex-shrink:0}
+.coin-icon img{width:100%;height:100%;object-fit:cover}
+.coin-name{font-weight:700}.coin-sub{color:var(--muted);font-size:10px;margin-top:3px}
+.tag{display:inline-block;padding:4px 7px;border-radius:5px;background:var(--panel2);color:var(--muted);font-size:10px}
+.empty{padding:30px 14px;color:var(--muted);text-align:center;font-size:12px}
+.empty i{display:block;font-size:23px;margin-bottom:10px;opacity:.7}
+.notice{border:1px solid #e8d3a2;background:#fff8e8;color:#805b16;padding:13px 14px;border-radius:10px;font-size:12px;line-height:1.6}
+.notice.error{border-color:#f3c3cb;background:#fff0f2;color:#a92740}
+.notice.info{border-color:#cbdcff;background:#eef4ff;color:#31518c}
+[data-theme="dark"] .notice{background:#282115;border-color:#5a4626;color:#e9c78c}
+[data-theme="dark"] .notice.error{background:#2b1720;border-color:#663342;color:#ff9eae}
+[data-theme="dark"] .notice.info{background:#131f35;border-color:#2d436c;color:#b5caff}
+.hidden{display:none!important}.view{animation:appear .18s ease-out}
+@keyframes appear{from{opacity:.65;transform:translateY(3px)}to{opacity:1;transform:none}}
+.chart-box{width:100%;height:390px}.volume-box{width:100%;height:120px}
+.metric-box{background:var(--bg);border:1px solid var(--border);padding:14px;border-radius:10px}
+.metric-label{font-size:11px;color:var(--muted)}
+.metric-value{font-size:19px;font-weight:750;margin-top:9px;overflow-wrap:anywhere}
+.settings-row{padding:17px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:20px}
+.settings-row:last-child{border-bottom:0}
+.switch{width:42px;height:23px;accent-color:var(--blue);cursor:pointer}
+.login-card{max-width:480px;margin:35px auto;text-align:center;padding:35px}
+.login-logo{width:76px;height:76px;object-fit:contain;margin:0 auto 16px}
+.mobile-menu{display:none}
+.toast{position:fixed;bottom:22px;right:22px;z-index:100;max-width:min(420px,calc(100vw - 36px));padding:13px 16px;border:1px solid var(--border);border-radius:10px;background:var(--panel);color:var(--text);font-size:12px;box-shadow:0 15px 45px #0002}
+.footer{color:var(--muted);font-size:10px;text-align:center;padding-top:35px}
+@media(max-width:1100px){.stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.grid-3{grid-template-columns:repeat(2,minmax(0,1fr))}.content{padding:24px 20px 40px}.topbar{padding:0 20px}}
+@media(max-width:760px){.sidebar{transform:translateX(-100%);transition:transform .2s;box-shadow:15px 0 50px #0002}.sidebar.open{transform:translateX(0)}.main{margin-left:0}.mobile-menu{display:inline-flex}.topbar{height:65px;padding:0 14px}.content{padding:20px 14px 35px}.page-title{font-size:23px}.grid-2,.grid-3{grid-template-columns:1fr}.stat-grid{gap:10px}.stat-card{padding:14px}.stat-value{font-size:21px}.chart-box{height:310px}.panel{padding:14px}.login-card{padding:22px}.topbar-status{display:none}}
+@media(max-width:400px){.stat-grid{grid-template-columns:1fr}}
+</style>
 
-    * { box-sizing: border-box; }
-
-    body {
-      margin: 0;
-      background: var(--bg);
-      color: var(--text);
-      font-family: Inter, system-ui, sans-serif;
-      font-size: 13px;
-    }
-
-    button, input, select { font: inherit; }
-    button { cursor: pointer; }
-    button:disabled { opacity: .45; cursor: not-allowed; }
-
-    .mono { font-family: "DM Mono", monospace; }
-    .muted { color: var(--muted); }
-    .green { color: var(--green); }
-    .red { color: var(--red); }
-
-    .panel {
-      background: var(--panel);
-      border: 1px solid var(--line);
-      border-radius: 13px;
-    }
-
-    .panel-soft {
-      background: var(--panel2);
-      border: 1px solid var(--line);
-      border-radius: 10px;
-    }
-
-    .topbar {
-      background: rgba(9,13,24,.93);
-      border-bottom: 1px solid var(--line);
-      backdrop-filter: blur(18px);
-    }
-
-    .brand-mark {
-      width: 37px;
-      height: 37px;
-      display: grid;
-      place-items: center;
-      border-radius: 11px;
-      overflow: hidden;
-      background: #202b43;
-      border: 1px solid #344365;
-      flex-shrink: 0;
-    }
-
-    .brand-mark img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .nav-link {
-      color: var(--muted);
-      padding: 9px 11px;
-      border-radius: 7px;
-      white-space: nowrap;
-    }
-
-    .nav-link:hover, .nav-link.active {
-      color: #fff;
-      background: #1b2740;
-    }
-
-    .btn {
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      padding: 8px 12px;
-      color: var(--text);
-      background: #172136;
-      transition: .15s;
-    }
-
-    .btn:hover { background: #22314d; }
-    .btn-primary {
-      color: #fff;
-      background: #4268e9;
-      border-color: #4268e9;
-    }
-
-    .btn-primary:hover { background: #5579f4; }
-    .btn-sm { padding: 6px 9px; font-size: 11px; }
-
-    .input {
-      width: 100%;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: #0b1221;
-      color: var(--text);
-      padding: 10px 12px;
-      outline: none;
-    }
-
-    .input:focus { border-color: #6586f6; }
-    .input::placeholder { color: #65718a; }
-
-    .stat-label {
-      color: var(--muted);
-      font-size: 11px;
-    }
-
-    .stat-value {
-      font-size: clamp(19px, 2vw, 25px);
-      font-weight: 750;
-      letter-spacing: -.8px;
-      margin-top: 10px;
-    }
-
-    .stat-note { font-size: 11px; color: var(--muted); margin-top: 7px; }
-
-    .status-dot {
-      display: inline-block;
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: #78849b;
-      margin-right: 6px;
-    }
-
-    .status-dot.online { background: var(--green); box-shadow: 0 0 8px #29dba066; }
-    .status-dot.offline { background: var(--red); }
-    .status-dot.loading { background: #f2bd59; }
-
-    .filter-chip {
-      border: 1px solid var(--line);
-      border-radius: 7px;
-      padding: 7px 11px;
-      color: var(--muted);
-      background: transparent;
-      white-space: nowrap;
-    }
-
-    .filter-chip.active {
-      color: #c9d5ff;
-      border-color: #526bd0;
-      background: #202c50;
-    }
-
-    .table-wrap { overflow-x: auto; }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      white-space: nowrap;
-    }
-
-    thead th {
-      background: #121a2a;
-      color: var(--muted);
-      font-size: 10px;
-      text-transform: uppercase;
-      letter-spacing: .45px;
-      font-weight: 600;
-      padding: 13px 15px;
-      border-bottom: 1px solid var(--line);
-      text-align: right;
-    }
-
-    thead th:first-child, thead th:nth-child(2) { text-align: left; }
-
-    tbody td {
-      padding: 14px 15px;
-      border-bottom: 1px solid #202a3c;
-      text-align: right;
-    }
-
-    tbody tr { transition: background .12s; }
-    tbody tr:hover { background: #172136; }
-    tbody tr:last-child td { border-bottom: 0; }
-
-    tbody td:first-child, tbody td:nth-child(2) { text-align: left; }
-
-    .coin-logo {
-      width: 31px;
-      height: 31px;
-      border-radius: 50%;
-      background: #202b43;
-      border: 1px solid #34415a;
-      display: grid;
-      place-items: center;
-      color: #c7d3f6;
-      font-weight: 800;
-      font-size: 11px;
-      flex-shrink: 0;
-      overflow: hidden;
-    }
-
-    .coin-logo img { width: 100%; height: 100%; object-fit: cover; }
-
-    .coin-name { font-weight: 700; color: #f1f4fb; }
-    .coin-symbol { color: var(--muted); font-size: 10px; margin-top: 4px; }
-
-    .change-pill {
-      display: inline-block;
-      border-radius: 5px;
-      padding: 5px 7px;
-      font-size: 11px;
-      font-weight: 650;
-    }
-
-    .change-up { color: var(--green); background: #14382f; }
-    .change-down { color: var(--red); background: #3c202d; }
-    .change-flat { color: #aeb8ca; background: #202a3c; }
-
-    .skeleton {
-      background: linear-gradient(90deg, #192338 25%, #24314a 50%, #192338 75%);
-      background-size: 200% 100%;
-      animation: shimmer 1.4s infinite;
-      border-radius: 5px;
-      height: 13px;
-    }
-
-    @keyframes shimmer {
-      to { background-position: -200% 0; }
-    }
-
-    .chart-area { height: 370px; width: 100%; }
-    .chart-volume { height: 110px; width: 100%; }
-
-    .tab {
-      border-bottom: 2px solid transparent;
-      padding: 12px 2px;
-      color: var(--muted);
-      white-space: nowrap;
-    }
-
-    .tab.active {
-      color: #e9edff;
-      border-color: #7894ff;
-    }
-
-    .metric {
-      padding: 12px;
-      border-radius: 9px;
-      background: #0d1525;
-      border: 1px solid #222e44;
-      min-width: 0;
-    }
-
-    .metric-label { font-size: 10px; color: var(--muted); }
-    .metric-value { font-size: 13px; font-weight: 700; margin-top: 8px; overflow-wrap: anywhere; }
-
-    .empty-state {
-      padding: 38px 18px;
-      text-align: center;
-      color: var(--muted);
-    }
-
-    .footer {
-      border-top: 1px solid var(--line);
-      color: var(--muted);
-    }
-
-    .scrollbar::-webkit-scrollbar { height: 5px; width: 5px; }
-    .scrollbar::-webkit-scrollbar-thumb { background: #33415c; border-radius: 8px; }
-
-    @media (max-width: 700px) {
-      .chart-area { height: 285px; }
-      .chart-volume { height: 75px; }
-      .stat-value { font-size: 21px; }
-      tbody td { padding: 12px 10px; }
-      thead th { padding: 12px 10px; }
-    }
-  </style>
+<script>
+/* Apply saved theme before rendering the dashboard. */
+(function(){
+  let theme = "light";
+  try { theme = localStorage.getItem("blobsignal-theme") || "light"; } catch(e) {}
+  document.documentElement.dataset.theme = theme === "dark" ? "dark" : "light";
+})();
+</script>
 </head>
-
 <body>
-  <header class="topbar sticky top-0 z-50">
-    <div class="max-w-screen-2xl mx-auto px-4 lg:px-7">
-      <div class="flex items-center justify-between gap-4 min-h-[70px]">
-        <a href="/" class="flex items-center gap-3 shrink-0">
-          <div class="brand-mark" id="brandMark">
-            <img src="/mascot.png" alt="BlobSignal" id="brandLogo"
-                 onerror="this.style.display='none';document.getElementById('brandFallback').style.display='grid'">
-            <span id="brandFallback" style="display:none" class="w-full h-full place-items-center text-blue-300 text-lg">
-              <i class="fa-solid fa-wave-square"></i>
-            </span>
-          </div>
-          <div>
-            <div class="font-extrabold text-lg tracking-tight">Blob<span class="text-blue-400">Signal</span></div>
-            <div class="text-[9px] muted tracking-[2px] uppercase">Crypto Futures Intelligence</div>
-          </div>
-        </a>
+<div class="app">
+<aside id="sidebar" class="sidebar">
+  <div class="brand">
+    <img src="/mascot.png" alt="BlobSignal" onerror="this.style.display='none'">
+    <div><div class="brand-name">BlobSignal<span class="blue">.</span></div><div class="brand-sub">FUTURES INTELLIGENCE</div></div>
+  </div>
 
-        <nav class="hidden lg:flex items-center gap-1">
-          <a href="#market" class="nav-link active">Markets</a>
-          <a href="#analysis" class="nav-link">Technical Analysis</a>
-          <a href="#overview" class="nav-link">Overview</a>
-        </nav>
+  <div class="nav-label">WORKSPACE</div>
+  <nav id="navigation">
+    <button class="nav-btn active" data-view="overview"><i class="fa-solid fa-house"></i>Overview</button>
+    <button class="nav-btn" data-view="chart"><i class="fa-solid fa-chart-column"></i>Live Chart</button>
+    <button class="nav-btn" data-view="scanner"><i class="fa-solid fa-magnifying-glass-chart"></i>Market Scanner</button>
+    <button class="nav-btn" data-view="detail"><i class="fa-solid fa-chart-line"></i>Market Detail</button>
+    <div class="nav-label">PREFERENCES</div>
+    <button class="nav-btn" data-view="settings"><i class="fa-solid fa-sliders"></i>Settings</button>
+    <button class="nav-btn" data-view="login"><i class="fa-regular fa-circle-user"></i>Login Google</button>
+  </nav>
 
-        <div class="flex items-center gap-2">
-          <div class="hidden sm:flex items-center text-[11px] muted border border-slate-700/70 rounded-lg px-3 py-2">
-            <span class="status-dot loading" id="headerStatusDot"></span>
-            <span id="headerStatus">Connecting API</span>
-          </div>
-          <button class="btn btn-sm" id="refreshBtn" title="Refresh data">
-            <i class="fa-solid fa-rotate-right" id="refreshIcon"></i>
-            <span class="hidden sm:inline ml-1">Refresh</span>
-          </button>
-        </div>
-      </div>
+  <div class="side-bottom">
+    <div class="panel" style="padding:13px">
+      <div class="flex-between"><span class="small" style="font-weight:700">API Connection</span><span class="dot loading" id="sideApiDot"></span></div>
+      <div id="sideApiText" class="panel-note">Checking connection...</div>
+      <button class="btn btn-quiet" style="width:100%;margin-top:12px" id="sideRefresh"><i class="fa-solid fa-rotate"></i> Refresh data</button>
     </div>
-  </header>
-
-  <main class="max-w-screen-2xl mx-auto px-4 lg:px-7 py-6 space-y-6">
-
-    <section class="flex flex-col md:flex-row md:items-end justify-between gap-4">
-      <div>
-        <div class="text-[10px] muted uppercase tracking-[2px] mb-2">Market intelligence / Futures</div>
-        <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight">Crypto Futures <span class="text-blue-400">Explorer</span></h1>
-        <p class="muted mt-2 text-xs md:text-sm">Pantau harga, pergerakan pasar, dan analisis teknikal kontrak perpetual.</p>
-      </div>
-      <div class="flex flex-wrap gap-2">
-        <span class="panel px-3 py-2 text-[11px]">
-          <span class="muted">Provider</span>
-          <strong class="ml-2">MEXC Futures</strong>
-        </span>
-        <span class="panel px-3 py-2 text-[11px]">
-          <span class="muted">Terakhir diperbarui</span>
-          <strong class="ml-2 mono" id="lastUpdated">--:--:--</strong>
-        </span>
-      </div>
-    </section>
-
-    <section id="overview" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
-      <div class="panel p-5">
-        <div class="flex justify-between items-center">
-          <span class="stat-label">Kontrak tersedia</span>
-          <i class="fa-solid fa-layer-group text-blue-400"></i>
-        </div>
-        <div class="stat-value" id="statMarkets">--</div>
-        <div class="stat-note">USDT perpetual yang diterima API</div>
-      </div>
-
-      <div class="panel p-5">
-        <div class="flex justify-between items-center">
-          <span class="stat-label">Market naik 24 jam</span>
-          <i class="fa-solid fa-arrow-trend-up green"></i>
-        </div>
-        <div class="stat-value green" id="statGainers">--</div>
-        <div class="stat-note" id="gainersNote">Menunggu data market</div>
-      </div>
-
-      <div class="panel p-5">
-        <div class="flex justify-between items-center">
-          <span class="stat-label">Market turun 24 jam</span>
-          <i class="fa-solid fa-arrow-trend-down red"></i>
-        </div>
-        <div class="stat-value red" id="statLosers">--</div>
-        <div class="stat-note" id="losersNote">Menunggu data market</div>
-      </div>
-
-      <div class="panel p-5">
-        <div class="flex justify-between items-center">
-          <span class="stat-label">Total turnover 24 jam</span>
-          <i class="fa-solid fa-chart-column text-blue-400"></i>
-        </div>
-        <div class="stat-value mono" id="statTurnover">--</div>
-        <div class="stat-note">Akumulasi kontrak pada halaman hasil API</div>
-      </div>
-    </section>
-
-    <section class="panel p-4 md:p-5">
-      <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-4">
-        <div>
-          <h2 class="font-bold text-base">Market scanner</h2>
-          <p class="muted text-[11px] mt-1">Pilih kontrak untuk melihat chart dan indikator teknikal.</p>
-        </div>
-        <div class="flex flex-wrap gap-2 text-[11px]">
-          <span class="panel-soft px-3 py-2">
-            <span class="status-dot loading" id="marketDot"></span>
-            <span id="marketStatus">Memuat market...</span>
-          </span>
-          <span class="panel-soft px-3 py-2 muted" id="marketCount">0 market</span>
-        </div>
-      </div>
-
-      <div class="flex flex-col sm:flex-row gap-3 mb-4">
-        <div class="relative flex-1">
-          <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 muted"></i>
-          <input class="input pl-9" id="searchInput" placeholder="Cari BTC, ETH, SOL, atau nama kontrak..." autocomplete="off">
-        </div>
-        <select class="input sm:max-w-[180px]" id="sortSelect" aria-label="Urutkan market">
-          <option value="volume">Turnover tertinggi</option>
-          <option value="gainers">Kenaikan tertinggi</option>
-          <option value="losers">Penurunan tertinggi</option>
-          <option value="price">Harga tertinggi</option>
-        </select>
-        <button class="btn" id="clearSearch"><i class="fa-solid fa-xmark mr-1"></i>Reset</button>
-      </div>
-
-      <div class="flex items-center gap-2 overflow-x-auto scrollbar pb-3 mb-1">
-        <button class="filter-chip active" data-filter="all">Semua market</button>
-        <button class="filter-chip" data-filter="gainers">Gainers</button>
-        <button class="filter-chip" data-filter="losers">Losers</button>
-        <button class="filter-chip" data-filter="meme">Meme watchlist</button>
-      </div>
-
-      <div class="table-wrap scrollbar">
-        <table>
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Kontrak</th>
-              <th>Last price</th>
-              <th>24h change</th>
-              <th>24h volume</th>
-              <th>24h turnover</th>
-              <th>Funding rate</th>
-              <th>Open interest</th>
-              <th>Chart</th>
-            </tr>
-          </thead>
-          <tbody id="marketTable">
-            <tr><td colspan="9">
-              <div class="empty-state">
-                <i class="fa-solid fa-circle-notch fa-spin text-xl mb-3"></i>
-                <div>Memuat data market dari Worker...</div>
-              </div>
-            </td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div class="flex flex-col sm:flex-row justify-between items-center gap-3 mt-4 pt-4 border-t border-slate-700/60">
-        <span class="muted text-[11px]" id="tableInfo">Menunggu data API</span>
-        <div class="flex gap-2">
-          <button class="btn btn-sm" id="prevPage" disabled><i class="fa-solid fa-chevron-left mr-1"></i>Sebelumnya</button>
-          <span class="px-3 py-2 mono text-[11px]" id="pageLabel">1 / 1</span>
-          <button class="btn btn-sm" id="nextPage" disabled>Berikutnya<i class="fa-solid fa-chevron-right ml-1"></i></button>
-        </div>
-      </div>
-    </section>
-
-    <section id="analysis" class="panel overflow-hidden">
-      <div class="p-4 md:p-5 border-b border-slate-700/70">
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div class="flex items-center gap-3">
-            <div class="coin-logo" id="selectedLogo">B</div>
-            <div>
-              <div class="flex items-center flex-wrap gap-2">
-                <h2 class="text-lg font-extrabold" id="selectedSymbol">BTC_USDT</h2>
-                <span class="text-[10px] bg-blue-950 text-blue-300 border border-blue-900 rounded px-2 py-1">PERPETUAL</span>
-              </div>
-              <div class="muted text-[11px] mt-1" id="selectedName">Pilih kontrak untuk memuat analisis</div>
-            </div>
-          </div>
-
-          <div class="flex flex-wrap items-center gap-3">
-            <div>
-              <div class="muted text-[10px]">Last price</div>
-              <div class="mono font-bold text-lg" id="selectedPrice">--</div>
-            </div>
-            <div>
-              <div class="muted text-[10px]">24h change</div>
-              <div class="font-bold" id="selectedChange">--</div>
-            </div>
-            <select class="input !w-auto" id="intervalSelect" aria-label="Timeframe">
-              <option value="1m">1m</option>
-              <option value="5m">5m</option>
-              <option value="15m">15m</option>
-              <option value="30m">30m</option>
-              <option value="1h" selected>1H</option>
-              <option value="4h">4H</option>
-              <option value="8h">8H</option>
-              <option value="1d">1D</option>
-              <option value="1w">1W</option>
-            </select>
-            <button class="btn btn-sm" id="reloadChart"><i class="fa-solid fa-rotate-right mr-1"></i>Refresh chart</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_300px]">
-        <div class="min-w-0 p-3 md:p-4">
-          <div class="flex items-center justify-between gap-3 px-2 pb-3">
-            <div class="font-semibold text-xs">Candlestick / OHLCV</div>
-            <div class="muted text-[10px]" id="chartStatus">Menunggu candle</div>
-          </div>
-          <div id="priceChart" class="chart-area"></div>
-          <div class="flex items-center justify-between px-2 pt-3">
-            <span class="muted text-[10px]">Volume</span>
-            <span class="muted text-[10px]" id="candleCount">0 candles</span>
-          </div>
-          <div id="volumeChart" class="chart-volume"></div>
-          <div id="chartError" class="hidden mt-3 rounded-lg border border-red-900/70 bg-red-950/30 p-3 text-red-300 text-xs"></div>
-        </div>
-
-        <aside class="border-t xl:border-t-0 xl:border-l border-slate-700/70 p-4">
-          <div class="font-bold mb-1">Technical snapshot</div>
-          <p class="muted text-[10px] mb-4">Dihitung dari candle yang sudah selesai.</p>
-
-          <div class="grid grid-cols-2 xl:grid-cols-1 gap-2">
-            <div class="metric">
-              <div class="metric-label">Analisis trend</div>
-              <div class="metric-value" id="metricTrend">Menunggu data</div>
-            </div>
-            <div class="metric">
-              <div class="metric-label">RSI</div>
-              <div class="metric-value mono" id="metricRsi">--</div>
-            </div>
-            <div class="metric">
-              <div class="metric-label">MACD</div>
-              <div class="metric-value mono" id="metricMacd">--</div>
-            </div>
-            <div class="metric">
-              <div class="metric-label">Moving average</div>
-              <div class="metric-value mono" id="metricMa">--</div>
-            </div>
-            <div class="metric">
-              <div class="metric-label">Support</div>
-              <div class="metric-value mono" id="metricSupport">--</div>
-            </div>
-            <div class="metric">
-              <div class="metric-label">Resistance</div>
-              <div class="metric-value mono" id="metricResistance">--</div>
-            </div>
-          </div>
-
-          <div class="panel-soft p-3 mt-3">
-            <div class="text-xs font-bold mb-2"><i class="fa-solid fa-circle-info text-blue-400 mr-1"></i>Catatan analisis</div>
-            <p class="muted text-[11px] leading-relaxed" id="analysisNote">
-              Data indikator akan muncul setelah endpoint teknikal berhasil diakses.
-            </p>
-          </div>
-        </aside>
-      </div>
-    </section>
-
-    <section class="panel p-4 md:p-5">
-      <div class="flex items-center justify-between gap-3">
-        <div>
-          <h2 class="font-bold">Data integrity & API status</h2>
-          <p class="muted text-[11px] mt-1">Status koneksi dan batasan data yang tersedia.</p>
-        </div>
-        <span class="text-[10px] muted mono" id="apiVersion">Worker --</span>
-      </div>
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-4">
-        <div class="panel-soft p-3">
-          <div class="muted text-[10px]">Market endpoint</div>
-          <div class="mt-2 font-semibold text-xs" id="marketApiState">Belum diuji</div>
-        </div>
-        <div class="panel-soft p-3">
-          <div class="muted text-[10px]">Technical endpoint</div>
-          <div class="mt-2 font-semibold text-xs" id="technicalApiState">Belum diuji</div>
-        </div>
-        <div class="panel-soft p-3">
-          <div class="muted text-[10px]">Sumber data</div>
-          <div class="mt-2 font-semibold text-xs">MEXC Futures API</div>
-        </div>
-      </div>
-      <div class="muted text-[11px] leading-relaxed mt-4">
-        Harga dan indikator bergantung pada ketersediaan API sumber. Market cap, likuidasi agregat,
-        fear & greed, dan data saham tidak ditampilkan karena tidak disediakan oleh endpoint Worker ini.
-        Data ini untuk informasi, bukan rekomendasi investasi.
-      </div>
-    </section>
-
-    <footer class="footer py-5 flex flex-col sm:flex-row justify-between gap-2 text-[10px]">
-      <span>© <span id="year"></span> BlobSignal · Crypto Futures Intelligence</span>
-      <span>Market data by MEXC Futures · Use at your own risk</span>
-    </footer>
-  </main>
-
-  <script>
-    "use strict";
-
-    // Pastikan alamat ini sama dengan domain Worker yang sudah dideploy.
-    const API_BASE = "https://crypto-research-ai.mhd-aldirahman-56.workers.dev";
-
-    const REFRESH_MS = 30000;
-    const PAGE_SIZE = 50;
-
-    const state = {
-      markets: [],
-      filtered: [],
-      page: 1,
-      filter: "all",
-      search: "",
-      sort: "volume",
-      selectedSymbol: "BTC_USDT",
-      interval: "1h",
-      chart: null,
-      volumeChart: null,
-      candleSeries: null,
-      volumeSeries: null,
-      loadingMarket: false,
-      loadingTechnical: false,
-      lastMarketTime: null,
-      marketError: null,
-      technicalError: null
-    };
-
-    const $ = (id) => document.getElementById(id);
-
-    const memeSymbols = new Set([
-      "DOGE", "SHIB", "PEPE", "BONK", "FLOKI", "WIF",
-      "BOME", "MEME", "BRETT", "POPCAT", "NEIRO",
-      "TURBO", "MOG", "PONKE", "MEW", "FARTCOIN"
-    ]);
-
-    function safeNumber(value) {
-      if (value === null || value === undefined || value === "") return null;
-      const n = Number(value);
-      return Number.isFinite(n) ? n : null;
-    }
-
-    function formatPrice(value) {
-      const n = safeNumber(value);
-      if (n === null) return "--";
-
-      return new Intl.NumberFormat("en-US", {
-        maximumFractionDigits: n >= 1000 ? 2 : n >= 1 ? 4 : n >= 0.01 ? 6 : 10
-      }).format(n);
-    }
-
-    function formatCompact(value) {
-      const n = safeNumber(value);
-      if (n === null) return "--";
-
-      const abs = Math.abs(n);
-      if (abs >= 1e12) return (n / 1e12).toFixed(2) + "T";
-      if (abs >= 1e9) return (n / 1e9).toFixed(2) + "B";
-      if (abs >= 1e6) return (n / 1e6).toFixed(2) + "M";
-      if (abs >= 1e3) return (n / 1e3).toFixed(2) + "K";
-      return new Intl.NumberFormat("en-US", { maximumFractionDigits: 2 }).format(n);
-    }
-
-    function formatPercent(value) {
-      const n = safeNumber(value);
-      if (n === null) return "--";
-      return (n > 0 ? "+" : "") + n.toFixed(2) + "%";
-    }
-
-    function formatFunding(value) {
-      const n = safeNumber(value);
-      if (n === null) return "--";
-      return (n * 100).toFixed(4) + "%";
-    }
-
-    function changeClass(value) {
-      const n = safeNumber(value);
-      if (n === null || n === 0) return "change-flat";
-      return n > 0 ? "change-up" : "change-down";
-    }
-
-    function safeText(value) {
-      return String(value ?? "")
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
-    }
-
-    async function apiFetch(path) {
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 18000);
-
-      try {
-        const response = await fetch(API_BASE + path, {
-          method: "GET",
-          headers: { "Accept": "application/json" },
-          signal: controller.signal,
-          cache: "no-store"
-        });
-
-        const data = await response.json().catch(() => null);
-
-        if (!response.ok) {
-          const message = data?.message || data?.error || ("HTTP " + response.status);
-          throw new Error(message);
-        }
-
-        if (!data || typeof data !== "object") {
-          throw new Error("Respons API bukan JSON yang valid.");
-        }
-
-        if (data.success === false) {
-          throw new Error(data.message || data.error || "API mengembalikan success=false.");
-        }
-
-        return data;
-      } finally {
-        clearTimeout(timeout);
-      }
-    }
-
-    function setApiState(id, text, kind = "muted") {
-      const el = $(id);
-      if (!el) return;
-
-      el.textContent = text;
-      el.className = "mt-2 font-semibold text-xs";
-
-      if (kind === "good") el.classList.add("green");
-      else if (kind === "bad") el.classList.add("red");
-      else el.classList.add("muted");
-    }
-
-    function setConnectionStatus(kind, text) {
-      const dot = $("headerStatusDot");
-      dot.className = "status-dot " + (
-        kind === "good" ? "online" :
-        kind === "bad" ? "offline" : "loading"
-      );
-      $("headerStatus").textContent = text;
-    }
-
-    function updateMarketStats() {
-      const markets = state.markets;
-      const gainers = markets.filter(m => (safeNumber(m.change_24h_percent) ?? 0) > 0);
-      const losers = markets.filter(m => (safeNumber(m.change_24h_percent) ?? 0) < 0);
-
-      const totalTurnover = markets.reduce((sum, m) => {
-        return sum + (safeNumber(m.turnover_24h) ?? 0);
-      }, 0);
-
-      $("statMarkets").textContent = markets.length.toLocaleString("en-US");
-      $("statGainers").textContent = gainers.length.toLocaleString("en-US");
-      $("statLosers").textContent = losers.length.toLocaleString("en-US");
-      $("statTurnover").textContent = formatCompact(totalTurnover);
-
-      $("gainersNote").textContent = markets.length
-        ? ((gainers.length / markets.length) * 100).toFixed(1) + "% dari kontrak yang diterima"
-        : "Data belum tersedia";
-
-      $("losersNote").textContent = markets.length
-        ? ((losers.length / markets.length) * 100).toFixed(1) + "% dari kontrak yang diterima"
-        : "Data belum tersedia";
-
-      $("marketCount").textContent = markets.length.toLocaleString("en-US") + " market";
-    }
-
-    function getFilteredMarkets() {
-      let items = [...state.markets];
-
-      if (state.search) {
-        const term = state.search.toLowerCase();
-        items = items.filter(m =>
-          String(m.symbol || "").toLowerCase().includes(term) ||
-          String(m.name || "").toLowerCase().includes(term) ||
-          String(m.contract_symbol || "").toLowerCase().includes(term)
-        );
-      }
-
-      if (state.filter === "gainers") {
-        items = items.filter(m => (safeNumber(m.change_24h_percent) ?? 0) > 0);
-      } else if (state.filter === "losers") {
-        items = items.filter(m => (safeNumber(m.change_24h_percent) ?? 0) < 0);
-      } else if (state.filter === "meme") {
-        items = items.filter(m => memeSymbols.has(String(m.symbol || "").toUpperCase()));
-      }
-
-      if (state.sort === "gainers") {
-        items.sort((a, b) => (safeNumber(b.change_24h_percent) ?? -Infinity) -
-                             (safeNumber(a.change_24h_percent) ?? -Infinity));
-      } else if (state.sort === "losers") {
-        items.sort((a, b) => (safeNumber(a.change_24h_percent) ?? Infinity) -
-                             (safeNumber(b.change_24h_percent) ?? Infinity));
-      } else if (state.sort === "price") {
-        items.sort((a, b) => (safeNumber(b.price) ?? 0) - (safeNumber(a.price) ?? 0));
-      } else {
-        items.sort((a, b) => (safeNumber(b.turnover_24h) ?? 0) -
-                             (safeNumber(a.turnover_24h) ?? 0));
-      }
-
-      return items;
-    }
-
-    function renderTable() {
-      state.filtered = getFilteredMarkets();
-
-      const total = state.filtered.length;
-      const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
-      state.page = Math.min(Math.max(1, state.page), pages);
-
-      const start = (state.page - 1) * PAGE_SIZE;
-      const items = state.filtered.slice(start, start + PAGE_SIZE);
-
-      $("pageLabel").textContent = state.page + " / " + pages;
-      $("tableInfo").textContent = total
-        ? `Menampilkan ${start + 1}–${Math.min(start + PAGE_SIZE, total)} dari ${total} kontrak`
-        : "Tidak ada kontrak yang sesuai filter.";
-
-      $("prevPage").disabled = state.page <= 1;
-      $("nextPage").disabled = state.page >= pages;
-
-      if (!items.length) {
-        $("marketTable").innerHTML = `
-          <tr><td colspan="9">
-            <div class="empty-state">
-              <i class="fa-solid fa-magnifying-glass text-xl mb-3"></i>
-              <div class="font-semibold text-slate-300">Data market tidak ditemukan</div>
-              <div class="mt-2 text-xs">Coba ubah kata kunci atau filter.</div>
-            </div>
-          </td></tr>`;
-        return;
-      }
-
-      $("marketTable").innerHTML = items.map((m, index) => {
-        const symbol = String(m.symbol || "");
-        const contract = String(m.contract_symbol || (symbol + "_USDT"));
-        const change = safeNumber(m.change_24h_percent);
-        const logo = m.logo_url
-          ? `<img src="${safeText(m.logo_url)}" alt="" loading="lazy"
-                  onerror="this.style.display='none';this.parentElement.textContent='${safeText(symbol.slice(0, 1) || '?')}';">`
-          : safeText(symbol.slice(0, 1) || "?");
-
-        const selected = contract === state.selectedSymbol;
-
-        return `
-          <tr>
-            <td class="muted mono">${start + index + 1}</td>
-            <td>
-              <div class="flex items-center gap-3">
-                <div class="coin-logo">${logo}</div>
-                <div>
-                  <div class="coin-name">${safeText(symbol)} <span class="muted font-normal">/ USDT</span></div>
-                  <div class="coin-symbol">${safeText(m.name || symbol)} · Perpetual</div>
-                </div>
-              </div>
-            </td>
-            <td class="mono font-semibold">${formatPrice(m.price)}</td>
-            <td><span class="change-pill ${changeClass(change)}">${formatPercent(change)}</span></td>
-            <td class="mono">${formatCompact(m.volume_24h)}</td>
-            <td class="mono">${formatCompact(m.turnover_24h)}</td>
-            <td class="mono">${formatFunding(m.funding_rate)}</td>
-            <td class="mono">${formatCompact(m.open_interest)}</td>
-            <td>
-              <button class="btn btn-sm ${selected ? "btn-primary" : ""}"
-                data-open-chart="${safeText(contract)}"
-                aria-label="Lihat chart ${safeText(contract)}">
-                <i class="fa-solid fa-chart-line mr-1"></i>Chart
-              </button>
-            </td>
-          </tr>`;
-      }).join("");
-
-      $("marketTable").querySelectorAll("[data-open-chart]").forEach(button => {
-        button.addEventListener("click", () => {
-          const symbol = button.getAttribute("data-open-chart");
-          selectMarket(symbol);
-        });
-      });
-    }
-
-    function updateSelectedHeader(market) {
-      if (!market) return;
-
-      const symbol = market.contract_symbol || (market.symbol + "_USDT");
-      state.selectedSymbol = symbol;
-
-      $("selectedSymbol").textContent = symbol;
-      $("selectedName").textContent = (market.name || market.symbol) + " · MEXC Futures";
-      $("selectedPrice").textContent = formatPrice(market.price);
-
-      const change = safeNumber(market.change_24h_percent);
-      $("selectedChange").textContent = formatPercent(change);
-      $("selectedChange").className = "font-bold " +
-        (change === null ? "muted" : change >= 0 ? "green" : "red");
-
-      const logo = $("selectedLogo");
-      logo.innerHTML = "";
-
-      if (market.logo_url) {
-        const img = document.createElement("img");
-        img.src = market.logo_url;
-        img.alt = "";
-        img.onerror = () => { logo.textContent = String(market.symbol || "?").slice(0, 1); };
-        logo.appendChild(img);
-      } else {
-        logo.textContent = String(market.symbol || "?").slice(0, 1);
-      }
-    }
-
-    async function selectMarket(symbol) {
-      const market = state.markets.find(m =>
-        (m.contract_symbol || (m.symbol + "_USDT")) === symbol
-      );
-
-      if (!market) {
-        state.selectedSymbol = symbol;
-        $("selectedSymbol").textContent = symbol;
-      } else {
-        updateSelectedHeader(market);
-      }
-
-      renderTable();
-
-      if (location.hash !== "#analysis") {
-        history.replaceState(null, "", "#analysis");
-      }
-
-      await loadTechnicals();
-      $("analysis").scrollIntoView({ behavior: "smooth", block: "start" });
-    }
-
-    async function loadMarket() {
-      if (state.loadingMarket) return;
-      state.loadingMarket = true;
-      $("refreshIcon").classList.add("fa-spin");
-      $("marketDot").className = "status-dot loading";
-      $("marketStatus").textContent = "Memuat data...";
-      setApiState("marketApiState", "Memuat endpoint market...", "muted");
-
-      try {
-        const result = await apiFetch("/api/market?page=1&limit=500");
-
-        if (!Array.isArray(result.data)) {
-          throw new Error("Format API tidak sesuai: properti data bukan array.");
-        }
-
-        state.markets = result.data;
-        state.marketError = null;
-        state.lastMarketTime = new Date();
-
-        updateMarketStats();
-        renderTable();
-
-        $("lastUpdated").textContent = state.lastMarketTime.toLocaleTimeString("id-ID");
-        $("marketDot").className = "status-dot online";
-        $("marketStatus").textContent = "Market connected";
-        setApiState("marketApiState", "Connected · " + state.markets.length + " kontrak", "good");
-        setConnectionStatus("good", "API connected");
-
-        $("apiVersion").textContent = "Worker " + (result.version || "online");
-
-        let selected = state.markets.find(m =>
-          (m.contract_symbol || (m.symbol + "_USDT")) === state.selectedSymbol
-        );
-
-        if (!selected && state.markets.length) {
-          selected = state.markets.find(m => m.symbol === "BTC") || state.markets[0];
-        }
-
-        if (selected) {
-          updateSelectedHeader(selected);
-          await loadTechnicals();
-        } else {
-          showTechnicalError("API berhasil diakses, tetapi tidak ada kontrak yang dikembalikan.");
-        }
-      } catch (error) {
-        state.marketError = error;
-        $("marketDot").className = "status-dot offline";
-        $("marketStatus").textContent = "Market unavailable";
-        setApiState("marketApiState", "Gagal: " + error.message, "bad");
-        setConnectionStatus("bad", "API unavailable");
-
-        $("marketTable").innerHTML = `
-          <tr><td colspan="9">
-            <div class="empty-state">
-              <i class="fa-solid fa-triangle-exclamation text-2xl red mb-3"></i>
-              <div class="font-semibold text-slate-200">Gagal mengambil data market</div>
-              <div class="mt-2 text-xs">${safeText(error.message)}</div>
-              <button class="btn btn-sm mt-4" id="retryMarket">Coba lagi</button>
-            </div>
-          </td></tr>`;
-
-        $("retryMarket")?.addEventListener("click", loadMarket);
-        $("statMarkets").textContent = "--";
-        $("statGainers").textContent = "--";
-        $("statLosers").textContent = "--";
-        $("statTurnover").textContent = "--";
-        $("marketCount").textContent = "Data tidak tersedia";
-
-        if (!state.markets.length) {
-          showTechnicalError("Grafik tidak dapat dimuat karena data market belum tersedia.");
-        }
-      } finally {
-        state.loadingMarket = false;
-        $("refreshIcon").classList.remove("fa-spin");
-      }
-    }
-
-    function initCharts() {
-      if (!window.LightweightCharts) {
-        $("chartError").textContent = "Library chart gagal dimuat. Periksa koneksi internet atau CDN.";
-        $("chartError").classList.remove("hidden");
-        return false;
-      }
-
-      const common = {
-        layout: {
-          background: { color: "#111827" },
-          textColor: "#8490a8",
-          fontFamily: "DM Mono, monospace",
-          fontSize: 10
-        },
-        grid: {
-          vertLines: { color: "#1d293c" },
-          horzLines: { color: "#1d293c" }
-        },
-        rightPriceScale: {
-          borderColor: "#253047"
-        },
-        timeScale: {
-          borderColor: "#253047",
-          timeVisible: true,
-          secondsVisible: false
-        },
-        crosshair: {
-          vertLine: { color: "#627db5", width: 1, style: 2 },
-          horzLine: { color: "#627db5", width: 1, style: 2 }
-        },
-        handleScroll: true,
-        handleScale: true
-      };
-
-      state.chart = LightweightCharts.createChart($("priceChart"), {
-        ...common,
-        width: $("priceChart").clientWidth,
-        height: $("priceChart").clientHeight,
-        localization: { priceFormatter: formatPrice }
-      });
-
-      state.candleSeries = state.chart.addCandlestickSeries({
-        upColor: "#29dba0",
-        downColor: "#ff667f",
-        borderUpColor: "#29dba0",
-        borderDownColor: "#ff667f",
-        wickUpColor: "#29dba0",
-        wickDownColor: "#ff667f",
-        priceLineVisible: true,
-        lastValueVisible: true
-      });
-
-      state.volumeChart = LightweightCharts.createChart($("volumeChart"), {
-        ...common,
-        width: $("volumeChart").clientWidth,
-        height: $("volumeChart").clientHeight,
-        rightPriceScale: { borderColor: "#253047" },
-        timeScale: {
-          borderColor: "#253047",
-          timeVisible: true,
-          secondsVisible: false
-        }
-      });
-
-      state.volumeSeries = state.volumeChart.addHistogramSeries({
-        priceFormat: { type: "volume" },
-        priceScaleId: "",
-        lastValueVisible: false,
-        priceLineVisible: false
-      });
-
-      state.volumeChart.priceScale("").applyOptions({
-        scaleMargins: { top: 0.1, bottom: 0 }
-      });
-
-      state.chart.timeScale().subscribeVisibleLogicalRangeChange(range => {
-        if (range) state.volumeChart.timeScale().setVisibleLogicalRange(range);
-      });
-
-      state.volumeChart.timeScale().subscribeVisibleLogicalRangeChange(range => {
-        if (range) state.chart.timeScale().setVisibleLogicalRange(range);
-      });
-
-      const resizeObserver = new ResizeObserver(() => {
-        if (!state.chart || !state.volumeChart) return;
-
-        state.chart.applyOptions({
-          width: $("priceChart").clientWidth,
-          height: $("priceChart").clientHeight
-        });
-
-        state.volumeChart.applyOptions({
-          width: $("volumeChart").clientWidth,
-          height: $("volumeChart").clientHeight
-        });
-      });
-
-      resizeObserver.observe($("priceChart"));
-      resizeObserver.observe($("volumeChart"));
-
-      return true;
-    }
-
-    function showTechnicalError(message) {
-      state.technicalError = message;
-      $("chartStatus").textContent = "Data unavailable";
-      $("chartError").textContent = message;
-      $("chartError").classList.remove("hidden");
-      $("candleCount").textContent = "0 candles";
-      setApiState("technicalApiState", "Unavailable: " + message, "bad");
-      $("analysisNote").textContent = "Tidak ada data teknikal yang dapat diverifikasi saat ini.";
-    }
-
-    function findMetric(object, keys, depth = 0) {
-      if (!object || typeof object !== "object" || depth > 4) return null;
-
-      for (const key of keys) {
-        if (Object.prototype.hasOwnProperty.call(object, key)) {
-          const value = object[key];
-          if (value !== null && value !== undefined && typeof value !== "object") {
-            return value;
-          }
-        }
-      }
-
-      for (const value of Object.values(object)) {
-        if (value && typeof value === "object") {
-          const found = findMetric(value, keys, depth + 1);
-          if (found !== null && found !== undefined) return found;
-        }
-      }
-
-      return null;
-    }
-
-    function updateAnalysisMetrics(analysis, candles) {
-      const rsi = findMetric(analysis, ["rsi", "RSI", "rsi14", "RSI14"]);
-      const macd = findMetric(analysis, ["macd", "MACD", "macdLine"]);
-      const trend = findMetric(analysis, ["trend", "signal", "bias", "direction"]);
-      const ma = findMetric(analysis, ["ema20", "EMA20", "sma20", "SMA20", "ema", "movingAverage"]);
-      const support = findMetric(analysis, ["support", "supportLevel", "nearestSupport"]);
-      const resistance = findMetric(analysis, ["resistance", "resistanceLevel", "nearestResistance"]);
-
-      $("metricRsi").textContent = rsi === null ? "--" : String(rsi);
-      $("metricMacd").textContent = macd === null
-        ? "--"
-        : (typeof macd === "object" ? JSON.stringify(macd) : String(macd));
-      $("metricTrend").textContent = trend === null ? "Belum tersedia" : String(trend);
-      $("metricMa").textContent = ma === null ? "--" : formatPrice(ma);
-      $("metricSupport").textContent = support === null ? "--" : formatPrice(support);
-      $("metricResistance").textContent = resistance === null ? "--" : formatPrice(resistance);
-
-      if (candles.length) {
-        const last = candles[candles.length - 1];
-        $("analysisNote").textContent =
-          "Candle terakhir yang selesai ditutup pada " +
-          new Date(last.time * 1000).toLocaleString("id-ID") +
-          ". Sinyal indikator mengikuti data dan rumus backend; bukan jaminan arah harga.";
-      }
-    }
-
-    async function loadTechnicals() {
-      if (state.loadingTechnical) return;
-      if (!state.selectedSymbol) return;
-
-      state.loadingTechnical = true;
-      state.technicalError = null;
-      $("chartStatus").textContent = "Memuat candle...";
-      $("chartError").classList.add("hidden");
-      setApiState("technicalApiState", "Memuat candle dan indikator...", "muted");
-
-      try {
-        const path = "/api/technicals?symbol=" +
-          encodeURIComponent(state.selectedSymbol) +
-          "&interval=" + encodeURIComponent(state.interval) +
-          "&limit=250";
-
-        const result = await apiFetch(path);
-        const chartCandles = Array.isArray(result.chartCandles)
-          ? result.chartCandles
-          : result.candles;
-
-        if (!Array.isArray(chartCandles) || chartCandles.length === 0) {
-          throw new Error("API tidak mengembalikan candle untuk chart.");
-        }
-
-        const candles = chartCandles
-          .map(c => ({
-            time: Number(c.time),
-            open: Number(c.open),
-            high: Number(c.high),
-            low: Number(c.low),
-            close: Number(c.close),
-            volume: Number(c.volume ?? 0)
-          }))
-          .filter(c =>
-            Number.isFinite(c.time) &&
-            Number.isFinite(c.open) &&
-            Number.isFinite(c.high) &&
-            Number.isFinite(c.low) &&
-            Number.isFinite(c.close) &&
-            c.high >= c.low
-          )
-          .sort((a, b) => a.time - b.time);
-
-        const unique = candles.filter((c, i) =>
-          i === 0 || c.time !== candles[i - 1].time
-        );
-
-        if (!unique.length) throw new Error("Tidak ada candle OHLC valid.");
-
-        if (!state.candleSeries && !initCharts()) {
-          throw new Error("Library chart tidak tersedia.");
-        }
-
-        state.candleSeries.setData(unique.map(c => ({
-          time: c.time,
-          open: c.open,
-          high: c.high,
-          low: c.low,
-          close: c.close
-        })));
-
-        state.volumeSeries.setData(unique.map(c => ({
-          time: c.time,
-          value: Math.max(0, c.volume),
-          color: c.close >= c.open ? "#29dba066" : "#ff667f66"
-        })));
-
-        state.chart.timeScale().fitContent();
-        state.volumeChart.timeScale().fitContent();
-
-        $("chartStatus").textContent = state.interval.toUpperCase() + " · " + unique.length + " candles";
-        $("candleCount").textContent = unique.length + " candles";
-        setApiState("technicalApiState", "Connected · " + unique.length + " candles", "good");
-        updateAnalysisMetrics(result.analysis || {}, Array.isArray(result.candles) ? result.candles : unique);
-      } catch (error) {
-        showTechnicalError(error.message);
-      } finally {
-        state.loadingTechnical = false;
-      }
-    }
-
-    function applyFilter(filter) {
-      state.filter = filter;
-      state.page = 1;
-
-      document.querySelectorAll("[data-filter]").forEach(button => {
-        button.classList.toggle("active", button.dataset.filter === filter);
-      });
-
-      renderTable();
-    }
-
-    $("searchInput").addEventListener("input", event => {
-      state.search = event.target.value.trim();
-      state.page = 1;
-      renderTable();
-    });
-
-    $("sortSelect").addEventListener("change", event => {
-      state.sort = event.target.value;
-      state.page = 1;
-      renderTable();
-    });
-
-    $("clearSearch").addEventListener("click", () => {
-      $("searchInput").value = "";
-      state.search = "";
-      state.page = 1;
-      state.sort = "volume";
-      state.filter = "all";
-      $("sortSelect").value = "volume";
-      applyFilter("all");
-    });
-
-    document.querySelectorAll("[data-filter]").forEach(button => {
-      button.addEventListener("click", () => applyFilter(button.dataset.filter));
-    });
-
-    $("prevPage").addEventListener("click", () => {
-      if (state.page > 1) {
-        state.page--;
-        renderTable();
-      }
-    });
-
-    $("nextPage").addEventListener("click", () => {
-      const pages = Math.max(1, Math.ceil(state.filtered.length / PAGE_SIZE));
-      if (state.page < pages) {
-        state.page++;
-        renderTable();
-      }
-    });
-
-    $("intervalSelect").addEventListener("change", async event => {
-      state.interval = event.target.value;
-      await loadTechnicals();
-    });
-
-    $("reloadChart").addEventListener("click", loadTechnicals);
-
-    $("refreshBtn").addEventListener("click", async () => {
-      await loadMarket();
-    });
-
-    $("year").textContent = new Date().getFullYear();
-
-    async function boot() {
-      await loadMarket();
-
-      // Refresh berkala untuk ticker market.
-      setInterval(() => {
-        if (!document.hidden) loadMarket();
-      }, REFRESH_MS);
-
-      // Refresh chart lebih jarang agar tidak membebani upstream API.
-      setInterval(() => {
-        if (!document.hidden && !state.loadingTechnical) loadTechnicals();
-      }, 60000);
-    }
-
-    boot();
-  </script>
+    <div class="panel-note" style="padding:15px 5px 0">BlobSignal V2 · Market information only.</div>
+  </div>
+</aside>
+
+<main class="main">
+<header class="topbar">
+  <div class="flex-between" style="justify-content:flex-start">
+    <button class="btn mobile-menu" id="mobileMenu" aria-label="Open menu"><i class="fa-solid fa-bars"></i></button>
+    <div><div class="small muted">Crypto Futures / <span id="breadcrumb">Overview</span></div><div class="small" style="font-weight:700;margin-top:3px" id="headerPair">Market intelligence</div></div>
+  </div>
+  <div class="toolbar">
+    <span class="api-pill topbar-status"><span class="dot loading" id="topApiDot"></span><span id="topApiText">Connecting</span></span>
+    <button class="btn" id="themeToggle" title="Change theme"><i class="fa-solid fa-moon" id="themeToggleIcon"></i><span id="themeToggleText">Dark Mode</span></button>
+    <button class="btn" id="globalRefresh"><i class="fa-solid fa-rotate"></i> Refresh</button>
+    <button class="btn btn-primary" data-goto="login"><i class="fa-brands fa-google"></i> Login</button>
+  </div>
+</header>
+
+<div class="content">
+
+<section class="view" id="view-overview">
+  <div class="flex-between mb" style="align-items:flex-start;flex-wrap:wrap">
+    <div><div class="page-title">Market Overview</div><div class="subtitle">Ringkasan pasar kontrak futures berdasarkan data API.</div></div>
+    <div class="small muted" id="lastUpdated">Last update: —</div>
+  </div>
+  <div id="overviewAlert" class="notice info mb hidden"></div>
+
+  <div class="stat-grid">
+    <div class="stat-card"><div class="stat-top"><span class="stat-label">Listed Contracts</span><span class="stat-icon"><i class="fa-solid fa-layer-group"></i></span></div><div class="stat-value" id="statContracts">—</div><div class="stat-foot">Kontrak diterima API</div></div>
+    <div class="stat-card"><div class="stat-top"><span class="stat-label">Gainers 24H</span><span class="stat-icon"><i class="fa-solid fa-arrow-trend-up"></i></span></div><div class="stat-value green" id="statGainers">—</div><div class="stat-foot">Perubahan positif</div></div>
+    <div class="stat-card"><div class="stat-top"><span class="stat-label">Losers 24H</span><span class="stat-icon"><i class="fa-solid fa-arrow-trend-down"></i></span></div><div class="stat-value red" id="statLosers">—</div><div class="stat-foot">Perubahan negatif</div></div>
+    <div class="stat-card"><div class="stat-top"><span class="stat-label">Turnover 24H</span><span class="stat-icon"><i class="fa-solid fa-coins"></i></span></div><div class="stat-value" id="statTurnover">—</div><div class="stat-foot">Total nilai turnover tersedia</div></div>
+  </div>
+
+  <div class="grid-2 mt">
+    <div class="panel"><div class="flex-between"><div><div class="panel-title">Top Gainers</div><div class="panel-note">Kenaikan tertinggi</div></div><span class="tag green">24H</span></div><div id="topGainers" class="mt"><div class="empty">Memuat data...</div></div></div>
+    <div class="panel"><div class="flex-between"><div><div class="panel-title">Top Losers</div><div class="panel-note">Penurunan terbesar</div></div><span class="tag red">24H</span></div><div id="topLosers" class="mt"><div class="empty">Memuat data...</div></div></div>
+  </div>
+
+  <div class="panel mt">
+    <div class="flex-between mb"><div><div class="panel-title">Market Snapshot</div><div class="panel-note">Kontrak dengan turnover terbesar yang tersedia.</div></div><button class="btn" data-goto="scanner">Open Scanner <i class="fa-solid fa-arrow-right"></i></button></div>
+    <div class="table-wrap"><table><thead><tr><th>Contract</th><th>Last Price</th><th>24H Change</th><th>Volume 24H</th><th>Turnover</th><th>Action</th></tr></thead><tbody id="overviewTable"><tr><td colspan="6"><div class="empty">Memuat...</div></td></tr></tbody></table></div>
+  </div>
+  <div class="footer">Market information only. Not financial advice.</div>
+</section>
+
+<section class="view hidden" id="view-chart">
+  <div class="flex-between mb" style="align-items:flex-start;flex-wrap:wrap"><div><div class="page-title">Live Chart</div><div class="subtitle">Candlestick dan volume berdasarkan respons API.</div></div><button class="btn btn-primary" id="chartRefresh"><i class="fa-solid fa-rotate"></i> Refresh chart</button></div>
+  <div class="panel mb"><div class="toolbar"><label class="small muted" for="chartPair">Contract</label><select class="field" id="chartPair"><option value="BTC_USDT">BTC_USDT</option></select><label class="small muted" for="chartInterval">Timeframe</label><select class="field" id="chartInterval"><option value="1m">1m</option><option value="5m">5m</option><option value="15m">15m</option><option value="30m">30m</option><option value="1h" selected>1H</option><option value="4h">4H</option><option value="8h">8H</option><option value="1d">1D</option><option value="1w">1W</option></select><span id="chartStatus" class="api-pill"><span class="dot loading"></span>Waiting</span></div></div>
+  <div id="chartAlert" class="notice info mb hidden"></div>
+  <div class="panel">
+    <div class="flex-between mb"><div><div class="panel-title" id="chartHeading">BTC_USDT · 1H</div><div class="panel-note">Candlestick chart</div></div><div class="small muted" id="chartLastPrice">Last close: —</div></div>
+    <div id="priceChart" class="chart-box"></div><div class="panel-note" style="margin:10px 0">Volume</div><div id="volumeChart" class="volume-box"></div><div class="panel-note mt" id="chartCandleInfo">Candle data: —</div>
+  </div>
+  <div class="grid-3 mt">
+    <div class="metric-box"><div class="metric-label">RSI</div><div class="metric-value" id="indicatorRSI">—</div><div class="panel-note" id="indicatorRSINote">Belum tersedia</div></div>
+    <div class="metric-box"><div class="metric-label">MACD</div><div class="metric-value" id="indicatorMACD">—</div><div class="panel-note" id="indicatorMACDNote">Belum tersedia</div></div>
+    <div class="metric-box"><div class="metric-label">Moving Average</div><div class="metric-value" id="indicatorMA">—</div><div class="panel-note" id="indicatorMANote">Belum tersedia</div></div>
+    <div class="metric-box"><div class="metric-label">Support</div><div class="metric-value" id="indicatorSupport">—</div></div>
+    <div class="metric-box"><div class="metric-label">Resistance</div><div class="metric-value" id="indicatorResistance">—</div></div>
+    <div class="metric-box"><div class="metric-label">Analysis Status</div><div class="metric-value" id="indicatorStatus" style="font-size:15px">Waiting</div><div class="panel-note">Bukan jaminan arah harga</div></div>
+  </div>
+</section>
+
+<section class="view hidden" id="view-scanner">
+  <div class="flex-between mb" style="align-items:flex-start;flex-wrap:wrap"><div><div class="page-title">Market Scanner</div><div class="subtitle">Cari, filter, dan urutkan kontrak yang tersedia.</div></div><button class="btn btn-primary" id="scannerRefresh"><i class="fa-solid fa-rotate"></i> Refresh</button></div>
+  <div class="panel mb"><div class="toolbar">
+    <input class="field" id="marketSearch" placeholder="Search symbol, e.g. BTC..." style="flex:1;min-width:180px">
+    <select class="field" id="changeFilter"><option value="all">All changes</option><option value="gainers">Gainers only</option><option value="losers">Losers only</option></select>
+    <select class="field" id="sortBy"><option value="turnover">Sort: Turnover</option><option value="change">Sort: 24H Change</option><option value="price">Sort: Price</option><option value="volume">Sort: Volume</option><option value="symbol">Sort: Symbol</option></select>
+    <select class="field" id="sortDirection"><option value="desc">Descending</option><option value="asc">Ascending</option></select>
+  </div></div>
+  <div class="panel">
+    <div class="flex-between mb"><div><div class="panel-title">Futures Contracts</div><div class="panel-note" id="scannerCount">Waiting for market data...</div></div><span class="tag">API data</span></div>
+    <div class="table-wrap"><table><thead><tr><th>Contract</th><th>Last Price</th><th>24H Change</th><th>Volume 24H</th><th>Turnover 24H</th><th>Funding</th><th>Open Interest</th><th>Actions</th></tr></thead><tbody id="marketTable"><tr><td colspan="8"><div class="empty">Memuat...</div></td></tr></tbody></table></div>
+    <div class="flex-between mt" style="flex-wrap:wrap"><div class="small muted" id="pageInfo">Page 1</div><div class="toolbar"><select class="field" id="pageSize"><option value="20">20 / page</option><option value="50">50 / page</option><option value="100">100 / page</option></select><button class="btn" id="prevPage"><i class="fa-solid fa-chevron-left"></i> Previous</button><button class="btn" id="nextPage">Next <i class="fa-solid fa-chevron-right"></i></button></div></div>
+  </div>
+</section>
+
+<section class="view hidden" id="view-detail">
+  <div class="flex-between mb" style="align-items:flex-start;flex-wrap:wrap"><div><div class="page-title">Market Detail</div><div class="subtitle">Informasi kontrak dan indikator teknikal.</div></div><button class="btn btn-primary" id="detailOpenChart"><i class="fa-solid fa-chart-column"></i> Open Live Chart</button></div>
+  <div class="panel mb"><div class="toolbar"><label class="small muted" for="detailPair">Contract</label><select class="field" id="detailPair"><option value="BTC_USDT">BTC_USDT</option></select><button class="btn" id="detailRefresh"><i class="fa-solid fa-rotate"></i> Refresh detail</button></div></div>
+  <div id="detailAlert" class="notice info mb hidden"></div>
+  <div class="flex-between mb"><div><div class="page-title" style="font-size:22px" id="detailSymbol">BTC_USDT</div><div class="subtitle" id="detailName">Perpetual contract</div></div><div style="text-align:right"><div class="small muted">Last Price</div><div class="page-title" id="detailPrice">—</div><div id="detailChange" class="small">—</div></div></div>
+  <div class="stat-grid">
+    <div class="metric-box"><div class="metric-label">24H Volume</div><div class="metric-value" id="detailVolume">—</div></div>
+    <div class="metric-box"><div class="metric-label">24H Turnover</div><div class="metric-value" id="detailTurnover">—</div></div>
+    <div class="metric-box"><div class="metric-label">Funding Rate</div><div class="metric-value" id="detailFunding">—</div></div>
+    <div class="metric-box"><div class="metric-label">Open Interest</div><div class="metric-value" id="detailOI">—</div></div>
+    <div class="metric-box"><div class="metric-label">24H High</div><div class="metric-value" id="detailHigh">—</div></div>
+    <div class="metric-box"><div class="metric-label">24H Low</div><div class="metric-value" id="detailLow">—</div></div>
+    <div class="metric-box"><div class="metric-label">Index Price</div><div class="metric-value" id="detailIndex">—</div></div>
+    <div class="metric-box"><div class="metric-label">Fair / Mark Price</div><div class="metric-value" id="detailMark">—</div></div>
+  </div>
+  <div class="grid-2 mt">
+    <div class="panel"><div class="panel-title">Technical Snapshot</div><div class="panel-note">Indikator dari backend bila tersedia.</div>
+      <div class="mt"><div class="settings-row"><span class="small muted">RSI</span><strong id="detailRSI">—</strong></div><div class="settings-row"><span class="small muted">MACD</span><strong id="detailMACD">—</strong></div><div class="settings-row"><span class="small muted">Moving Average</span><strong id="detailMA">—</strong></div><div class="settings-row"><span class="small muted">Support</span><strong id="detailSupport">—</strong></div><div class="settings-row"><span class="small muted">Resistance</span><strong id="detailResistance">—</strong></div></div>
+      <button class="btn mt" id="detailLoadTechnical">Load technical analysis</button>
+    </div>
+    <div class="panel"><div class="panel-title">Data Status</div><div class="panel-note">Status endpoint dan waktu pembaruan.</div>
+      <div class="mt"><div class="settings-row"><span class="small muted">Ticker endpoint</span><span id="detailTickerStatus" class="tag">Not requested</span></div><div class="settings-row"><span class="small muted">Technical endpoint</span><span id="detailTechnicalStatus" class="tag">Not requested</span></div><div class="settings-row"><span class="small muted">Last refresh</span><strong id="detailUpdated" class="small">—</strong></div></div>
+      <div class="notice info mt">Field yang tidak tersedia dari API akan ditampilkan sebagai tanda pisah, bukan dianggap nol.</div>
+    </div>
+  </div>
+</section>
+
+<section class="view hidden" id="view-settings">
+  <div class="mb"><div class="page-title">Settings</div><div class="subtitle">Atur tampilan dan perilaku dashboard.</div></div>
+  <div class="panel">
+    <div class="panel-title">Appearance & Preferences</div>
+    <div class="settings-row"><div><div class="small" style="font-weight:700">Theme / Tema</div><div class="panel-note">Tema terang atau gelap, tersimpan di browser.</div></div><select class="field" id="themeSelect"><option value="light">Light — Putih</option><option value="dark">Dark — Gelap</option></select></div>
+    <div class="settings-row"><div><div class="small" style="font-weight:700">Auto-refresh market</div><div class="panel-note">Pembaruan data pasar secara berkala.</div></div><input type="checkbox" class="switch" id="autoRefresh" checked></div>
+    <div class="settings-row"><div><div class="small" style="font-weight:700">Refresh interval</div><div class="panel-note">Interval permintaan market API.</div></div><select class="field" id="refreshInterval"><option value="15">15 seconds</option><option value="30" selected>30 seconds</option><option value="60">60 seconds</option><option value="120">120 seconds</option></select></div>
+    <div class="settings-row"><div><div class="small" style="font-weight:700">Default timeframe</div><div class="panel-note">Timeframe awal Live Chart.</div></div><select class="field" id="defaultInterval"><option value="1m">1m</option><option value="5m">5m</option><option value="15m">15m</option><option value="30m">30m</option><option value="1h">1H</option><option value="4h">4H</option><option value="8h">8H</option><option value="1d">1D</option><option value="1w">1W</option></select></div>
+    <div class="settings-row"><div><div class="small" style="font-weight:700">Default contract</div><div class="panel-note">Pair awal dashboard.</div></div><select class="field" id="defaultPair"><option value="BTC_USDT">BTC_USDT</option></select></div>
+    <div class="settings-row"><div><div class="small" style="font-weight:700">Market API</div><div class="panel-note">Menggunakan origin website ini.</div></div><span class="tag">Same-origin</span></div>
+    <div class="toolbar mt"><button class="btn btn-primary" id="saveSettings"><i class="fa-solid fa-check"></i> Save settings</button><button class="btn" id="resetSettings">Reset defaults</button></div>
+  </div>
+  <div class="panel mt"><div class="panel-title">Connection Diagnostics</div><div class="panel-note">Uji endpoint market API.</div><div class="settings-row"><span class="small muted">Website origin</span><code class="small" id="originText"></code></div><div class="settings-row"><span class="small muted">Market endpoint</span><code class="small">/api/market?page=1&amp;limit=20</code></div><div class="settings-row"><span class="small muted">Last API error</span><span class="small" id="lastApiError">None</span></div><button class="btn mt" id="testConnection"><i class="fa-solid fa-plug"></i> Test connection</button></div>
+</section>
+
+<section class="view hidden" id="view-login">
+  <div class="mb"><div class="page-title">Account</div><div class="subtitle">Pengaturan akun BlobSignal.</div></div>
+  <div class="panel login-card"><img src="/mascot.png" alt="BlobSignal" class="login-logo" onerror="this.style.display='none'"><div class="page-title" style="font-size:23px">Welcome to BlobSignal</div><div class="subtitle" style="margin-bottom:22px">Masuk setelah autentikasi backend diaktifkan.</div>
+    <div class="notice info" style="text-align:left;margin-bottom:18px"><strong>Google OAuth belum dikonfigurasi.</strong><br>Untuk login sungguhan, Worker harus menangani authorization, callback, state validation, dan sesi pengguna. Jangan letakkan Google Client Secret di frontend.</div>
+    <button class="btn" style="width:100%;justify-content:center" id="googleLogin"><i class="fa-brands fa-google"></i> Continue with Google</button><div class="panel-note mt">Status akun: Belum login</div>
+  </div>
+</section>
+
+</div>
+</main>
+</div>
+<div id="toast" class="toast hidden" role="status"></div>
+
+<script>
+(() => {
+"use strict";
+
+const API_BASE = window.location.origin;
+const $ = id => document.getElementById(id);
+const DEFAULTS = {autoRefresh:true,refreshInterval:30,defaultInterval:"1h",defaultPair:"BTC_USDT",theme:"light"};
+
+const state = {
+ view:"overview",market:[],selectedSymbol:"BTC_USDT",page:1,pageSize:20,
+ marketError:"",lastUpdated:null,chart:null,volumeChart:null,candleSeries:null,
+ volumeSeries:null,chartSymbol:"",chartInterval:"",chartRequest:0,detailRequest:0,
+ refreshTimer:null,refreshBusy:false,toastTimer:null,settings:{...DEFAULTS}
+};
+
+function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function num(v){if(v===null||v===undefined||v==="")return null;const n=Number(v);return Number.isFinite(n)?n:null;}
+function first(o,keys){for(const k of keys)if(o&&o[k]!==undefined&&o[k]!==null&&o[k]!=="")return o[k];return null;}
+function fmtPrice(v){const n=num(v);return n===null?"—":n.toLocaleString("en-US",{maximumFractionDigits:n>=1000?2:n>=1?5:8});}
+function fmtCompact(v){const n=num(v);if(n===null)return"—";const a=Math.abs(n);if(a>=1e12)return(n/1e12).toFixed(2)+"T";if(a>=1e9)return(n/1e9).toFixed(2)+"B";if(a>=1e6)return(n/1e6).toFixed(2)+"M";if(a>=1e3)return(n/1e3).toFixed(2)+"K";return n.toLocaleString("en-US",{maximumFractionDigits:4});}
+function fmtPercent(v){const n=num(v);return n===null?"—":(n>0?"+":"")+n.toFixed(2)+"%";}
+function fmtRate(v){const n=num(v);return n===null?"—":(n*100).toFixed(5)+"%";}
+function fmtDate(v){const d=v instanceof Date?v:new Date(v);return Number.isFinite(d.getTime())?d.toLocaleString():"—";}
+function symbolOf(x){return String(first(x,["contract_symbol","symbol","contractCode","contract"])||"").trim().toUpperCase();}
+function changeOf(x){return num(first(x,["change_24h_percent","priceChangePercent","changePercent","change24h","change_24h"]));}
+function priceOf(x){return first(x,["price","price_usd","lastPrice","last","last_price"]);}
+function volumeOf(x){return first(x,["volume_24h","volume24","volume","amount24"]);}
+function turnoverOf(x){return first(x,["turnover_24h","turnover24","turnover","quoteVolume"]);}
+function fundingOf(x){return first(x,["funding_rate","fundingRate","funding"]);}
+function oiOf(x){return first(x,["open_interest","holdVol","openInterest","open_interest_value"]);}
+
+function toast(message){
+ const el=$("toast");el.textContent=message;el.classList.remove("hidden");
+ clearTimeout(state.toastTimer);state.toastTimer=setTimeout(()=>el.classList.add("hidden"),4500);
+}
+
+function applyTheme(theme,save=true){
+ theme=theme==="dark"?"dark":"light";
+ document.documentElement.dataset.theme=theme;
+ state.settings.theme=theme;
+ const icon=$("themeToggleIcon"),label=$("themeToggleText"),select=$("themeSelect");
+ if(icon)icon.className=theme==="light"?"fa-solid fa-moon":"fa-solid fa-sun";
+ if(label)label.textContent=theme==="light"?"Dark Mode":"Light Mode";
+ if(select)select.value=theme;
+ const meta=document.querySelector('meta[name="theme-color"]');
+ if(meta)meta.content=theme==="light"?"#f4f7fb":"#090d16";
+ if(save){try{localStorage.setItem("blobsignal-theme",theme);}catch(e){}}
+ updateChartTheme();
+}
+
+function updateChartTheme(){
+ if(!state.chart||!state.volumeChart)return;
+ const light=document.documentElement.dataset.theme==="light";
+ const opts={
+  layout:{background:{color:light?"#ffffff":"#101725"},textColor:light?"#69788e":"#91a0b8"},
+  grid:{vertLines:{color:light?"#edf1f7":"#1c2839"},horzLines:{color:light?"#edf1f7":"#1c2839"}},
+  rightPriceScale:{borderColor:light?"#dfe6f0":"#29364a"},
+  timeScale:{borderColor:light?"#dfe6f0":"#29364a"}
+ };
+ state.chart.applyOptions(opts);state.volumeChart.applyOptions(opts);
+}
+
+function setApiStatus(status,message){
+ const cls=status==="ok"?"ok":status==="error"?"error":"loading";
+ $("sideApiDot").className="dot "+cls;$("topApiDot").className="dot "+cls;
+ $("sideApiText").textContent=message;
+ $("topApiText").textContent=status==="ok"?"API Connected":status==="error"?"API Error":"Connecting";
+}
+
+function notice(id,message,type="info"){
+ const el=$(id);if(!el)return;
+ if(!message){el.classList.add("hidden");el.textContent="";return;}
+ el.className="notice "+type+" mb";el.textContent=message;el.classList.remove("hidden");
+}
+
+async function apiFetch(path){
+ const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),15000);
+ try{
+  const r=await fetch(API_BASE+path,{headers:{Accept:"application/json"},cache:"no-store",signal:controller.signal});
+  const raw=await r.text();let data;
+  try{data=raw?JSON.parse(raw):{};}catch{throw new Error("API returned non-JSON response (HTTP "+r.status+").");}
+  if(!r.ok)throw new Error(first(data,["error","message","msg"])||"HTTP "+r.status);
+  if(data&&data.success===false)throw new Error(first(data,["error","message","msg"])||"API request failed.");
+  return data;
+ }catch(e){if(e.name==="AbortError")throw new Error("Request timed out after 15 seconds.");throw e;}
+ finally{clearTimeout(timer);}
+}
+
+function normalizeMarket(payload){
+ let rows=Array.isArray(payload)?payload:first(payload,["data","market","markets","contracts","result"]);
+ if(rows&&!Array.isArray(rows)&&typeof rows==="object")rows=first(rows,["data","list","rows","contracts"]);
+ return Array.isArray(rows)?rows.filter(x=>x&&typeof x==="object"&&symbolOf(x)):[];
+}
+
+function coinCell(x){
+ const symbol=symbolOf(x),name=first(x,["name","baseCoin","base_currency"])||symbol.replace(/[_-]?USDT$/,""),logo=first(x,["logo_url","logoUrl","icon"]);
+ return `<div class="coin-cell"><div class="coin-icon">${logo?`<img src="${esc(logo)}" alt="" loading="lazy" onerror="this.style.display='none'">`:esc(String(name).slice(0,3))}</div><div><div class="coin-name">${esc(symbol)}</div><div class="coin-sub">${esc(name)}</div></div></div>`;
+}
+function actions(symbol){
+ return `<div class="toolbar" style="justify-content:flex-end;flex-wrap:nowrap"><button class="btn" data-detail="${esc(symbol)}" title="Market detail"><i class="fa-solid fa-list"></i></button><button class="btn btn-primary" data-chart="${esc(symbol)}" title="Open chart"><i class="fa-solid fa-chart-line"></i></button></div>`;
+}
+function marketRow(x,mode="scanner"){
+ const c=changeOf(x),cls=c===null?"muted":c>=0?"green":"red";
+ const common=`<td>${coinCell(x)}</td><td>${fmtPrice(priceOf(x))}</td><td class="${cls}" style="font-weight:700">${fmtPercent(c)}</td><td>${fmtCompact(volumeOf(x))}</td><td>${fmtCompact(turnoverOf(x))}</td>`;
+ return mode==="overview"?`<tr>${common}<td>${actions(symbolOf(x))}</td></tr>`:`<tr>${common}<td>${fmtRate(fundingOf(x))}</td><td>${fmtCompact(oiOf(x))}</td><td>${actions(symbolOf(x))}</td></tr>`;
+}
+
+function leaders(items,positive){
+ const sorted=[...items].sort((a,b)=>positive?changeOf(b)-changeOf(a):changeOf(a)-changeOf(b)).slice(0,5);
+ if(!sorted.length)return'<div class="empty">Data perubahan harga tidak tersedia.</div>';
+ return sorted.map(x=>`<div class="flex-between" style="padding:11px 0;border-bottom:1px solid var(--border);gap:10px"><div>${coinCell(x)}</div><div style="text-align:right"><div class="${positive?"green":"red"}" style="font-weight:750">${fmtPercent(changeOf(x))}</div><div class="panel-note">${fmtPrice(priceOf(x))}</div></div><button class="btn" data-detail="${esc(symbolOf(x))}"><i class="fa-solid fa-arrow-up-right-from-square"></i></button></div>`).join("");
+}
+
+function renderOverview(){
+ const rows=state.market;
+ $("statContracts").textContent=rows.length?rows.length.toLocaleString():"—";
+ if(!rows.length){
+  ["statGainers","statLosers","statTurnover"].forEach(id=>$(id).textContent="—");
+  $("overviewTable").innerHTML=`<tr><td colspan="6"><div class="empty">${esc(state.marketError||"Belum ada data pasar.")}</div></td></tr>`;
+  $("topGainers").innerHTML=`<div class="empty">${esc(state.marketError||"Data belum tersedia.")}</div>`;
+  $("topLosers").innerHTML=`<div class="empty">${esc(state.marketError||"Data belum tersedia.")}</div>`;
+  notice("overviewAlert",state.marketError?"Market API error: "+state.marketError:"Belum ada data kontrak yang valid.","error");return;
+ }
+ notice("overviewAlert","");
+ const g=rows.filter(x=>changeOf(x)!==null&&changeOf(x)>0),l=rows.filter(x=>changeOf(x)!==null&&changeOf(x)<0);
+ $("statGainers").textContent=g.length.toLocaleString();$("statLosers").textContent=l.length.toLocaleString();
+ $("statTurnover").textContent=fmtCompact(rows.reduce((s,x)=>s+(num(turnoverOf(x))||0),0));
+ $("topGainers").innerHTML=leaders(g,true);$("topLosers").innerHTML=leaders(l,false);
+ $("overviewTable").innerHTML=[...rows].sort((a,b)=>(num(turnoverOf(b))||0)-(num(turnoverOf(a))||0)).slice(0,10).map(x=>marketRow(x,"overview")).join("");
+}
+
+function filteredMarket(){
+ const search=$("marketSearch").value.trim().toUpperCase(),filter=$("changeFilter").value;
+ const sort=$("sortBy").value,dir=$("sortDirection").value==="asc"?1:-1;
+ let arr=state.market.filter(x=>{
+  const sym=symbolOf(x),name=String(first(x,["name","baseCoin"])||"").toUpperCase(),c=changeOf(x);
+  if(search&&!sym.includes(search)&&!name.includes(search))return false;
+  if(filter==="gainers"&&!(c!==null&&c>0))return false;
+  if(filter==="losers"&&!(c!==null&&c<0))return false;
+  return true;
+ });
+ const get={turnover:x=>num(turnoverOf(x)),volume:x=>num(volumeOf(x)),price:x=>num(priceOf(x)),change:x=>changeOf(x),symbol:x=>symbolOf(x).toLowerCase()}[sort]||((x)=>num(turnoverOf(x)));
+ arr.sort((a,b)=>{const av=get(a),bv=get(b);if(av==null)return 1;if(bv==null)return-1;return(typeof av==="string"?av.localeCompare(bv):av-bv)*dir;});
+ return arr;
+}
+function renderScanner(){
+ const items=filteredMarket();state.pageSize=Number($("pageSize").value)||20;
+ const pages=Math.max(1,Math.ceil(items.length/state.pageSize));state.page=Math.min(Math.max(1,state.page),pages);
+ const visible=items.slice((state.page-1)*state.pageSize,state.page*state.pageSize);
+ $("scannerCount").textContent=`${items.length} matching contracts · ${state.market.length} total`;
+ $("pageInfo").textContent=`Page ${state.page} of ${pages}`;
+ $("prevPage").disabled=state.page<=1;$("nextPage").disabled=state.page>=pages;
+ $("marketTable").innerHTML=visible.length?visible.map(x=>marketRow(x)).join():`<tr><td colspan="8"><div class="empty">${esc(state.marketError||"Tidak ada kontrak yang cocok.")}</div></td></tr>`;
+}
+function updatePairSelectors(){
+ const symbols=[...new Set(state.market.map(symbolOf).filter(Boolean))];
+ for(const [id,current] of [["chartPair",state.chartSymbol||state.settings.defaultPair],["detailPair",state.selectedSymbol],["defaultPair",state.settings.defaultPair]]){
+  const el=$(id),opts=[...new Set([...symbols,current||"BTC_USDT"])].sort();
+  el.innerHTML=opts.map(s=>`<option value="${esc(s)}">${esc(s)}</option>`).join("");
+  el.value=opts.includes(current)?current:opts[0];
+ }
+}
+
+async function refreshMarket(manual=false){
+ if(state.refreshBusy)return;state.refreshBusy=true;setApiStatus("loading","Loading market data");
+ try{
+  const payload=await apiFetch("/api/market?page=1&limit=500"),rows=normalizeMarket(payload);
+  if(!rows.length)throw new Error("API returned no recognizable market contracts. Check /api/market response.");
+  state.market=rows;state.marketError="";state.lastUpdated=new Date();
+  $("lastUpdated").textContent="Last update: "+fmtDate(state.lastUpdated);$("lastApiError").textContent="None";
+  setApiStatus("ok",rows.length+" contracts");updatePairSelectors();renderOverview();renderScanner();
+  if(manual)toast("Market data updated: "+rows.length+" contracts.");
+ }catch(e){
+  state.marketError=e.message||"Unknown API error";$("lastApiError").textContent=state.marketError;
+  setApiStatus("error",state.marketError);renderOverview();renderScanner();
+  if(manual)toast("Market API error: "+state.marketError);
+ }finally{state.refreshBusy=false;}
+}
+
+function switchView(name){
+ if(!["overview","chart","scanner","detail","settings","login"].includes(name))return;
+ state.view=name;
+ document.querySelectorAll(".view").forEach(x=>x.classList.add("hidden"));
+ $("view-"+name).classList.remove("hidden");
+ document.querySelectorAll(".nav-btn[data-view]").forEach(x=>x.classList.toggle("active",x.dataset.view===name));
+ const labels={overview:"Overview",chart:"Live Chart",scanner:"Market Scanner",detail:"Market Detail",settings:"Settings",login:"Account"};
+ $("breadcrumb").textContent=labels[name];
+ $("headerPair").textContent=name==="chart"?(state.chartSymbol||state.settings.defaultPair):name==="detail"?state.selectedSymbol:"Market intelligence";
+ $("sidebar").classList.remove("open");
+ if(name==="chart")requestAnimationFrame(loadChart);
+ if(name==="detail")loadDetail();
+ if(name==="scanner")renderScanner();
+ if(name==="overview")renderOverview();
+}
+
+function initCharts(){
+ if(state.chart&&state.volumeChart)return true;
+ if(!window.LightweightCharts){notice("chartAlert","Chart library gagal dimuat. Periksa koneksi CDN.","error");return false;}
+ const light=document.documentElement.dataset.theme==="light";
+ const common={layout:{background:{color:light?"#ffffff":"#101725"},textColor:light?"#69788e":"#91a0b8"},grid:{vertLines:{color:light?"#edf1f7":"#1c2839"},horzLines:{color:light?"#edf1f7":"#1c2839"}},rightPriceScale:{borderColor:light?"#dfe6f0":"#29364a"},timeScale:{borderColor:light?"#dfe6f0":"#29364a",timeVisible:true},handleScroll:true,handleScale:true};
+ try{
+  state.chart=LightweightCharts.createChart($("priceChart"),{...common,width:$("priceChart").clientWidth||600,height:390});
+  state.candleSeries=state.chart.addCandlestickSeries({upColor:"#35b989",downColor:"#e65c72",borderUpColor:"#35b989",borderDownColor:"#e65c72",wickUpColor:"#35b989",wickDownColor:"#e65c72"});
+  state.volumeChart=LightweightCharts.createChart($("volumeChart"),{...common,width:$("volumeChart").clientWidth||600,height:120});
+  state.volumeSeries=state.volumeChart.addHistogramSeries({priceFormat:{type:"volume"},priceScaleId:"",lastValueVisible:false,priceLineVisible:false});
+  state.volumeChart.priceScale("").applyOptions({scaleMargins:{top:.1,bottom:0}});
+  if(window.ResizeObserver){
+   const observer=new ResizeObserver(()=>{if(state.view!=="chart")return;const w=$("priceChart").clientWidth;if(w>0){state.chart.applyOptions({width:w});state.volumeChart.applyOptions({width:w});}});
+   observer.observe($("priceChart"));observer.observe($("volumeChart"));
+  }
+  return true;
+ }catch(e){notice("chartAlert","Chart initialization failed: "+e.message,"error");return false;}
+}
+
+function normalizeCandles(payload){
+ let rows=first(payload,["candles","chartCandles","klines","list"]);
+ if(!Array.isArray(rows)&&payload.data&&typeof payload.data==="object")rows=first(payload.data,["candles","chartCandles","list","klines"]);
+ if(!Array.isArray(rows))return[];
+ const out=[];
+ for(const c of rows){
+  if(!c)continue;
+  let t=first(c,["time","timestamp","t","ts","openTime"]);
+  const o=num(first(c,["open","o"])),h=num(first(c,["high","h"])),l=num(first(c,["low","l"])),cl=num(first(c,["close","c"])),v=num(first(c,["volume","vol","v","amount"]))||0;
+  if([o,h,l,cl].some(x=>x===null))continue;
+  if(typeof t==="string"&&!/^\d+$/.test(t)){const d=new Date(t);if(!Number.isFinite(d.getTime()))continue;t=Math.floor(d.getTime()/1000);}
+  else{t=Number(t);if(!Number.isFinite(t))continue;if(t>1e12)t=Math.floor(t/1000);}
+  out.push({time:Math.floor(t),open:o,high:h,low:l,close:cl,volume:v});
+ }
+ out.sort((a,b)=>a.time-b.time);
+ return out.filter((x,i)=>i===0||x.time>out[i-1].time);
+}
+function analysisOf(payload){return first(payload,["analysis","technicals","indicators","technicalAnalysis"])||{};}
+function indicator(a,keys){
+ for(const k of keys){let v=a&&a[k];if(v===undefined||v===null||v==="")continue;if(typeof v==="object"){v=first(v,["value","current","latest","result"]);if(v===null)continue;}return v;}
+ return null;
+}
+function indicatorText(v){return v===null?"—":typeof v==="object"?JSON.stringify(v):fmtPrice(v);}
+function renderAnalysis(a){
+ const r=indicator(a,["rsi","RSI","rsi14"]),m=indicator(a,["macd","MACD"]),ma=indicator(a,["ma","movingAverage","moving_average","ema","EMA"]),s=indicator(a,["support","supportLevel","support_level"]),r=indicator(a,["resistance","resistanceLevel","resistance_level"]),signal=indicator(a,["signal","trend","bias","recommendation","summary"]);
+ $("indicatorRSI").textContent=indicatorText(r);$("indicatorRSINote").textContent=r===null?"Nilai tidak dikembalikan API":(num(r)>=70?"Zona overbought konvensional":num(r)<=30?"Zona oversold konvensional":"Nilai dari backend");
+ $("indicatorMACD").textContent=indicatorText(m);$("indicatorMACDNote").textContent=m===null?"Nilai tidak dikembalikan API":"Nilai dari backend";
+ $("indicatorMA").textContent=indicatorText(ma);$("indicatorMANote").textContent=ma===null?"Nilai tidak dikembalikan API":"Nilai dari backend";
+ $("indicatorSupport").textContent=indicatorText(s);$("indicatorResistance").textContent=indicatorText(r);
+ $("indicatorStatus").textContent=signal===null?"Unavailable":typeof signal==="object"?JSON.stringify(signal):String(signal);
+ $("detailRSI").textContent=indicatorText(r);$("detailMACD").textContent=indicatorText(m);$("detailMA").textContent=indicatorText(ma);$("detailSupport").textContent=indicatorText(s);$("detailResistance").textContent=indicatorText(r);
+}
+
+async function loadChart(){
+ const symbol=$("chartPair").value||state.settings.defaultPair,interval=$("chartInterval").value||state.settings.defaultInterval,id=++state.chartRequest;
+ state.chartSymbol=symbol;state.selectedSymbol=symbol;$("chartHeading").textContent=symbol+" · "+interval.toUpperCase();
+ $("chartStatus").innerHTML='<span class="dot loading"></span> Loading';$("chartCandleInfo").textContent="Requesting technical data...";notice("chartAlert","");
+ if(!initCharts())return;
+ try{
+  const p=await apiFetch("/api/technicals?"+new URLSearchParams({symbol,interval,limit:"250"}));
+  if(id!==state.chartRequest)return;
+  const candles=normalizeCandles(p);if(!candles.length)throw new Error("No valid candles returned. Verify API field names and timestamp format.");
+  state.candleSeries.setData(candles.map(c=>({time:c.time,open:c.open,high:c.high,low:c.low,close:c.close})));
+  state.volumeSeries.setData(candles.map(c=>({time:c.time,value:c.volume,color:c.close>=c.open?"#35b98988":"#e65c7288"})));
+  state.chart.timeScale().fitContent();state.volumeChart.timeScale().fitContent();
+  const last=candles[candles.length-1];
+  $("chartLastPrice").textContent="Last close: "+fmtPrice(last.close);
+  $("chartCandleInfo").textContent=`${candles.length} candles · Last: ${fmtDate(last.time*1000)} · O ${fmtPrice(last.open)} / H ${fmtPrice(last.high)} / L ${fmtPrice(last.low)} / C ${fmtPrice(last.close)}`;
+  $("chartStatus").innerHTML='<span class="dot ok"></span> Data loaded';renderAnalysis(analysisOf(p));notice("chartAlert","");
+  $("headerPair").textContent=symbol;
+ }catch(e){
+  if(id!==state.chartRequest)return;
+  $("chartStatus").innerHTML='<span class="dot error"></span> API error';
+  $("chartCandleInfo").textContent="Chart data unavailable.";
+  notice("chartAlert","Technical API error: "+e.message,"error");
+  $("indicatorStatus").textContent="Unavailable";
+ }
+}
+
+async function loadDetail(){
+ const symbol=$("detailPair").value||state.selectedSymbol||"BTC_USDT",id=++state.detailRequest;
+ state.selectedSymbol=symbol;$("detailSymbol").textContent=symbol;$("detailName").textContent="Loading contract data...";
+ $("detailTickerStatus").textContent="Loading";notice("detailAlert","");
+ const local=state.market.find(x=>symbolOf(x)===symbol);if(local)renderDetail(local);
+ try{
+  const p=await apiFetch("/api/ticker?symbol="+encodeURIComponent(symbol));
+  if(id!==state.detailRequest)return;
+  const ticker=first(p,["data","ticker","result"])||p;
+  if(ticker&&typeof ticker==="object")renderDetail({...local,...ticker});
+  $("detailTickerStatus").textContent="Loaded";$("detailUpdated").textContent=fmtDate(new Date());
+ }catch(e){
+  if(id!==state.detailRequest)return;
+  $("detailTickerStatus").textContent="Error";$("detailUpdated").textContent=fmtDate(new Date());
+  notice("detailAlert","Ticker API error: "+e.message+(local?" Showing fields available in market list.":""),"error");
+ }
+}
+function renderDetail(x){
+ $("detailSymbol").textContent=symbolOf(x)||state.selectedSymbol;$("detailName").textContent=first(x,["name","description"])||"Perpetual contract";
+ $("detailPrice").textContent=fmtPrice(priceOf(x));
+ const c=changeOf(x);$("detailChange").textContent=fmtPercent(c);$("detailChange").className="small "+(c===null?"muted":c>=0?"green":"red");
+ $("detailVolume").textContent=fmtCompact(volumeOf(x));$("detailTurnover").textContent=fmtCompact(turnoverOf(x));$("detailFunding").textContent=fmtRate(fundingOf(x));$("detailOI").textContent=fmtCompact(oiOf(x));
+ $("detailHigh").textContent=fmtPrice(first(x,["high_24h","high24Price","high24","highPrice","high"]));
+ $("detailLow").textContent=fmtPrice(first(x,["low_24h","lower24Price","low24","lowPrice","low"]));
+ $("detailIndex").textContent=fmtPrice(first(x,["index_price","indexPrice"]));$("detailMark").textContent=fmtPrice(first(x,["mark_price","fair_price","fairPrice","markPrice"]));
+}
+async function loadDetailTechnical(){
+ const symbol=$("detailPair").value||state.selectedSymbol;$("detailTechnicalStatus").textContent="Loading";
+ try{
+  const p=await apiFetch("/api/technicals?"+new URLSearchParams({symbol,interval:$("chartInterval").value||state.settings.defaultInterval,limit:"250"}));
+  renderAnalysis(analysisOf(p));$("detailTechnicalStatus").textContent="Loaded";toast("Technical snapshot loaded.");
+ }catch(e){$("detailTechnicalStatus").textContent="Error";notice("detailAlert","Technical API error: "+e.message,"error");}
+}
+
+function applySettingsUI(){
+ $("autoRefresh").checked=state.settings.autoRefresh;$("refreshInterval").value=String(state.settings.refreshInterval);
+ $("defaultInterval").value=state.settings.defaultInterval;$("originText").textContent=API_BASE;
+ updatePairSelectors();$("defaultPair").value=state.settings.defaultPair;
+ $("chartInterval").value=state.settings.defaultInterval;$("chartPair").value=state.settings.defaultPair;$("detailPair").value=state.settings.defaultPair;
+ $("themeSelect").value=state.settings.theme;applyTheme(state.settings.theme,false);
+}
+function startRefreshTimer(){
+ clearInterval(state.refreshTimer);state.refreshTimer=null;
+ if(state.settings.autoRefresh)state.refreshTimer=setInterval(()=>{if(document.visibilityState==="visible")refreshMarket(false);},state.settings.refreshInterval*1000);
+}
+function saveSettings(){
+ state.settings.autoRefresh=$("autoRefresh").checked;
+ state.settings.refreshInterval=Number($("refreshInterval").value)||30;
+ state.settings.defaultInterval=$("defaultInterval").value||"1h";
+ state.settings.defaultPair=$("defaultPair").value||"BTC_USDT";
+ state.selectedSymbol=state.settings.defaultPair;state.chartSymbol=state.settings.defaultPair;
+ $("chartPair").value=state.settings.defaultPair;$("chartInterval").value=state.settings.defaultInterval;$("detailPair").value=state.settings.defaultPair;
+ applyTheme($("themeSelect").value||"light",true);startRefreshTimer();
+ toast("Settings saved for this session; theme is saved in your browser.");
+}
+function resetSettings(){
+ state.settings={...DEFAULTS};applySettingsUI();startRefreshTimer();toast("Settings reset to defaults.");
+}
+
+function bindEvents(){
+ $("navigation").addEventListener("click",e=>{const b=e.target.closest("[data-view]");if(b)switchView(b.dataset.view);});
+ document.addEventListener("click",e=>{
+  const go=e.target.closest("[data-goto]");if(go)switchView(go.dataset.goto);
+  const d=e.target.closest("[data-detail]");if(d){state.selectedSymbol=d.dataset.detail;$("detailPair").value=d.dataset.detail;switchView("detail");}
+  const c=e.target.closest("[data-chart]");if(c){state.chartSymbol=c.dataset.chart;state.selectedSymbol=c.dataset.chart;updatePairSelectors();$("chartPair").value=c.dataset.chart;switchView("chart");}
+ });
+ $("mobileMenu").addEventListener("click",()=>$("sidebar").classList.toggle("open"));
+ $("globalRefresh").addEventListener("click",()=>refreshMarket(true));$("sideRefresh").addEventListener("click",()=>refreshMarket(true));
+ $("scannerRefresh").addEventListener("click",()=>refreshMarket(true));$("chartRefresh").addEventListener("click",loadChart);
+ $("detailRefresh").addEventListener("click",loadDetail);$("detailLoadTechnical").addEventListener("click",loadDetailTechnical);
+ $("chartPair").addEventListener("change",loadChart);$("chartInterval").addEventListener("change",loadChart);
+ $("detailPair").addEventListener("change",()=>{state.selectedSymbol=$("detailPair").value;loadDetail();});
+ $("detailOpenChart").addEventListener("click",()=>{state.chartSymbol=$("detailPair").value||state.selectedSymbol;$("chartPair").value=state.chartSymbol;switchView("chart");});
+ ["marketSearch","changeFilter","sortBy","sortDirection","pageSize"].forEach(id=>$(id).addEventListener(id==="marketSearch"?"input":"change",()=>{state.page=1;renderScanner();}));
+ $("prevPage").addEventListener("click",()=>{state.page=Math.max(1,state.page-1);renderScanner();});
+ $("nextPage").addEventListener("click",()=>{state.page++;renderScanner();});
+
+ $("themeToggle").addEventListener("click",()=>applyTheme(document.documentElement.dataset.theme==="light"?"dark":"light",true));
+ $("themeSelect").addEventListener("change",()=>applyTheme($("themeSelect").value,true));
+ $("saveSettings").addEventListener("click",saveSettings);$("resetSettings").addEventListener("click",resetSettings);
+ $("testConnection").addEventListener("click",async()=>{
+  try{const p=await apiFetch("/api/market?page=1&limit=20");toast("Connection successful. Contracts: "+normalizeMarket(p).length);}
+  catch(e){toast("Connection failed: "+e.message);}
+ });
+ $("googleLogin").addEventListener("click",()=>toast("Google OAuth belum aktif. Konfigurasikan endpoint dan callback backend terlebih dahulu."));
+}
+
+async function init(){
+ bindEvents();applySettingsUI();startRefreshTimer();await refreshMarket(false);
+}
+window.App={refreshMarket};
+init();
+})();
+</script>
 </body>
 </html>
