@@ -17,7 +17,7 @@ function json(data, status = 200) {
 }
 
 export default {
-  async fetch(request) {
+  async fetch(request, env) {
     const url = new URL(request.url);
 
     if (request.method === "OPTIONS") {
@@ -25,23 +25,17 @@ export default {
     }
 
     if (request.method !== "GET") {
-      return json({
-        success: false,
-        error: "Method not allowed",
-      }, 405);
+      return json({ success: false, error: "Method not allowed" }, 405);
     }
 
-    if (url.pathname === "/") {
-      return json({
-        success: true,
-        name: "Crypto Research AI",
-        status: "online",
-        version: "1.3.1",
-        provider: "CoinMarketCap",
-        endpoints: ["/health", "/api/market"],
-      });
+    // Halaman utama website
+    if (url.pathname === "/" || url.pathname === "/index.html") {
+      return env.ASSETS.fetch(
+        new Request(new URL("/index.html", request.url), request)
+      );
     }
 
+    // Pemeriksaan status backend
     if (url.pathname === "/health") {
       return json({
         success: true,
@@ -51,6 +45,7 @@ export default {
       });
     }
 
+    // Data harga pasar
     if (url.pathname === "/api/market") {
       try {
         const apiUrl =
@@ -58,9 +53,7 @@ export default {
           "?symbol=BTC,ETH,SOL&convert=USD";
 
         const response = await fetch(apiUrl, {
-          headers: {
-            Accept: "application/json",
-          },
+          headers: { Accept: "application/json" },
         });
 
         if (!response.ok) {
@@ -80,10 +73,8 @@ export default {
           return json({
             success: false,
             error: "Invalid market data response",
-            provider_message:
-              result.status?.error_message ?? null,
-            provider_code:
-              result.status?.error_code ?? null,
+            provider_message: result.status?.error_message ?? null,
+            provider_code: result.status?.error_code ?? null,
           }, 502);
         }
 
@@ -98,8 +89,7 @@ export default {
           success: true,
           name: "Crypto Research AI",
           provider: "CoinMarketCap",
-          timestamp:
-            result.status.timestamp ?? new Date().toISOString(),
+          timestamp: result.status.timestamp ?? new Date().toISOString(),
           currency: "USD",
           count: data.length,
           data,
@@ -113,10 +103,7 @@ export default {
       }
     }
 
-    return json({
-      success: false,
-      error: "Endpoint not found",
-      available_endpoints: ["/", "/health", "/api/market"],
-    }, 404);
+    // Aset website lainnya
+    return env.ASSETS.fetch(request);
   },
 };
