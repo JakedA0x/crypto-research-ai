@@ -6,9 +6,11 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#090d14">
 <meta name="application-name" content="BlobSignal">
-<meta name="description" content="BlobSignal — Crypto Market Terminal for futures technical analysis and market research.">
+<meta name="description" content="BlobSignal — Crypto futures market terminal, live candlestick charts, and technical analysis.">
 <link rel="icon" type="image/png" href="/mascot.png">
 <title>BlobSignal — Crypto Market Terminal</title>
+
+<script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.2.2/dist/lightweight-charts.standalone.production.js"></script>
 
 <style>
 :root{
@@ -25,25 +27,15 @@
   --amber:#e8bd69;
 }
 *{box-sizing:border-box}
-body{
-  margin:0;background:var(--bg);color:var(--text);
-  font:13px/1.6 Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif
-}
-button,select{font:inherit;cursor:pointer}
-button:focus-visible,select:focus-visible{outline:1px solid var(--blue);outline-offset:2px}
+body{margin:0;background:var(--bg);color:var(--text);font:13px/1.6 Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+button,input,select{font:inherit}
+button,select{cursor:pointer}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:1px solid var(--blue);outline-offset:2px}
 button:disabled{opacity:.55;cursor:wait}
 a{color:inherit;text-decoration:none}
-.topbar{
-  min-height:66px;border-bottom:1px solid var(--border);
-  display:flex;align-items:center;justify-content:space-between;
-  padding:10px 24px;gap:18px;background:#0b111b;
-  position:sticky;top:0;z-index:5
-}
+.topbar{min-height:66px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:10px 24px;gap:18px;background:#0b111b;position:sticky;top:0;z-index:5}
 .brand{display:flex;align-items:center;gap:11px;min-width:0}
-.brand-mascot{
-  width:42px;height:42px;object-fit:contain;
-  border-radius:11px;flex-shrink:0
-}
+.brand-mascot{width:42px;height:42px;object-fit:contain;border-radius:11px;flex-shrink:0}
 .brand-copy{display:flex;flex-direction:column;gap:1px}
 .brand-name{font-size:19px;line-height:1.2;font-weight:800;letter-spacing:-.7px}
 .brand-name span{color:var(--blue)}
@@ -51,8 +43,7 @@ a{color:inherit;text-decoration:none}
 .top-right,.inline,.actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .status{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:7px}
 .dot{width:7px;height:7px;border-radius:50%;background:var(--amber);display:inline-block;flex-shrink:0}
-.dot.ok{background:var(--green)}
-.dot.bad{background:var(--red)}
+.dot.ok{background:var(--green)}.dot.bad{background:var(--red)}
 .clock{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
 .layout{max-width:1600px;margin:auto;padding:24px 24px 42px}
 .page-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;margin-bottom:22px}
@@ -68,31 +59,51 @@ h1{font-size:25px;letter-spacing:-.8px;margin:5px 0 3px;font-weight:750}
 .ticker-symbol{font-size:10px;color:var(--muted);margin-left:5px}
 .ticker-price{font-size:21px;font-weight:700;letter-spacing:-.5px;margin-top:8px;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
 .ticker-source{font-size:10px;color:var(--muted);margin-top:3px}
-.green{color:var(--green)!important}
-.red{color:var(--red)!important}
-.muted{color:var(--muted)}
+.green{color:var(--green)!important}.red{color:var(--red)!important}.muted{color:var(--muted)}
 .section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
 .section-title{font-size:13px;font-weight:700}
 .section-note{font-size:10px;color:var(--muted)}
-.workspace{border:1px solid var(--border);border-radius:9px;overflow:hidden;margin-bottom:22px}
-.toolbar{padding:15px 17px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.panel,.workspace{border:1px solid var(--border);border-radius:9px;overflow:hidden;margin-bottom:22px;min-width:0}
+.panel-head,.toolbar{padding:15px 17px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
 .controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-select{background:#0c121c;color:var(--text);border:1px solid #304057;border-radius:6px;padding:9px 29px 9px 10px;min-width:94px}
+select,input{background:#0c121c;color:var(--text);border:1px solid #304057;border-radius:6px;padding:9px 10px;min-width:100px}
+input{cursor:text}
+.search-input{width:min(300px,100%);min-width:180px}
 .btn{border:1px solid #304057;background:#182333;color:var(--text);border-radius:6px;padding:9px 13px;font-size:11px;font-weight:650}
 .btn:hover{border-color:var(--blue)}
 .btn-primary{background:var(--blue);border-color:var(--blue);color:#06111a}
 .btn-primary:hover{background:#7bd6ff}
 .btn-quiet{background:transparent}
+.btn:disabled{cursor:not-allowed}
+.market-tools{display:flex;gap:9px;flex-wrap:wrap;align-items:center}
+.market-count{font-size:10px;color:var(--muted)}
+.market-scroll{overflow:auto;max-height:520px}
+.market-table{width:100%;border-collapse:collapse;white-space:nowrap;font-size:11px}
+.market-table th{position:sticky;top:0;z-index:1;background:#111a27;color:var(--muted);font-size:10px;font-weight:550;text-align:right;padding:11px 15px;border-bottom:1px solid var(--border)}
+.market-table th:first-child,.market-table td:first-child{text-align:left}
+.market-table td{text-align:right;padding:11px 15px;border-bottom:1px solid #202b3b;font-variant-numeric:tabular-nums}
+.market-row{cursor:pointer;transition:background .15s}
+.market-row:hover,.market-row.selected{background:#152338}
+.market-row.selected td:first-child{box-shadow:inset 2px 0 var(--blue)}
+.coin-cell{display:flex;align-items:center;gap:10px;min-width:175px;text-align:left}
+.coin-logo{width:29px;height:29px;border-radius:50%;object-fit:contain;background:#202b3b;flex-shrink:0}
+.coin-fallback{width:29px;height:29px;border-radius:50%;display:grid;place-items:center;background:#202b3b;color:var(--blue);font-weight:750;font-size:10px;flex-shrink:0}
+.coin-name{font-weight:650}
+.coin-symbol{color:var(--muted);font-size:10px}
+.badge{font-size:10px;border-radius:4px;padding:3px 6px;display:inline-block;background:#222e40;color:var(--muted)}
+.pagination{padding:12px 15px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;background:#0d141e}
+.workspace{overflow:hidden}
 .workspace-body{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(265px,.8fr)}
 .chart-side{padding:18px;border-right:1px solid var(--border);min-width:0}
 .chart-meta{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px}
+.asset-heading{display:flex;align-items:center;gap:10px}
+.asset-logo{width:35px;height:35px;border-radius:50%;object-fit:contain;background:#202b3b}
 .asset-title{font-size:15px;font-weight:750}
 .asset-sub{font-size:10px;color:var(--muted);margin-top:3px}
 .last-price{text-align:right;font-size:20px;font-weight:700;font-variant-numeric:tabular-nums}
 .last-price small{display:block;color:var(--muted);font-size:10px;font-weight:400;margin-top:2px}
-.chart-box{height:280px;position:relative;background:linear-gradient(180deg,#111c2b,#0c121c);border:1px solid #253347;border-radius:7px;overflow:hidden}
-.chart-box svg{width:100%;height:100%;display:block}
-.chart-placeholder{position:absolute;inset:0;display:grid;place-items:center;color:var(--muted);font-size:11px;text-align:center;padding:20px}
+.chart-box{height:390px;position:relative;background:#0c121c;border:1px solid #253347;border-radius:7px;overflow:hidden}
+.chart-placeholder{position:absolute;inset:0;display:grid;place-items:center;color:var(--muted);font-size:11px;text-align:center;padding:20px;z-index:0}
 .chart-legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:12px;color:var(--muted);font-size:10px}
 .legend-dot{display:inline-block;width:7px;height:7px;border-radius:2px;margin-right:5px}
 .side-panel{padding:18px;min-width:0}
@@ -105,7 +116,7 @@ select{background:#0c121c;color:var(--text);border:1px solid #304057;border-radi
 .signal-tag.long{background:#15352b;color:var(--green)}
 .signal-tag.short{background:#3a2027;color:var(--red)}
 .signal-tag.wait{background:#352d1d;color:var(--amber)}
-.signal-facts{margin-top:14px;display:grid;gap:0}
+.signal-facts{margin-top:14px;display:grid}
 .fact{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--border);font-size:11px}
 .fact:last-child{border-bottom:0}
 .fact span:first-child{color:var(--muted)}
@@ -116,8 +127,6 @@ select{background:#0c121c;color:var(--text);border:1px solid #304057;border-radi
 .metric-value{font-size:17px;font-weight:700;margin-top:7px;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
 .metric-note{font-size:10px;color:var(--muted);margin-top:4px}
 .lower-grid{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:16px}
-.panel{border:1px solid var(--border);border-radius:8px;overflow:hidden;min-width:0}
-.panel-head{padding:13px 15px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--surface)}
 .panel-content{padding:15px}
 .data-table{width:100%;border-collapse:collapse;font-size:11px}
 .data-table th{text-align:left;color:var(--muted);font-weight:500;font-size:10px;padding:9px 8px;border-bottom:1px solid var(--border)}
@@ -125,49 +134,34 @@ select{background:#0c121c;color:var(--text);border:1px solid #304057;border-radi
 .data-table tr:last-child td{border-bottom:0}
 .data-table td:last-child,.data-table th:last-child{text-align:right}
 .table-scroll{overflow-x:auto}
-.key{color:var(--muted)}
-.val{font-variant-numeric:tabular-nums;text-align:right}
-.badge{font-size:10px;border-radius:4px;padding:3px 6px;display:inline-block;background:#222e40;color:var(--muted)}
+.key{color:var(--muted)}.val{font-variant-numeric:tabular-nums;text-align:right}
 .disclaimer{margin-top:18px;border:1px solid var(--border);border-radius:7px;padding:13px 15px;color:var(--muted);font-size:10px;line-height:1.9;background:#0e141e}
 footer{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:20px 0 0;color:#64738a;font-size:10px}
 .loading{color:var(--muted);padding:18px 0;font-size:11px}
 .error-text{color:var(--red)}
-.small-btn{padding:5px 8px;font-size:10px}
 @media(max-width:1000px){
  .workspace-body{grid-template-columns:minmax(0,1.3fr) minmax(245px,.8fr)}
  .data-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
- .layout{padding:18px 15px 30px}
- .topbar{padding:10px 15px}
+ .layout{padding:18px 15px 30px}.topbar{padding:10px 15px}
 }
 @media(max-width:700px){
  .topbar{min-height:58px;padding:10px 12px}
- .brand-mascot{width:36px;height:36px}
- .brand-name{font-size:16px}
+ .brand-mascot{width:36px;height:36px}.brand-name{font-size:16px}
  .brand-subtitle{font-size:8px;letter-spacing:1px}
- .top-right{justify-content:flex-end;gap:8px}
- .clock{display:none}
- .status{font-size:10px}
- .layout{padding:18px 12px 25px}
- .page-heading{align-items:flex-start}
- h1{font-size:21px}
- .ticker-item{padding:11px 9px}
- .ticker-price{font-size:15px}
- .ticker-name{font-size:10px}
- .ticker-symbol{display:block;margin:2px 0 0}
+ .top-right{justify-content:flex-end;gap:8px}.clock{display:none}
+ .status{font-size:10px}.layout{padding:18px 12px 25px}
+ .page-heading{align-items:flex-start}h1{font-size:21px}
+ .ticker-item{padding:11px 9px}.ticker-price{font-size:15px}
+ .ticker-name{font-size:10px}.ticker-symbol{display:block;margin:2px 0 0}
  .workspace-body{grid-template-columns:1fr}
  .chart-side{border-right:0;border-bottom:1px solid var(--border);padding:12px}
- .side-panel{padding:12px}
- .chart-box{height:230px}
- .toolbar{padding:12px}
- .controls{width:100%}
- .controls select{flex:1;min-width:0}
- .controls .btn{flex:1}
- .lower-grid{grid-template-columns:1fr}
- .data-grid{gap:8px}
- .metric{padding:11px}
- .metric-value{font-size:15px}
- .section-note{display:none}
- .pill{font-size:9px}
+ .side-panel{padding:12px}.chart-box{height:330px}
+ .toolbar,.panel-head{padding:12px}.controls{width:100%}
+ .controls select{flex:1;min-width:0}.controls .btn{flex:1}
+ .lower-grid{grid-template-columns:1fr}.data-grid{gap:8px}
+ .metric{padding:11px}.metric-value{font-size:15px}
+ .section-note{display:none}.pill{font-size:9px}
+ .market-tools{width:100%}.search-input{width:100%;min-width:0;flex:1}
 }
 </style>
 </head>
@@ -182,7 +176,7 @@ footer{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;paddin
     </span>
   </a>
   <div class="top-right">
-    <div class="status"><span class="dot" id="apiDot"></span><span id="connection">Connecting to data...</span></div>
+    <div class="status"><span class="dot" id="apiDot"></span><span id="connection">Connecting...</span></div>
     <span class="clock" id="clock">--:--:-- UTC</span>
   </div>
 </header>
@@ -192,33 +186,75 @@ footer{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;paddin
     <div>
       <div class="eyebrow">BLOBSIGNAL INTELLIGENCE</div>
       <h1>Crypto Market Terminal</h1>
-      <div class="sub">Read the market. Manage the risk. Technical analysis for crypto futures.</div>
+      <div class="sub">Read the market. Manage the risk. Futures data, candlestick charts, and technical analysis.</div>
     </div>
-    <div class="pill"><span class="dot ok"></span> Live research workspace</div>
+    <div class="pill"><span class="dot ok"></span> REST data · Auto-refresh</div>
   </section>
 
-  <section class="ticker" id="market">
-    <div class="ticker-item"><div class="loading">Loading market data...</div></div>
-    <div class="ticker-item"><div class="loading">Loading...</div></div>
-    <div class="ticker-item"><div class="loading">Loading...</div></div>
+  <section class="ticker" id="marketTicker">
+    <div class="ticker-item"><div class="loading">Loading BTC...</div></div>
+    <div class="ticker-item"><div class="loading">Loading ETH...</div></div>
+    <div class="ticker-item"><div class="loading">Loading SOL...</div></div>
+  </section>
+
+  <section class="panel" id="marketExplorer">
+    <div class="panel-head">
+      <div>
+        <div class="section-title">All Futures Markets</div>
+        <div class="section-note">USDT perpetual contracts returned by MEXC</div>
+      </div>
+      <span class="badge" id="marketProvider">MEXC Futures</span>
+    </div>
+    <div class="panel-head" style="background:#0d141e">
+      <div class="market-tools">
+        <input class="search-input" id="marketSearch" type="search" placeholder="Search coin or symbol..." aria-label="Search crypto market">
+        <select id="marketSort" aria-label="Sort markets">
+          <option value="volume">Highest turnover</option>
+          <option value="gainers">Top gainers</option>
+          <option value="losers">Top losers</option>
+          <option value="price">Highest price</option>
+        </select>
+        <button class="btn" id="refreshMarketBtn" type="button">Refresh</button>
+      </div>
+      <div class="market-count" id="marketCount">Loading markets...</div>
+    </div>
+    <div class="market-scroll">
+      <table class="market-table">
+        <thead>
+          <tr>
+            <th>Asset</th>
+            <th>Last price</th>
+            <th>24h change</th>
+            <th>24h turnover</th>
+            <th>24h high</th>
+            <th>24h low</th>
+          </tr>
+        </thead>
+        <tbody id="marketBody">
+          <tr><td colspan="6" class="muted">Loading MEXC futures markets...</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="pagination">
+      <span class="market-count" id="marketPageInfo">—</span>
+      <button class="btn" id="loadMoreBtn" type="button">Load more markets</button>
+    </div>
   </section>
 
   <section class="workspace">
     <div class="toolbar">
       <div>
-        <div class="section-title">Perpetual Futures</div>
-        <div class="section-note">Market data · Technical indicators · Conditional setup</div>
+        <div class="section-title">Live Futures Chart</div>
+        <div class="section-note">Candlesticks · Volume · Technical indicators</div>
       </div>
       <div class="controls">
         <select id="symbol" aria-label="Futures symbol">
           <option value="BTC_USDT">BTC / USDT</option>
           <option value="ETH_USDT">ETH / USDT</option>
           <option value="SOL_USDT">SOL / USDT</option>
-          <option value="JUP_USDT">JUP / USDT</option>
-          <option value="DOGE_USDT">DOGE / USDT</option>
-          <option value="XRP_USDT">XRP / USDT</option>
         </select>
         <select id="interval" aria-label="Chart timeframe">
+          <option value="1m">1m</option>
           <option value="5m">5m</option>
           <option value="15m" selected>15m</option>
           <option value="30m">30m</option>
@@ -228,33 +264,37 @@ footer{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;paddin
           <option value="1d">1D</option>
           <option value="1w">1W</option>
         </select>
-        <button class="btn btn-primary" id="analyzeBtn" onclick="loadTechnicals()">Run analysis ↗</button>
+        <button class="btn btn-primary" id="analyzeBtn" type="button">Load chart ↗</button>
       </div>
     </div>
 
     <div class="workspace-body">
       <div class="chart-side">
         <div class="chart-meta">
-          <div>
-            <div class="asset-title" id="assetTitle">BTC / USDT</div>
-            <div class="asset-sub" id="chartSubtitle">MEXC perpetual · 15m</div>
+          <div class="asset-heading">
+            <img id="chartAssetLogo" class="asset-logo" src="/mascot.png" alt="Selected asset">
+            <div>
+              <div class="asset-title" id="assetTitle">BTC / USDT</div>
+              <div class="asset-sub" id="chartSubtitle">MEXC perpetual · 15m</div>
+            </div>
           </div>
           <div class="last-price" id="lastPrice">—<small id="lastTime">Waiting for candles</small></div>
         </div>
         <div class="chart-box" id="chartBox">
-          <div class="chart-placeholder" id="chartPlaceholder">Loading MEXC Futures candle data...</div>
+          <div class="chart-placeholder" id="chartPlaceholder">Loading candlestick data...</div>
         </div>
         <div class="chart-legend">
-          <span><i class="legend-dot" style="background:var(--green)"></i>Price movement</span>
-          <span><i class="legend-dot" style="background:var(--blue)"></i>Latest price</span>
-          <span>Historical closing-price line · not a candlestick chart</span>
+          <span><i class="legend-dot" style="background:var(--green)"></i>Bullish candle</span>
+          <span><i class="legend-dot" style="background:var(--red)"></i>Bearish candle</span>
+          <span><i class="legend-dot" style="background:var(--blue)"></i>Volume</span>
+          <span id="chartRefreshStatus">Waiting for chart data</span>
         </div>
       </div>
 
       <aside class="side-panel">
         <div class="section-head">
           <div class="section-title">Technical bias</div>
-          <span class="badge" id="signalConfidence">Rule-based</span>
+          <span class="badge">Rule-based</span>
         </div>
         <div class="signal-card">
           <div class="signal-top">
@@ -264,7 +304,7 @@ footer{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;paddin
           <div class="signal-value" id="signalValue">WAIT</div>
           <div class="signal-desc" id="signalDesc">Loading available technical indicators.</div>
           <div class="signal-facts">
-            <div class="fact"><span>Last close</span><strong id="factPrice">—</strong></div>
+            <div class="fact"><span>Last completed close</span><strong id="factPrice">—</strong></div>
             <div class="fact"><span>RSI (14)</span><strong id="factRsi">—</strong></div>
             <div class="fact"><span>MACD histogram</span><strong id="factMacd">—</strong></div>
             <div class="fact"><span>EMA trend</span><strong id="factEma">—</strong></div>
@@ -272,7 +312,7 @@ footer{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;paddin
           </div>
         </div>
         <div class="disclaimer" style="margin-top:12px">
-          Bias is a transparent indicator rule, not an AI prediction or guaranteed trade signal. Confirm market structure, fees, funding and liquidation risk before trading.
+          This is a transparent indicator rule, not an AI prediction or guaranteed signal. Confirm market structure, fees, funding and liquidation risk before trading.
         </div>
       </aside>
     </div>
@@ -302,7 +342,7 @@ footer{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;paddin
       <div class="panel-content table-scroll">
         <table class="data-table">
           <thead><tr><th>Level</th><th>Type</th><th>Price</th></tr></thead>
-          <tbody id="levelsBody"><tr><td colspan="3" class="muted">Run analysis to load levels.</td></tr></tbody>
+          <tbody id="levelsBody"><tr><td colspan="3" class="muted">Loading levels...</td></tr></tbody>
         </table>
       </div>
     </div>
@@ -331,53 +371,92 @@ footer{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;paddin
 
   <section class="disclaimer">
     <strong style="color:var(--text)">Risk disclosure</strong><br>
-    BlobSignal is a research and educational interface, not financial advice. Technical indicators are calculated from historical data and may lag sudden market moves. The displayed bias does not account for every market condition, trading fees, funding, slippage, leverage or liquidation price. Verify exchange data independently before making trading decisions.
+    BlobSignal is a research and educational interface, not financial advice. Candles are refreshed by periodic API polling, not a direct exchange WebSocket connection. Market availability, logo coverage, data delays and indicator accuracy depend on their respective sources. Verify exchange data independently before trading.
   </section>
 
   <footer>
     <span>BlobSignal · Crypto Market Terminal</span>
-    <span id="footerUpdate">Market: CoinMarketCap · Futures: MEXC</span>
+    <span id="footerUpdate">Market: MEXC Futures · Chart: MEXC Futures</span>
   </footer>
 </main>
 
 <script>
+"use strict";
+
 const BASE = "https://crypto-research-ai.mhd-aldirahman-56.workers.dev";
 const MARKET_URL = BASE + "/api/market";
 const TECH_URL = BASE + "/api/technicals";
 const $ = id => document.getElementById(id);
+
+const state = {
+  markets: [],
+  page: 1,
+  limit: 100,
+  total: 0,
+  totalPages: 1,
+  loadingMore: false,
+  chart: null,
+  candleSeries: null,
+  volumeSeries: null,
+  selectedLogo: null,
+  refreshTimer: null,
+  searchTimer: null,
+  requestId: 0,
+  marketRequestId: 0,
+  lastChartData: null
+};
 
 function num(value) {
   if (value === null || value === undefined || value === "") return null;
   const n = Number(value);
   return Number.isFinite(n) ? n : null;
 }
+
+function escapeHtml(value) {
+  return String(value ?? "").replace(/[&<>"']/g, char => ({
+    "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;"
+  })[char]);
+}
+
 function fmt(value, digits) {
   const n = num(value);
   if (n === null) return "—";
   return n.toLocaleString("en-US", {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: digits === undefined ? (Math.abs(n) < 1 ? 6 : 2) : digits
+    maximumFractionDigits: digits ?? (Math.abs(n) < 1 ? 6 : 2)
   });
 }
+
 function price(value) {
   const n = num(value);
   if (n === null) return "—";
   return "$" + n.toLocaleString("en-US", {
     minimumFractionDigits: 2,
-    maximumFractionDigits: Math.abs(n) < 1 ? 6 : 2
+    maximumFractionDigits: Math.abs(n) < 1 ? 8 : 2
   });
 }
-function setConnection(text, state) {
-  $("connection").textContent = text;
-  $("apiDot").className = "dot " + (state || "");
+
+function compact(value) {
+  const n = num(value);
+  if (n === null) return "—";
+  return new Intl.NumberFormat("en-US", {
+    notation: "compact",
+    maximumFractionDigits: 2
+  }).format(n);
 }
+
 function safeTime(value) {
   if (!value) return "Time unavailable";
   const d = new Date(value);
   return Number.isNaN(d.getTime()) ? String(value) : d.toLocaleString("id-ID");
 }
+
+function setConnection(text, status) {
+  $("connection").textContent = text;
+  $("apiDot").className = "dot " + (status || "");
+}
+
 async function getJson(url) {
-  const response = await fetch(url, {cache:"no-store"});
+  const response = await fetch(url, { cache: "no-store" });
   const data = await response.json();
   if (!response.ok || data.success === false) {
     throw new Error(data.error || "API request failed (" + response.status + ")");
@@ -385,52 +464,327 @@ async function getJson(url) {
   return data;
 }
 
-function renderMarket(coins) {
-  if (!Array.isArray(coins) || !coins.length) throw new Error("No market data returned.");
-  $("market").innerHTML = coins.slice(0, 3).map(coin => {
-    const symbol = String(coin.symbol || "—");
-    const icons = {BTC:"₿",ETH:"Ξ",SOL:"◎"};
+function fallbackLogo(symbol) {
+  return `<span class="coin-fallback">${escapeHtml(String(symbol || "?").slice(0, 4))}</span>`;
+}
+
+function logoMarkup(url, symbol) {
+  if (!url) return fallbackLogo(symbol);
+  return `<img class="coin-logo" src="${escapeHtml(url)}" alt="${escapeHtml(symbol)}"
+    loading="lazy" referrerpolicy="no-referrer"
+    onerror="this.outerHTML='<span class=&quot;coin-fallback&quot;>${escapeHtml(String(symbol || "?").slice(0, 4))}</span>'">`;
+}
+
+function setChartLogo(url) {
+  const img = $("chartAssetLogo");
+  img.onerror = () => {
+    img.onerror = null;
+    img.src = "/mascot.png";
+  };
+  img.src = url || "/mascot.png";
+}
+
+function renderTicker(markets) {
+  const preferred = ["BTC", "ETH", "SOL"];
+  const chosen = preferred.map(symbol =>
+    markets.find(coin => coin.symbol === symbol)
+  ).filter(Boolean);
+
+  if (!chosen.length) {
+    $("marketTicker").innerHTML =
+      '<div class="ticker-item"><div class="muted">No ticker data available.</div></div>';
+    return;
+  }
+
+  $("marketTicker").innerHTML = chosen.map(coin => {
+    const change = num(coin.change_24h_percent);
+    const changeClass = change === null ? "" : change >= 0 ? "green" : "red";
     return `<article class="ticker-item">
       <div class="ticker-top">
-        <div><span class="ticker-name">${icons[symbol] || ""} ${coin.name || symbol}</span>
-        <span class="ticker-symbol">${symbol}</span></div>
-        <span class="badge">SPOT</span>
+        <div style="display:flex;align-items:center;gap:8px">
+          ${logoMarkup(coin.logo_url, coin.symbol)}
+          <div><span class="ticker-name">${escapeHtml(coin.name || coin.symbol)}</span>
+          <span class="ticker-symbol">${escapeHtml(coin.symbol)}</span></div>
+        </div>
+        <span class="badge">PERP</span>
       </div>
-      <div class="ticker-price">${price(coin.price_usd)}</div>
-      <div class="ticker-source">CoinMarketCap · USD</div>
+      <div class="ticker-price">${price(coin.price)}</div>
+      <div class="ticker-source">
+        <span class="${changeClass}">${change === null ? "—" : (change > 0 ? "+" : "") + fmt(change, 2) + "%"}</span>
+        · MEXC Futures
+      </div>
     </article>`;
   }).join("");
 }
-async function loadMarket() {
+
+function renderMarketRows(markets, append) {
+  const body = $("marketBody");
+  const html = markets.map(coin => {
+    const symbol = String(coin.symbol || "");
+    const contract = String(coin.contract_symbol || "");
+    const change = num(coin.change_24h_percent);
+    const changeClass = change === null ? "" : change >= 0 ? "green" : "red";
+    const selected = contract === $("symbol").value ? " selected" : "";
+
+    return `<tr class="market-row${selected}" data-contract="${escapeHtml(contract)}"
+      data-symbol="${escapeHtml(symbol)}" tabindex="0" role="button"
+      aria-label="Select ${escapeHtml(symbol)} market">
+      <td><div class="coin-cell">
+        ${logoMarkup(coin.logo_url, symbol)}
+        <div><div class="coin-name">${escapeHtml(coin.name || symbol)}</div>
+        <div class="coin-symbol">${escapeHtml(symbol)} / ${escapeHtml(coin.quote_asset || "USDT")}</div></div>
+      </div></td>
+      <td>${price(coin.price)}</td>
+      <td class="${changeClass}">${change === null ? "—" : (change > 0 ? "+" : "") + fmt(change, 2) + "%"}</td>
+      <td>${compact(coin.turnover_24h)}</td>
+      <td>${price(coin.high_24h)}</td>
+      <td>${price(coin.low_24h)}</td>
+    </tr>`;
+  }).join("");
+
+  if (append) {
+    body.insertAdjacentHTML("beforeend", html);
+  } else {
+    body.innerHTML = html || '<tr><td colspan="6" class="muted">No matching markets found.</td></tr>';
+  }
+
+  $("marketCount").textContent =
+    `${state.markets.length.toLocaleString()} loaded · ${state.total.toLocaleString()} available`;
+
+  $("marketPageInfo").textContent =
+    `Page ${state.page} of ${Math.max(state.totalPages, 1)}`;
+
+  $("loadMoreBtn").disabled =
+    state.loadingMore || state.page >= state.totalPages || !state.total;
+
+  $("loadMoreBtn").textContent =
+    state.page >= state.totalPages ? "All loaded" :
+    state.loadingMore ? "Loading..." : "Load more markets";
+}
+
+async function loadMarket(reset = true) {
+  if (state.loadingMore) return;
+
+  const requestId = ++state.marketRequestId;
+  if (reset) {
+    state.page = 1;
+    state.markets = [];
+    $("marketBody").innerHTML =
+      '<tr><td colspan="6" class="muted">Loading futures markets...</td></tr>';
+  }
+
+  const search = $("marketSearch").value.trim();
+  const sort = $("marketSort").value;
+  const page = reset ? 1 : state.page + 1;
+
+  state.loadingMore = !reset;
+  $("loadMoreBtn").disabled = true;
+  $("marketCount").textContent = "Loading market data...";
+
   try {
-    const result = await getJson(MARKET_URL);
-    renderMarket(result.data);
-    setConnection("API connected", "ok");
-    $("footerUpdate").textContent = "Market: CoinMarketCap · Updated " + safeTime(result.timestamp);
+    const params = new URLSearchParams({
+      page: String(page),
+      limit: String(state.limit),
+      sort
+    });
+    if (search) params.set("search", search);
+
+    const result = await getJson(MARKET_URL + "?" + params.toString());
+    if (requestId !== state.marketRequestId) return;
+
+    const incoming = Array.isArray(result.data) ? result.data : [];
+    state.page = Number(result.page || page);
+    state.total = Number(result.total ?? incoming.length);
+    state.totalPages = Number(result.total_pages || 1);
+    state.markets = reset ? incoming : state.markets.concat(incoming);
+
+    if (reset) {
+      renderTicker(state.markets);
+      $("footerUpdate").textContent =
+        "Market: MEXC Futures · Updated " + safeTime(result.timestamp);
+    }
+
+    renderMarketRows(incoming, !reset);
+    if (reset) renderMarketRows(state.markets, false);
+    setConnection("Market API connected", "ok");
   } catch (error) {
+    if (requestId !== state.marketRequestId) return;
+    $("marketBody").innerHTML =
+      `<tr><td colspan="6" class="error-text">${escapeHtml(error.message)}</td></tr>`;
+    $("marketCount").textContent = "Market request failed";
     setConnection("Market API error", "bad");
-    $("market").innerHTML = `<div class="ticker-item"><div class="error-text">Market data unavailable</div><div class="muted">${error.message}</div></div>`;
+  } finally {
+    if (requestId === state.marketRequestId) {
+      state.loadingMore = false;
+      $("loadMoreBtn").disabled = state.page >= state.totalPages || !state.total;
+      $("loadMoreBtn").textContent =
+        state.page >= state.totalPages ? "All loaded" : "Load more markets";
+    }
   }
 }
 
-function flatten(obj, prefix, out, depth) {
-  out = out || [];
-  depth = depth || 0;
-  if (!obj || typeof obj !== "object" || depth > 5) return out;
+function initChart() {
+  if (!window.LightweightCharts) {
+    $("chartBox").innerHTML =
+      '<div class="chart-placeholder error-text">Chart library failed to load. Check your connection or CDN access.</div>';
+    return false;
+  }
+
+  state.chart = LightweightCharts.createChart($("chartBox"), {
+    width: $("chartBox").clientWidth,
+    height: $("chartBox").clientHeight,
+    layout: {
+      background: { color: "#0c121c" },
+      textColor: "#8998ad",
+      fontFamily: 'Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif'
+    },
+    grid: {
+      vertLines: { color: "#172131" },
+      horzLines: { color: "#172131" }
+    },
+    crosshair: {
+      mode: LightweightCharts.CrosshairMode.Normal
+    },
+    rightPriceScale: {
+      borderColor: "#253347",
+      scaleMargins: { top: 0.08, bottom: 0.25 }
+    },
+    timeScale: {
+      borderColor: "#253347",
+      timeVisible: true,
+      secondsVisible: false,
+      rightOffset: 5
+    },
+    localization: {
+      locale: "en-US",
+      priceFormatter: value => "$" + Number(value).toLocaleString("en-US", {
+        maximumFractionDigits: Math.abs(value) < 1 ? 6 : 2
+      })
+    },
+    handleScroll: true,
+    handleScale: true
+  });
+
+  state.candleSeries = state.chart.addCandlestickSeries({
+    upColor: "#45d6a0",
+    downColor: "#f16d7a",
+    borderUpColor: "#45d6a0",
+    borderDownColor: "#f16d7a",
+    wickUpColor: "#45d6a0",
+    wickDownColor: "#f16d7a",
+    priceLineVisible: true,
+    lastValueVisible: true
+  });
+
+  state.volumeSeries = state.chart.addHistogramSeries({
+    color: "#54c8ff",
+    priceFormat: { type: "volume" },
+    priceScaleId: "",
+    lastValueVisible: false,
+    priceLineVisible: false
+  });
+
+  state.volumeSeries.priceScale().applyOptions({
+    scaleMargins: { top: 0.78, bottom: 0 }
+  });
+
+  const resize = () => {
+    if (!state.chart) return;
+    state.chart.applyOptions({
+      width: $("chartBox").clientWidth,
+      height: $("chartBox").clientHeight
+    });
+  };
+
+  if ("ResizeObserver" in window) {
+    new ResizeObserver(resize).observe($("chartBox"));
+  } else {
+    window.addEventListener("resize", resize);
+  }
+
+  return true;
+}
+
+function normalizeCandles(candles) {
+  const map = new Map();
+
+  for (const c of candles || []) {
+    const time = num(c.time ?? c.timestamp ?? c.t);
+    const open = num(c.open ?? c.o);
+    const high = num(c.high ?? c.h);
+    const low = num(c.low ?? c.l);
+    const close = num(c.close ?? c.c);
+    const volume = num(c.volume ?? c.vol ?? c.v);
+
+    if ([time, open, high, low, close].some(v => v === null)) continue;
+
+    map.set(time, {
+      time: Math.floor(time),
+      open, high, low, close,
+      volume: volume ?? 0
+    });
+  }
+
+  return [...map.values()].sort((a, b) => a.time - b.time);
+}
+
+function renderCandles(candles) {
+  if (!state.chart || !state.candleSeries || !state.volumeSeries) {
+    if (!initChart()) return;
+  }
+
+  const valid = normalizeCandles(candles);
+  if (!valid.length) {
+    $("chartRefreshStatus").textContent = "No candle data";
+    return;
+  }
+
+  state.candleSeries.setData(valid.map(c => ({
+    time: c.time,
+    open: c.open,
+    high: c.high,
+    low: c.low,
+    close: c.close
+  })));
+
+  state.volumeSeries.setData(valid.map(c => ({
+    time: c.time,
+    value: c.volume,
+    color: c.close >= c.open ? "rgba(69,214,160,0.42)" : "rgba(241,109,122,0.42)"
+  })));
+
+  state.chart.timeScale().fitContent();
+
+  const last = valid[valid.length - 1];
+  $("lastPrice").innerHTML =
+    `${price(last.close)}<small>${new Date(last.time * 1000).toLocaleString("id-ID")}</small>`;
+  $("chartRefreshStatus").textContent =
+    "Last candle " + new Date(last.time * 1000).toLocaleTimeString("id-ID");
+
+  state.lastChartData = valid;
+}
+
+function flatten(obj, prefix = "", out = [], depth = 0) {
+  if (!obj || typeof obj !== "object" || depth > 6) return out;
+
   for (const [key, value] of Object.entries(obj)) {
     const path = prefix ? prefix + "." + key : key;
     if (value === null || value === undefined) continue;
-    if (typeof value === "number" || (typeof value === "string" && value.trim() !== "" && Number.isFinite(Number(value)))) {
-      out.push({key, path, value:Number(value)});
+
+    if (typeof value === "number" ||
+        (typeof value === "string" && value.trim() !== "" && Number.isFinite(Number(value)))) {
+      out.push({ key, path, value: Number(value) });
     } else if (typeof value === "object" && !Array.isArray(value)) {
       flatten(value, path, out, depth + 1);
     }
   }
   return out;
 }
+
 function norm(value) {
   return String(value).toLowerCase().replace(/[^a-z0-9]/g, "");
 }
+
 function findValue(entries, aliases) {
   for (const alias of aliases) {
     const exact = entries.find(e => norm(e.key) === norm(alias));
@@ -441,104 +795,6 @@ function findValue(entries, aliases) {
     if (match) return match.value;
   }
   return null;
-}
-function extractCandles(data) {
-  const candidates = [data.candles, data.data, data.klines, data.rows];
-  for (const item of candidates) {
-    if (Array.isArray(item) && item.length && typeof item[0] === "object") return item;
-  }
-  return [];
-}
-function candleClose(c) {
-  return num(c.close ?? c.c ?? c[4] ?? c.lastPrice);
-}
-function candleTime(c) {
-  const t = c.time ?? c.timestamp ?? c.t ?? c.openTime ?? c.startTime ?? c[0];
-  if (num(t) !== null) {
-    const n = Number(t);
-    return new Date(n < 1e12 ? n * 1000 : n);
-  }
-  const d = new Date(t);
-  return Number.isNaN(d.getTime()) ? null : d;
-}
-function drawChart(candles) {
-  const box = $("chartBox");
-  const valid = candles.map(c => ({c, close:candleClose(c), time:candleTime(c)}))
-    .filter(x => x.close !== null).slice(-100);
-  if (valid.length < 2) {
-    box.innerHTML = '<div class="chart-placeholder">Closing-price series is unavailable in the API response.<br>Technical values may still be displayed.</div>';
-    return;
-  }
-  const values = valid.map(x => x.close);
-  let min = Math.min(...values), max = Math.max(...values);
-  if (max === min) { max += 1; min -= 1; }
-  const pad = (max - min) * .12;
-  min -= pad; max += pad;
-  const W = 900, H = 300, left = 18, right = 75, top = 16, bottom = 23;
-  const plotW = W - left - right, plotH = H - top - bottom;
-  const points = valid.map((x, i) => {
-    const px = left + (i / (valid.length - 1)) * plotW;
-    const py = top + ((max - x.close) / (max - min)) * plotH;
-    return px.toFixed(2) + "," + py.toFixed(2);
-  }).join(" ");
-  const grid = [0,1,2,3,4].map(i => {
-    const y = top + plotH * i / 4;
-    const v = max - (max-min) * i/4;
-    return `<line x1="${left}" y1="${y}" x2="${W-right}" y2="${y}" stroke="#253347" stroke-dasharray="3 5"/>
-      <text x="${W-right+8}" y="${y+4}" fill="#8998ad" font-size="11">${fmt(v, Math.abs(v)<1?5:2)}</text>`;
-  }).join("");
-  const first = valid[0].time ? valid[0].time.toLocaleString("id-ID") : "Earlier";
-  const last = valid[valid.length-1].time ? valid[valid.length-1].time.toLocaleString("id-ID") : "Latest";
-  box.innerHTML = `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="Historical closing-price line chart">
-    ${grid}
-    <polyline points="${points}" fill="none" stroke="#54c8ff" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
-    <circle cx="${left+plotW}" cy="${top+((max-values[values.length-1])/(max-min))*plotH}" r="4" fill="#45d6a0" stroke="#0e1116" stroke-width="2"/>
-    <text x="${left}" y="${H-5}" fill="#8998ad" font-size="10">${first}</text>
-    <text x="${W-right}" y="${H-5}" text-anchor="end" fill="#8998ad" font-size="10">${last}</text>
-  </svg>`;
-}
-
-function updateSignal(entries, close) {
-  const rsi = findValue(entries, ["rsi14","rsi"]);
-  const macd = findValue(entries, ["macdHistogram","histogram","macdHist"]);
-  const ema20 = findValue(entries, ["ema20"]);
-  const ema50 = findValue(entries, ["ema50"]);
-  const ema200 = findValue(entries, ["ema200"]);
-  let score = 0, reasons = [];
-  if (rsi !== null) {
-    if (rsi >= 50 && rsi < 70) { score++; reasons.push("RSI above 50"); }
-    else if (rsi < 50 && rsi > 30) { score--; reasons.push("RSI below 50"); }
-    else if (rsi >= 70) reasons.push("RSI elevated; momentum may be stretched");
-    else if (rsi <= 30) reasons.push("RSI oversold; reversal is not confirmed");
-  }
-  if (macd !== null && macd !== 0) {
-    score += macd > 0 ? 1 : -1;
-    reasons.push(macd > 0 ? "MACD histogram positive" : "MACD histogram negative");
-  }
-  if (ema20 !== null && ema50 !== null && ema20 !== ema50) {
-    score += ema20 > ema50 ? 1 : -1;
-    reasons.push(ema20 > ema50 ? "EMA20 above EMA50" : "EMA20 below EMA50");
-  }
-  if (ema200 !== null && close !== null && close !== ema200) {
-    score += close > ema200 ? 1 : -1;
-    reasons.push(close > ema200 ? "Price above EMA200" : "Price below EMA200");
-  }
-  let signal = "WAIT", cls = "wait", desc = "Insufficient or mixed indicator evidence. Wait for confirmation.";
-  if (score >= 2) {
-    signal = "LONG BIAS"; cls = "long";
-    desc = "Bullish conditions from the available indicators. This is a bias only, not an entry instruction.";
-  } else if (score <= -2) {
-    signal = "SHORT BIAS"; cls = "short";
-    desc = "Bearish conditions from the available indicators. This is a bias only, not an entry instruction.";
-  }
-  $("signalValue").textContent = signal;
-  $("signalTag").textContent = signal.replace(" BIAS", "");
-  $("signalTag").className = "signal-tag " + cls;
-  $("signalDesc").textContent = reasons.length ? desc + " Factors: " + reasons.join("; ") + "." : desc;
-  $("factPrice").textContent = price(close);
-  $("factRsi").textContent = rsi === null ? "—" : fmt(rsi, 2);
-  $("factMacd").textContent = macd === null ? "—" : fmt(macd, 5);
-  $("factEma").textContent = ema20 === null || ema50 === null ? "—" : (ema20 > ema50 ? "Bullish alignment" : ema20 < ema50 ? "Bearish alignment" : "Neutral");
 }
 
 function renderMetrics(entries) {
@@ -552,99 +808,320 @@ function renderMetrics(entries) {
     ["Bollinger Upper",["bollingerUpper","bbUpper","upperBand"],"Band"],
     ["Bollinger Lower",["bollingerLower","bbLower","lowerBand"],"Band"]
   ];
+
   $("metrics").innerHTML = definitions.map(([label, aliases, note]) => {
     const value = findValue(entries, aliases);
-    return `<article class="metric"><div class="metric-label">${label}</div>
+    return `<article class="metric">
+      <div class="metric-label">${label}</div>
       <div class="metric-value">${value === null ? "—" : fmt(value, label.includes("RSI") ? 2 : 6)}</div>
-      <div class="metric-note">${note}</div></article>`;
+      <div class="metric-note">${note}</div>
+    </article>`;
   }).join("");
 }
+
+function updateSignal(entries, close) {
+  const rsi = findValue(entries, ["rsi14","rsi"]);
+  const macd = findValue(entries, ["macdHistogram","histogram","macdHist"]);
+  const ema20 = findValue(entries, ["ema20"]);
+  const ema50 = findValue(entries, ["ema50"]);
+  const ema200 = findValue(entries, ["ema200"]);
+
+  let score = 0;
+  const reasons = [];
+
+  if (rsi !== null) {
+    if (rsi >= 50 && rsi < 70) {
+      score++; reasons.push("RSI above 50");
+    } else if (rsi < 50 && rsi > 30) {
+      score--; reasons.push("RSI below 50");
+    } else if (rsi >= 70) {
+      reasons.push("RSI elevated; momentum may be stretched");
+    } else if (rsi <= 30) {
+      reasons.push("RSI oversold; reversal is not confirmed");
+    }
+  }
+
+  if (macd !== null && macd !== 0) {
+    score += macd > 0 ? 1 : -1;
+    reasons.push(macd > 0 ? "MACD histogram positive" : "MACD histogram negative");
+  }
+
+  if (ema20 !== null && ema50 !== null && ema20 !== ema50) {
+    score += ema20 > ema50 ? 1 : -1;
+    reasons.push(ema20 > ema50 ? "EMA20 above EMA50" : "EMA20 below EMA50");
+  }
+
+  if (ema200 !== null && close !== null && close !== ema200) {
+    score += close > ema200 ? 1 : -1;
+    reasons.push(close > ema200 ? "Price above EMA200" : "Price below EMA200");
+  }
+
+  let signal = "WAIT", cls = "wait";
+  let desc = "Insufficient or mixed indicator evidence. Wait for confirmation.";
+
+  if (score >= 2) {
+    signal = "LONG BIAS";
+    cls = "long";
+    desc = "Bullish conditions from available indicators. This is a bias, not an entry instruction.";
+  } else if (score <= -2) {
+    signal = "SHORT BIAS";
+    cls = "short";
+    desc = "Bearish conditions from available indicators. This is a bias, not an entry instruction.";
+  }
+
+  $("signalValue").textContent = signal;
+  $("signalTag").textContent = signal.replace(" BIAS", "");
+  $("signalTag").className = "signal-tag " + cls;
+  $("signalDesc").textContent =
+    reasons.length ? desc + " Factors: " + reasons.join("; ") + "." : desc;
+  $("factPrice").textContent = price(close);
+  $("factRsi").textContent = rsi === null ? "—" : fmt(rsi, 2);
+  $("factMacd").textContent = macd === null ? "—" : fmt(macd, 6);
+  $("factEma").textContent =
+    ema20 === null || ema50 === null ? "—" :
+    ema20 > ema50 ? "Bullish alignment" :
+    ema20 < ema50 ? "Bearish alignment" : "Neutral";
+}
+
 function renderLevels(data, entries) {
-  const levels = data.levels || data.analysis?.levels || {};
-  const found = flatten(levels);
+  const analysis = data.analysis || {};
+  const possible = [
+    analysis.levels,
+    analysis.supportResistance,
+    analysis.support_resistance,
+    analysis.pivots,
+    analysis.fibonacci
+  ];
+
+  let found = [];
+  for (const item of possible) {
+    const list = flatten(item);
+    if (list.length) found.push(...list);
+  }
+
   if (!found.length) {
     const keywords = ["support","resistance","pivot","fib","fibonacci"];
-    found.push(...entries.filter(e => keywords.some(k => norm(e.path).includes(k))));
+    found = entries.filter(e => keywords.some(k => norm(e.path).includes(k)));
   }
-  if (!found.length) {
-    $("levelsBody").innerHTML = '<tr><td colspan="3" class="muted">Level data not found in response.</td></tr>';
+
+  const unique = new Map();
+  for (const item of found) unique.set(item.path, item);
+
+  const levels = [...unique.values()];
+  if (!levels.length) {
+    $("levelsBody").innerHTML =
+      '<tr><td colspan="3" class="muted">Price levels are not available in the API response.</td></tr>';
     return;
   }
-  $("levelsBody").innerHTML = found.slice(0, 30).map(item => {
+
+  $("levelsBody").innerHTML = levels.slice(0, 30).map(item => {
     const name = item.path.split(".").slice(-2).join(" · ");
     const key = norm(item.path);
     const type = key.includes("support") ? "Support" :
       key.includes("resistance") ? "Resistance" :
       key.includes("pivot") ? "Pivot" :
       key.includes("fib") ? "Fibonacci" : "Level";
-    return `<tr><td>${name}</td><td><span class="badge">${type}</span></td><td class="val">${price(item.value)}</td></tr>`;
+
+    return `<tr><td>${escapeHtml(name)}</td>
+      <td><span class="badge">${type}</span></td>
+      <td class="val">${price(item.value)}</td></tr>`;
   }).join("");
 }
+
 function renderStatus(data, candles, interval) {
-  const count = data.candleCount ?? candles.length ?? "—";
-  $("dataStatus").textContent = "Response received";
+  $("dataStatus").textContent = "Connected";
   $("statusBody").innerHTML = `
-    <tr><td class="key">Candle count</td><td class="val">${count}</td></tr>
-    <tr><td class="key">Selected timeframe</td><td class="val">${interval}</td></tr>
+    <tr><td class="key">Completed candles</td><td class="val">${data.candleCount ?? candles.length}</td></tr>
+    <tr><td class="key">Chart candles</td><td class="val">${data.chartCandleCount ?? candles.length}</td></tr>
+    <tr><td class="key">Selected timeframe</td><td class="val">${escapeHtml(interval)}</td></tr>
     <tr><td class="key">Funding rate</td><td class="val">Not connected</td></tr>
     <tr><td class="key">Open interest</td><td class="val">Not connected</td></tr>
     <tr><td class="key">Liquidation data</td><td class="val">Not connected</td></tr>`;
-  const limits = data.limitations;
+
+  const limits = data.dataLimitations;
   $("limitations").textContent = Array.isArray(limits) && limits.length
-    ? "Limitations: " + limits.join(" · ")
-    : "Funding, open interest and liquidation feeds have not been connected to this dashboard.";
+    ? limits.join(" ")
+    : "Market derivatives feeds beyond candle data may not be available.";
 }
-async function loadTechnicals() {
-  const button = $("analyzeBtn");
+
+async function loadTechnicals(options = {}) {
+  const refreshOnly = options.refreshOnly === true;
+  const requestId = ++state.requestId;
   const symbol = $("symbol").value;
   const interval = $("interval").value;
-  button.disabled = true;
-  button.textContent = "Analyzing...";
-  $("technicalUpdated").textContent = "Requesting candle data...";
+  const button = $("analyzeBtn");
+
+  if (!refreshOnly) {
+    button.disabled = true;
+    button.textContent = "Loading...";
+    $("technicalUpdated").textContent = "Requesting candle data...";
+  }
+
   $("assetTitle").textContent = symbol.replace("_", " / ");
   $("chartSubtitle").textContent = "MEXC perpetual · " + interval;
+  $("chartRefreshStatus").textContent = "Updating chart data...";
+
   try {
-    const url = TECH_URL + "?symbol=" + encodeURIComponent(symbol) + "&interval=" + encodeURIComponent(interval);
-    const data = await getJson(url);
-    const analysis = data.analysis || data.technicals || {};
-    const source = analysis.indicators || data.indicators || analysis;
+    const params = new URLSearchParams({ symbol, interval, limit: "250" });
+    const data = await getJson(TECH_URL + "?" + params.toString());
+    if (requestId !== state.requestId) return;
+
+    const analysis = data.analysis || {};
+    const source = analysis.indicators || analysis.technicals || analysis;
     const entries = flatten(source);
-    const closeSeries = extractCandles(data);
-    const lastCandle = closeSeries.length ? closeSeries[closeSeries.length - 1] : null;
-    const latestClose = num(data.latestCandle?.close) ?? num(data.latestCandle?.c) ?? (lastCandle ? candleClose(lastCandle) : null);
-    const close = latestClose ?? findValue(entries, ["close","lastPrice","price"]);
-    $("lastPrice").innerHTML = `${price(close)}<small id="lastTime">${safeTime(data.timestamp)}</small>`;
-    drawChart(closeSeries);
+    const chartCandles = Array.isArray(data.chartCandles)
+      ? data.chartCandles
+      : Array.isArray(data.candles) ? data.candles : [];
+
+    if (!chartCandles.length) {
+      throw new Error("The API returned no chart candles.");
+    }
+
+    renderCandles(chartCandles);
+
+    const completed = Array.isArray(data.candles) ? data.candles : [];
+    const latest = data.latestCandle || completed[completed.length - 1];
+    const close = num(latest?.close) ?? num(latest?.c) ??
+      (completed.length ? num(completed[completed.length - 1].close) : null);
+
+    if (close !== null && !$("lastPrice").textContent.includes("$")) {
+      $("lastPrice").textContent = price(close);
+    }
+
     renderMetrics(entries);
     updateSignal(entries, close);
     renderLevels(data, entries);
-    renderStatus(data, closeSeries, interval);
-    $("technicalUpdated").textContent = "Updated " + safeTime(data.timestamp) + " · " + (data.provider || "MEXC Futures");
-    setConnection("API connected", "ok");
+    renderStatus(data, chartCandles, interval);
+
+    $("technicalUpdated").textContent =
+      "Updated " + safeTime(data.timestamp) + " · " + (data.provider || "MEXC Futures");
+
+    $("footerUpdate").textContent =
+      "Market: MEXC Futures · Chart refreshed " +
+      new Date().toLocaleTimeString("id-ID");
+
+    setConnection("Market and futures connected", "ok");
   } catch (error) {
+    if (requestId !== state.requestId) return;
+
     $("dataStatus").textContent = "Request failed";
     $("technicalUpdated").textContent = "Could not load technical data";
-    $("chartBox").innerHTML = `<div class="chart-placeholder error-text">${error.message}<br><br>Check that this symbol and timeframe are supported by the backend.</div>`;
+    $("chartRefreshStatus").textContent = "Chart update failed";
+
+    if (!state.lastChartData) {
+      $("chartBox").innerHTML =
+        `<div class="chart-placeholder error-text">${escapeHtml(error.message)}<br><br>Check the symbol, timeframe, API and chart library.</div>`;
+    }
+
     $("signalValue").textContent = "UNAVAILABLE";
     $("signalTag").textContent = "ERROR";
     $("signalTag").className = "signal-tag wait";
-    $("signalDesc").textContent = "No new analysis was produced because the API request failed.";
-    setConnection("Technicals unavailable", "bad");
+    $("signalDesc").textContent =
+      "No new analysis was produced because the API request failed.";
+    setConnection("Technical data unavailable", "bad");
   } finally {
-    button.disabled = false;
-    button.textContent = "Run analysis ↗";
+    if (!refreshOnly && requestId === state.requestId) {
+      button.disabled = false;
+      button.textContent = "Load chart ↗";
+    }
   }
 }
 
+function selectMarket(contract, logo, name) {
+  if (!/^[A-Z0-9]+_USDT$/.test(contract)) return;
+
+  const symbolSelect = $("symbol");
+  let option = [...symbolSelect.options].find(o => o.value === contract);
+
+  if (!option) {
+    option = new Option(contract.replace("_USDT", " / USDT"), contract);
+    symbolSelect.add(option);
+  }
+
+  symbolSelect.value = contract;
+  state.selectedLogo = logo || null;
+  setChartLogo(logo);
+  $("assetTitle").textContent = name || contract.replace("_", " / ");
+  document.querySelectorAll(".market-row").forEach(row => {
+    row.classList.toggle("selected", row.dataset.contract === contract);
+  });
+
+  loadTechnicals();
+  document.querySelector(".workspace").scrollIntoView({
+    behavior: "smooth",
+    block: "start"
+  });
+}
+
+$("marketBody").addEventListener("click", event => {
+  const row = event.target.closest(".market-row");
+  if (!row) return;
+
+  const coin = state.markets.find(c => c.contract_symbol === row.dataset.contract);
+  if (!coin) return;
+  selectMarket(coin.contract_symbol, coin.logo_url, coin.name || coin.symbol);
+});
+
+$("marketBody").addEventListener("keydown", event => {
+  if (event.key !== "Enter" && event.key !== " ") return;
+  const row = event.target.closest(".market-row");
+  if (!row) return;
+  event.preventDefault();
+  row.click();
+});
+
+$("marketSearch").addEventListener("input", () => {
+  clearTimeout(state.searchTimer);
+  state.searchTimer = setTimeout(() => loadMarket(true), 350);
+});
+
+$("marketSort").addEventListener("change", () => loadMarket(true));
+$("refreshMarketBtn").addEventListener("click", () => loadMarket(true));
+$("loadMoreBtn").addEventListener("click", () => loadMarket(false));
+$("analyzeBtn").addEventListener("click", () => loadTechnicals());
+
+$("symbol").addEventListener("change", () => {
+  const selected = state.markets.find(c => c.contract_symbol === $("symbol").value);
+  state.selectedLogo = selected?.logo_url || null;
+  setChartLogo(state.selectedLogo);
+  loadTechnicals();
+});
+
+$("interval").addEventListener("change", () => loadTechnicals());
+
 function updateClock() {
   $("clock").textContent = new Date().toLocaleTimeString("en-GB", {
-    hour12:false,timeZone:"UTC"
+    hour12: false,
+    timeZone: "UTC"
   }) + " UTC";
 }
+
 updateClock();
 setInterval(updateClock, 1000);
-loadMarket();
+
+loadMarket(true).then(() => {
+  const btc = state.markets.find(c => c.symbol === "BTC");
+  if (btc) setChartLogo(btc.logo_url);
+});
+
+if (window.LightweightCharts) {
+  initChart();
+}
+
 loadTechnicals();
+
+// Polling berkala agar candle berjalan diperbarui dari endpoint REST.
+// Ini bukan WebSocket dan tidak menjamin tick-by-tick updates.
+state.refreshTimer = setInterval(() => {
+  if (!document.hidden) loadTechnicals({ refreshOnly: true });
+}, 15000);
+
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden) {
+    loadMarket(true);
+    loadTechnicals({ refreshOnly: true });
+  }
+});
 </script>
 </body>
 </html>
