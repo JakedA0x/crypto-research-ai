@@ -11,7 +11,7 @@ function json(data, status = 200) {
     headers: {
       ...corsHeaders,
       "Content-Type": "application/json; charset=utf-8",
-      "Cache-Control": "public, max-age=15",
+      "Cache-Control": "public, max-age=30",
     },
   });
 }
@@ -33,8 +33,8 @@ export default {
         success: true,
         name: "Crypto Research AI",
         status: "online",
-        version: "1.2.0",
-        provider: "Binance",
+        version: "1.3.0",
+        provider: "CoinMarketCap",
         endpoints: ["/health", "/api/market"],
       });
     }
@@ -50,10 +50,9 @@ export default {
 
     if (url.pathname === "/api/market") {
       try {
-        const symbols = ["BTCUSDT", "ETHUSDT", "SOLUSDT"];
         const apiUrl =
-          "https://api.binance.com/api/v3/ticker/24hr?symbols=" +
-          encodeURIComponent(JSON.stringify(symbols));
+          "https://pro-api.coinmarketcap.com/public-api/v2/simple/price" +
+          "?symbol=BTC,ETH,SOL&convert=USD";
 
         const response = await fetch(apiUrl, {
           headers: { Accept: "application/json" },
@@ -62,37 +61,33 @@ export default {
         if (!response.ok) {
           return json({
             success: false,
-            error: "Binance market data request failed",
+            error: "CoinMarketCap request failed",
             provider_status: response.status,
           }, 502);
         }
 
-        const tickers = await response.json();
+        const result = await response.json();
 
-        const names = {
-          BTCUSDT: { symbol: "BTC", name: "Bitcoin" },
-          ETHUSDT: { symbol: "ETH", name: "Ethereum" },
-          SOLUSDT: { symbol: "SOL", name: "Solana" },
-        };
+        if (result.status?.error_code !== 0 || !Array.isArray(result.data)) {
+          return json({
+            success: false,
+            error: "Invalid market data response",
+            provider_message: result.status?.error_message ?? null,
+          }, 502);
+        }
 
-        const data = tickers.map((ticker) => ({
-          ...names[ticker.symbol],
-          pair: ticker.symbol,
-          price_usdt: Number(ticker.lastPrice),
-          change_24h_percent: Number(ticker.priceChangePercent),
-          high_24h: Number(ticker.highPrice),
-          low_24h: Number(ticker.lowPrice),
-          volume_24h: Number(ticker.volume),
-          quote_volume_24h: Number(ticker.quoteVolume),
-          bid_price: Number(ticker.bidPrice),
-          ask_price: Number(ticker.askPrice),
+        const data = result.data.map((coin) => ({
+          id: coin.id,
+          name: coin.name,
+          symbol: coin.symbol,
+          price_usd: coin.quotes?.[0]?.price ?? null,
         }));
 
         return json({
           success: true,
-          provider: "Binance",
-          timestamp: new Date().toISOString(),
-          currency: "USDT",
+          provider: "CoinMarketCap",
+          timestamp: result.status.timestamp,
+          currency: "USD",
           data,
         });
       } catch (error) {
