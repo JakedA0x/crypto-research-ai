@@ -58,7 +58,7 @@ function normalizeChange(value) {
 
   if (number === null) return null;
 
-  // MEXC biasanya mengembalikan rasio, misalnya 0.05 = 5%.
+  // Rasio 0.05 = 5%.
   return Math.abs(number) <= 1 ? number * 100 : number;
 }
 
@@ -69,7 +69,6 @@ function logoUrl(symbol) {
 
   if (!normalized) return null;
 
-  // Logo publik berdasarkan simbol. Tidak semua token tersedia.
   return (
     "https://raw.githubusercontent.com/spothq/" +
     "cryptocurrency-icons/master/128/color/" +
@@ -85,6 +84,11 @@ function getBaseSymbol(contract) {
   ).toUpperCase();
 }
 
+// ======================================================
+// MARKET EXPLORER
+// GET /api/market
+// ======================================================
+
 async function getMarket(url) {
   const page = Math.max(
     1,
@@ -97,6 +101,7 @@ async function getMarket(url) {
   );
 
   const limit = Math.min(500, Math.max(1, requestedLimit));
+
   const search = (url.searchParams.get("search") || "")
     .trim()
     .toUpperCase();
@@ -104,8 +109,6 @@ async function getMarket(url) {
   const sort = (url.searchParams.get("sort") || "volume")
     .toLowerCase();
 
-  // Dua sumber data: daftar kontrak dan ticker 24 jam.
-  // Metadata kontrak diperlukan untuk memetakan simbol ke nama koin.
   const [detailResult, tickerResult] = await Promise.allSettled([
     fetchJson(`${API_BASE}/detail`),
     fetchJson(`${API_BASE}/ticker`),
@@ -118,6 +121,7 @@ async function getMarket(url) {
   }
 
   const tickerResponse = tickerResult.value;
+
   const tickerData = Array.isArray(tickerResponse.data)
     ? tickerResponse.data
     : [];
@@ -143,7 +147,6 @@ async function getMarket(url) {
     .filter((ticker) => {
       const symbol = String(ticker.symbol || "").toUpperCase();
 
-      // Terminal ini berfokus pada kontrak USDT perpetual.
       return (
         /^[A-Z0-9]+_USDT$/.test(symbol) &&
         numberOrNull(ticker.lastPrice) !== null
@@ -151,15 +154,13 @@ async function getMarket(url) {
     })
     .map((ticker) => {
       const contractSymbol = String(ticker.symbol).toUpperCase();
+
       const contract = detailsBySymbol.get(contractSymbol) || {
         symbol: contractSymbol,
       };
 
       const base = getBaseSymbol(contract);
       const price = numberOrNull(ticker.lastPrice);
-      const change = normalizeChange(ticker.riseFallRate);
-      const volume = numberOrNull(ticker.volume24);
-      const turnover = numberOrNull(ticker.amount24);
 
       return {
         id: contractSymbol,
@@ -168,26 +169,33 @@ async function getMarket(url) {
         contract_symbol: contractSymbol,
         quote_asset: contract.quoteCoin || "USDT",
 
-        // Field kompatibilitas untuk frontend lama.
+        // Kompatibilitas dengan frontend lama.
         price_usd: price,
 
-        // Data market tambahan.
         price,
-        change_24h_percent: change,
-        volume_24h: volume,
-        turnover_24h: turnover,
+        change_24h_percent: normalizeChange(ticker.riseFallRate),
+        volume_24h: numberOrNull(ticker.volume24),
+        turnover_24h: numberOrNull(ticker.amount24),
+
+        // Tidak disediakan langsung oleh ticker futures ini.
         market_cap: null,
+
         high_24h: numberOrNull(ticker.high24Price),
         low_24h: numberOrNull(ticker.lower24Price),
+
         fair_price: numberOrNull(ticker.fairPrice),
         index_price: numberOrNull(ticker.indexPrice),
         funding_rate: numberOrNull(ticker.fundingRate),
+
+        // Nilai mentah holdVol; satuan harus ditafsirkan
+        // berdasarkan spesifikasi kontrak MEXC.
         open_interest: numberOrNull(ticker.holdVol),
 
         logo_url: logoUrl(base),
 
         exchange: "MEXC Futures",
         market_type: "USDT Perpetual",
+
         price_scale: numberOrNull(contract.priceScale),
         volume_scale: numberOrNull(contract.volScale),
       };
@@ -196,7 +204,7 @@ async function getMarket(url) {
   if (search) {
     markets = markets.filter((coin) =>
       coin.symbol.includes(search) ||
-      coin.name.toUpperCase().includes(search) ||
+      String(coin.name).toUpperCase().includes(search) ||
       coin.contract_symbol.includes(search)
     );
   }
@@ -232,25 +240,125 @@ async function getMarket(url) {
     timestamp: new Date().toISOString(),
     currency: "USDT",
     market_type: "USDT Perpetual",
+
     count: data.length,
     total,
     page,
     limit,
     total_pages: Math.ceil(total / limit),
     has_next_page: startIndex + limit < total,
+
     search: search || null,
     sort,
     metadata_available: detailResult.status === "fulfilled",
+
     data,
+
     dataLimitations: [
-      "Daftar berisi kontrak USDT perpetual yang dikembalikan MEXC, bukan seluruh aset crypto di semua exchange.",
+      "Daftar berisi kontrak USDT perpetual yang dikembalikan MEXC.",
       "Market cap tidak tersedia pada endpoint ticker futures ini.",
-      "Volume, turnover, funding, dan open interest mengikuti definisi serta ketersediaan data MEXC.",
-      "Logo berasal dari repositori ikon publik berdasarkan simbol; tidak semua token memiliki logo dan simbol yang sama bisa ambigu.",
+      "Funding dan open interest mengikuti definisi serta ketersediaan data MEXC.",
+      "Open interest ditampilkan sebagai nilai holdVol mentah; jangan menganggapnya USDT tanpa konversi yang terverifikasi.",
+      "Logo menggunakan repositori ikon publik berdasarkan simbol dan tidak dijamin tersedia untuk setiap token.",
       "Harga dan statistik market dapat berubah setiap saat.",
     ],
   };
 }
+
+// ======================================================
+// SINGLE CONTRACT TICKER
+// GET /api/ticker?symbol=BTC_USDT
+// ======================================================
+
+async function getTickerDetail(url) {
+  const symbol = (
+    url.searchParams.get("symbol") || "BTC_USDT"
+  ).toUpperCase();
+
+  if (!/^[A-Z0-9]+_USDT$/.test(symbol)) {
+    return json({
+      success: false,
+      error: "Invalid symbol. Use a format such as BTC_USDT.",
+    }, 400);
+  }
+
+  try {
+    const result = await fetchJson(
+      `${API_BASE}/ticker?symbol=${encodeURIComponent(symbol)}`
+    );
+
+    const ticker = result.data;
+
+    if (
+      result.success !== true ||
+      !ticker ||
+      Array.isArray(ticker) ||
+      String(ticker.symbol || "").toUpperCase() !== symbol
+    ) {
+      return json({
+        success: false,
+        error: "Invalid MEXC ticker response.",
+        symbol,
+      }, 502);
+    }
+
+    const fundingRate = numberOrNull(ticker.fundingRate);
+    const timestamp = numberOrNull(ticker.timestamp);
+
+    return json({
+      success: true,
+      name: "BlobSignal",
+      provider: "MEXC Futures",
+      symbol,
+
+      timestamp: timestamp !== null
+        ? new Date(timestamp).toISOString()
+        : new Date().toISOString(),
+
+      price: numberOrNull(ticker.lastPrice),
+      bid: numberOrNull(ticker.bid1),
+      ask: numberOrNull(ticker.ask1),
+
+      fair_price: numberOrNull(ticker.fairPrice),
+      index_price: numberOrNull(ticker.indexPrice),
+
+      funding_rate: fundingRate,
+
+      // Contoh 0.000031 menjadi 0.0031 (%).
+      funding_rate_percent: fundingRate === null
+        ? null
+        : fundingRate * 100,
+
+      open_interest: numberOrNull(ticker.holdVol),
+
+      volume_24h: numberOrNull(ticker.volume24),
+      turnover_24h: numberOrNull(ticker.amount24),
+      high_24h: numberOrNull(ticker.high24Price),
+      low_24h: numberOrNull(ticker.lower24Price),
+
+      change_24h_percent: normalizeChange(ticker.riseFallRate),
+
+      dataLimitations: [
+        "Open interest menggunakan nilai holdVol dari MEXC; satuan dan konversinya perlu dikonfirmasi.",
+        "Funding rate berasal dari snapshot ticker; interval funding tidak diasumsikan.",
+        "Endpoint ini tidak menyediakan riwayat funding rate atau riwayat open interest.",
+        "Ticker merupakan snapshot dan dapat berubah setelah respons dikirim.",
+      ],
+    });
+  } catch (error) {
+    return json({
+      success: false,
+      error: "Unable to fetch ticker detail.",
+      message: String(error),
+      symbol,
+    }, 502);
+  }
+}
+
+// ======================================================
+// TECHNICAL ANALYSIS
+// GET /api/technicals?symbol=BTC_USDT&interval=15m
+// ======================================================
 
 async function getTechnicals(url) {
   const symbol = (
@@ -277,11 +385,15 @@ async function getTechnicals(url) {
   try {
     const end = Math.floor(Date.now() / 1000);
     const candleDuration = intervals[interval].seconds;
+
     const requestedCandles = Math.min(
       500,
       Math.max(
         50,
-        Number.parseInt(url.searchParams.get("limit") || "250", 10) || 250
+        Number.parseInt(
+          url.searchParams.get("limit") || "250",
+          10
+        ) || 250
       )
     );
 
@@ -344,8 +456,8 @@ async function getTechnicals(url) {
       }, 502);
     }
 
-    // Semua candle dikirim untuk visualisasi chart.
-    // Candle yang belum selesai tidak dipakai menghitung indikator.
+    // Chart menyertakan candle yang sedang berjalan.
+    // Indikator hanya memakai candle yang sudah selesai.
     const completedCandles = candles.filter(
       (c) => c.time + candleDuration <= end
     );
@@ -360,6 +472,7 @@ async function getTechnicals(url) {
     }
 
     const analysis = analyzeCandles(completedCandles);
+
     const latestCandle =
       completedCandles[completedCandles.length - 1];
 
@@ -371,25 +484,23 @@ async function getTechnicals(url) {
       interval,
       timestamp: new Date().toISOString(),
 
-      // Data candle yang sudah selesai untuk analisis.
       candleCount: completedCandles.length,
       latestCandle,
       candles: completedCandles,
 
-      // Data OHLCV lengkap, termasuk candle yang sedang berjalan,
-      // untuk frontend live chart.
       chartCandles: candles,
       chartCandleCount: candles.length,
       lastChartCandle: candles[candles.length - 1],
       candleDurationSeconds: candleDuration,
 
       analysis,
+
       dataLimitations: [
-        "Data candle berasal dari endpoint kontrak futures MEXC.",
-        "Candle yang belum selesai hanya disertakan pada chartCandles, bukan perhitungan indikator.",
-        "Frontend perlu melakukan polling berkala atau menggunakan WebSocket agar chart terus diperbarui.",
-        "Funding rate, open interest, dan liquidation heatmap tidak otomatis tersedia melalui endpoint candle ini.",
-        "Hasil indikator bukan probabilitas keberhasilan trading.",
+        "Candle berasal dari endpoint kontrak futures MEXC.",
+        "Candle yang belum selesai hanya disertakan pada chartCandles.",
+        "Frontend perlu melakukan polling atau memakai WebSocket agar chart diperbarui.",
+        "Funding rate dan open interest tidak dihitung dari data candle.",
+        "Indikator teknikal bukan jaminan profit atau probabilitas keberhasilan trading.",
       ],
     });
   } catch (error) {
@@ -402,6 +513,10 @@ async function getTechnicals(url) {
     }, 502);
   }
 }
+
+// ======================================================
+// CLOUDFLARE WORKER ROUTER
+// ======================================================
 
 export default {
   async fetch(request, env) {
@@ -432,8 +547,9 @@ export default {
         success: true,
         status: "healthy",
         service: "blobsignal",
-        version: "3.0.0",
+        version: "3.1.0",
         timestamp: new Date().toISOString(),
+
         endpoints: [
           "/health",
           "/api/market",
@@ -442,6 +558,7 @@ export default {
           "/api/market?sort=gainers",
           "/api/market?sort=losers",
           "/api/market?sort=volume",
+          "/api/ticker?symbol=BTC_USDT",
           "/api/technicals?symbol=BTC_USDT&interval=15m",
           "/api/technicals?symbol=BTC_USDT&interval=1h&limit=250",
         ],
@@ -459,6 +576,10 @@ export default {
           provider: "MEXC Futures",
         }, 502);
       }
+    }
+
+    if (url.pathname === "/api/ticker") {
+      return getTickerDetail(url);
     }
 
     if (url.pathname === "/api/technicals") {
