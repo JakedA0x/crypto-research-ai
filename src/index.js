@@ -307,12 +307,12 @@ async function getMarket(url) {
     data,
 
     dataLimitations: [
-      "Daftar berisi kontrak USDT perpetual yang dikembalikan MEXC.",
-      "Market cap tidak tersedia dari endpoint ticker futures.",
-      "Funding dan open interest mengikuti definisi serta ketersediaan data MEXC.",
-      "Open interest ditampilkan sebagai holdVol mentah.",
-      "Logo publik tidak dijamin tersedia untuk setiap token.",
-      "Harga dan statistik market dapat berubah setiap saat.",
+      "The list contains USDT perpetual contracts returned by MEXC.",
+      "Market capitalization is not provided by the futures ticker endpoint.",
+      "Funding rate and open interest follow MEXC's definitions and data availability.",
+      "Open interest is displayed as the raw holdVol value.",
+      "A public logo may not be available for every token.",
+      "Prices and market statistics can change at any time.",
     ],
   };
 }
@@ -390,10 +390,10 @@ async function getTickerDetail(url) {
       change_24h_percent: normalizeChange(ticker.riseFallRate),
 
       dataLimitations: [
-        "Open interest memakai nilai holdVol mentah.",
-        "Funding rate berasal dari snapshot ticker.",
-        "Ticker tidak menyediakan riwayat OI atau funding.",
-        "Data dapat berubah setelah respons dikirim.",
+        "Open interest uses the raw holdVol value.",
+        "Funding rate is taken from the ticker snapshot.",
+        "The ticker endpoint does not provide historical open-interest or funding-rate data.",
+        "Data may change after the response is sent.",
       ],
     });
   } catch (error) {
@@ -561,11 +561,11 @@ async function getTechnicals(url) {
       analysis,
 
       dataLimitations: [
-        "Candle berasal dari endpoint kontrak futures MEXC.",
-        "Candle aktif hanya disertakan pada chartCandles.",
-        "Frontend perlu melakukan polling atau memakai WebSocket.",
-        "Funding rate dan open interest tidak dihitung dari candle.",
-        "Indikator bukan jaminan profit.",
+        "Candles are retrieved from the MEXC futures contract endpoint.",
+        "The active candle is included only in chartCandles.",
+        "The frontend must poll for updates or use a WebSocket.",
+        "Funding rate and open interest are not calculated from candle data.",
+        "Indicators do not guarantee profits.",
       ],
     });
   } catch (error) {
