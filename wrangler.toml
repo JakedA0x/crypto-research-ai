@@ -2,3 +2,7 @@
 name = "crypto-research-ai"
 main = "src/index.js"
 compatibility_date = "2026-10-10"
+
+[assets]
+directory = "./public"
+binding = "ASSETS"
