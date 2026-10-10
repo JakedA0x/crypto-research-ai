@@ -103,6 +103,24 @@ tbody tr:last-child td{border-bottom:0}
 .mobile-menu{display:none}
 .toast{position:fixed;bottom:22px;right:22px;z-index:100;max-width:min(420px,calc(100vw - 36px));padding:13px 16px;border:1px solid var(--border);border-radius:10px;background:var(--panel);color:var(--text);font-size:12px;box-shadow:0 15px 45px #0002}
 .footer{color:var(--muted);font-size:10px;text-align:center;padding-top:30px}
+.ticker-ribbon{overflow:hidden;border:1px solid var(--border);border-radius:12px;background:var(--panel);margin:0 0 18px;padding:11px 0}
+.ticker-track{display:flex;width:max-content;animation:blobTickerScroll 75s linear infinite;will-change:transform}
+.ticker-ribbon:hover .ticker-track{animation-play-state:paused}
+.ticker-item{display:inline-flex;align-items:center;gap:9px;padding:0 22px;border-right:1px solid var(--border);font-size:11px;white-space:nowrap}
+.ticker-symbol{font-weight:800;letter-spacing:.2px}.ticker-price{font-variant-numeric:tabular-nums}.ticker-change{font-weight:700}
+@keyframes blobTickerScroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.draw-toolbar{display:flex;flex-wrap:wrap;gap:7px;align-items:center;margin:5px 0 12px}
+.draw-toolbar .btn.active{background:var(--blue);border-color:var(--blue);color:#fff}
+.chart-draw-host{position:relative}
+.drawing-overlay{position:absolute;inset:0;width:100%;height:100%;z-index:5;pointer-events:none;touch-action:none}
+.drawing-overlay.enabled{pointer-events:auto;cursor:crosshair}
+.prediction-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:14px}
+.prediction-cell{background:var(--bg);border:1px solid var(--border);padding:12px;border-radius:10px;min-width:0}
+.prediction-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px}
+.prediction-value{font-size:16px;font-weight:800;margin-top:7px;overflow-wrap:anywhere}
+.social-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px}
+.x-feed-frame{width:100%;height:430px;border:1px solid var(--border);border-radius:10px;background:var(--panel)}
+@media(max-width:760px){.prediction-grid,.social-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.ticker-item{padding:0 14px}}
 @media(max-width:1100px){.stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.grid-3{grid-template-columns:repeat(2,minmax(0,1fr))}.content{padding:22px 18px}.topbar{padding:0 18px}}
 @media(max-width:760px){.sidebar{transform:translateX(-100%);transition:transform .2s;box-shadow:15px 0 50px #0002}.sidebar.open{transform:translateX(0)}.main{margin-left:0}.mobile-menu{display:inline-flex}.topbar{height:65px;padding:0 12px}.content{padding:18px 12px 32px}.page-title{font-size:23px}.grid-2,.grid-3{grid-template-columns:1fr}.stat-grid{gap:9px}.stat-card{padding:12px}.stat-value{font-size:20px}.chart-box{height:310px}.panel{padding:13px}.topbar-status{display:none}}
 @media(max-width:400px){.stat-grid{grid-template-columns:1fr}}
@@ -163,6 +181,7 @@ tbody tr:last-child td{border-bottom:0}
 </header>
 
 <div class="content">
+  <section class="ticker-ribbon" aria-label="Live futures ticker"><div class="ticker-track" id="tickerTrack"><span class="ticker-item muted">Loading live market ticker…</span></div></section>
 
 <section class="view" id="view-overview">
   <div class="flex-between mb" style="align-items:flex-start;flex-wrap:wrap">
@@ -202,11 +221,45 @@ tbody tr:last-child td{border-bottom:0}
       <label class="chart-toggle"><input type="checkbox" id="showRSI" checked> RSI (14)</label>
       <label class="chart-toggle"><input type="checkbox" id="showMACD" checked> MACD (12, 26, 9)</label>
     </div>
-    <div id="priceChart" class="chart-box"></div>
+    <div class="draw-toolbar" aria-label="Chart drawing tools">
+      <span class="small muted">Drawing tools</span>
+      <button type="button" class="btn" data-draw="trend">Trend line</button>
+      <button type="button" class="btn" data-draw="horizontal">Horizontal line</button>
+      <button type="button" class="btn" data-draw="vertical">Vertical line</button>
+      <button type="button" class="btn" data-draw="clear">Clear drawings</button>
+      <span class="panel-note" id="drawingStatus">Select a tool to draw on the chart.</span>
+    </div>
+    <div class="chart-draw-host" id="chartDrawHost"><div id="priceChart" class="chart-box"></div><canvas id="drawingOverlay" class="drawing-overlay" aria-label="Chart drawing overlay"></canvas></div>
     <div class="panel-note" style="margin:10px 0">Volume</div><div id="volumeChart" class="volume-box"></div>
     <div id="rsiPane"><div class="panel-note" style="margin:14px 0 5px">Relative Strength Index (RSI 14) · 30 / 70 levels</div><div id="rsiChart" class="indicator-chart"></div></div>
     <div id="macdPane"><div class="panel-note" style="margin:14px 0 5px">Moving Average Convergence Divergence (MACD 12, 26, 9)</div><div id="macdChart" class="indicator-chart"></div></div>
     <div class="panel-note mt" id="chartCandleInfo">Candle data: —</div>
+  </div>
+  <div class="panel mt" id="predictionPanel">
+    <div class="flex-between"><div><div class="panel-title">Entry Scenario</div><div class="panel-note">Rule-based technical scenario from candle data; not a guaranteed signal.</div></div><span class="tag" id="predictionConfidence">Waiting for data</span></div>
+    <div class="prediction-grid">
+      <div class="prediction-cell"><div class="prediction-label">Scenario</div><div class="prediction-value" id="predSignal">—</div></div>
+      <div class="prediction-cell"><div class="prediction-label">Reference Entry</div><div class="prediction-value" id="predEntry">—</div></div>
+      <div class="prediction-cell"><div class="prediction-label">Stop Loss</div><div class="prediction-value red" id="predStop">—</div></div>
+      <div class="prediction-cell"><div class="prediction-label">Target 1</div><div class="prediction-value green" id="predTarget1">—</div></div>
+      <div class="prediction-cell"><div class="prediction-label">Target 2</div><div class="prediction-value green" id="predTarget2">—</div></div>
+      <div class="prediction-cell"><div class="prediction-label">Target 3</div><div class="prediction-value green" id="predTarget3">—</div></div>
+      <div class="prediction-cell"><div class="prediction-label">Risk / Reward</div><div class="prediction-value" id="predRR">—</div></div>
+      <div class="prediction-cell"><div class="prediction-label">Invalidation</div><div class="prediction-value" id="predInvalidation" style="font-size:12px">Waiting for data</div></div>
+    </div>
+    <div class="panel-note mt" id="predictionRationale">Waiting for enough candle data to evaluate the scenario.</div>
+  </div>
+  <div class="panel mt" id="socialPanel">
+    <div class="flex-between mb"><div><div class="panel-title">X Market Search & Social Feed</div><div class="panel-note">Search public posts by ticker and optional contract address (CA).</div></div><i class="fa-brands fa-x-twitter"></i></div>
+    <div class="toolbar mb">
+      <label class="small muted" for="xTicker">Ticker</label><input class="field" id="xTicker" value="BTC" placeholder="e.g. BTC" style="width:120px">
+      <label class="small muted" for="xCA">Contract address (CA)</label><input class="field" id="xCA" placeholder="Paste CA (optional)" style="flex:1;min-width:180px">
+      <button type="button" class="btn btn-primary" id="xSearchButton"><i class="fa-solid fa-magnifying-glass"></i> Search X</button>
+    </div>
+    <div class="social-grid">
+      <div><div class="panel-title mb">Search results</div><div class="notice" id="xSearchHint">Search opens public X results in a new tab. Live search results inside a custom feed require an X API integration.</div><div class="toolbar mt"><a class="btn" id="xTickerSearch" href="https://x.com/search?q=BTC" target="_blank" rel="noopener noreferrer">Search ticker</a><a class="btn" id="xCASearch" href="https://x.com/search?q=BTC" target="_blank" rel="noopener noreferrer">Search ticker + CA</a></div></div>
+      <div><div class="panel-title mb">BlobSignal on X</div><div class="panel-note mb">Public timeline for @BlobSignalAI. The feed depends on X allowing the profile embed in your browser.</div><div id="xFeedContainer"><blockquote class="twitter-timeline" data-height="430" data-theme="dark" data-dnt="true" data-chrome="noheader nofooter noborders" data-tweet-limit="8"><a href="https://twitter.com/BlobSignalAI?ref_src=twsrc%5Etfw">Posts by @BlobSignalAI</a></blockquote></div></div>
+    </div>
   </div>
   <div class="grid-3 mt">
     <div class="metric-box"><div class="metric-label">RSI</div><div class="metric-value" id="indicatorRSI">—</div><div class="panel-note" id="indicatorRSINote">Not available yet</div></div>
@@ -321,6 +374,10 @@ const state = {
   chartInterval:"",
   chartRequest:0,
   detailRequest:0,
+  tickerSignature:"",
+  drawingMode:"",
+  drawings:[],
+  pendingDrawingPoint:null,
   refreshTimer:null,
   refreshBusy:false,
   toastTimer:null,
@@ -605,6 +662,33 @@ function leaders(items,positive) {
     </div>`).join("");
 }
 
+function renderTickerRibbon() {
+  const track = $("tickerTrack");
+  if (!track || !state.market.length) return;
+  const items = [...state.market].sort((a,b) => symbolOf(a).localeCompare(symbolOf(b))).slice(0,80);
+  const signature = items.map(symbolOf).join("|");
+  if (signature !== state.tickerSignature) {
+    state.tickerSignature = signature;
+    const markup = items.map(x => {
+      const symbol = symbolOf(x), change = changeOf(x);
+      const cls = change == null ? "muted" : change >= 0 ? "green" : "red";
+      return '<span class="ticker-item"><span class="ticker-symbol">' + esc(symbol) +
+        '</span><span class="ticker-price" data-ticker-price="' + esc(symbol) + '">' + fmtPrice(priceOf(x)) +
+        '</span><span class="ticker-change ' + cls + '" data-ticker-change="' + esc(symbol) + '">' + fmtPercent(change) + '</span></span>';
+    }).join("");
+    track.innerHTML = markup + markup;
+  } else {
+    for (const x of items) {
+      const symbol = symbolOf(x), change = changeOf(x);
+      track.querySelectorAll('[data-ticker-price="' + CSS.escape(symbol) + '"]').forEach(el => el.textContent = fmtPrice(priceOf(x)));
+      track.querySelectorAll('[data-ticker-change="' + CSS.escape(symbol) + '"]').forEach(el => {
+        el.textContent = fmtPercent(change);
+        el.className = "ticker-change " + (change == null ? "muted" : change >= 0 ? "green" : "red");
+      });
+    }
+  }
+}
+
 function renderOverview() {
   const rows = state.market;
   $("statContracts").textContent = rows.length ? rows.length.toLocaleString() : "—";
@@ -717,6 +801,7 @@ async function refreshMarket(manual=false) {
     $("lastApiError").textContent = "None";
     setApiStatus("ok",rows.length+" contracts");
     updatePairSelectors();
+    renderTickerRibbon();
     renderOverview();
     renderScanner();
 
@@ -785,6 +870,91 @@ function chartOptions(el,height) {
   };
 }
 
+function resizeDrawingOverlay() {
+  const canvas = $("drawingOverlay"), host = $("chartDrawHost");
+  if (!canvas || !host) return;
+  const rect = host.getBoundingClientRect();
+  const ratio = window.devicePixelRatio || 1;
+  canvas.width = Math.max(1, Math.floor(rect.width * ratio));
+  canvas.height = Math.max(1, Math.floor(rect.height * ratio));
+  canvas.style.width = rect.width + "px";
+  canvas.style.height = rect.height + "px";
+  const ctx = canvas.getContext("2d");
+  if (ctx) ctx.setTransform(ratio,0,0,ratio,0,0);
+  drawOverlayLines();
+}
+
+function drawOverlayLines() {
+  const canvas = $("drawingOverlay");
+  if (!canvas) return;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return;
+  const width = canvas.clientWidth, height = canvas.clientHeight;
+  ctx.clearRect(0,0,width,height);
+  ctx.lineWidth = 2;
+  ctx.strokeStyle = "#e3a33b";
+  ctx.fillStyle = "#e3a33b";
+  for (const line of state.drawings) {
+    ctx.beginPath();
+    ctx.moveTo(line.x1,line.y1);
+    ctx.lineTo(line.x2,line.y2);
+    ctx.stroke();
+  }
+  if (state.pendingDrawingPoint) {
+    ctx.beginPath();
+    ctx.arc(state.pendingDrawingPoint.x,state.pendingDrawingPoint.y,4,0,Math.PI*2);
+    ctx.fill();
+  }
+}
+
+function setDrawingMode(mode) {
+  state.drawingMode = mode === "clear" ? "" : mode;
+  const canvas = $("drawingOverlay");
+  if (canvas) canvas.classList.toggle("enabled",!!state.drawingMode);
+  document.querySelectorAll("[data-draw]").forEach(btn => btn.classList.toggle("active",btn.dataset.draw===state.drawingMode));
+  $("drawingStatus").textContent = state.drawingMode
+    ? (state.drawingMode==="trend" ? "Click two points to place a trend line." : "Click the chart to place a " + state.drawingMode + " line.")
+    : "Chart navigation enabled. Choose a drawing tool to draw.";
+}
+
+function bindDrawingOverlay() {
+  const canvas = $("drawingOverlay");
+  if (!canvas || canvas.dataset.bound === "1") return;
+  canvas.dataset.bound = "1";
+  canvas.addEventListener("click",e => {
+    if (!state.drawingMode) return;
+    const rect = canvas.getBoundingClientRect();
+    const point = {x:e.clientX-rect.left,y:e.clientY-rect.top};
+    if (state.drawingMode === "horizontal") {
+      state.drawings.push({x1:0,y1:point.y,x2:canvas.clientWidth,y2:point.y});
+      drawOverlayLines();
+      return;
+    }
+    if (state.drawingMode === "vertical") {
+      state.drawings.push({x1:point.x,y1:0,x2:point.x,y2:canvas.clientHeight});
+      drawOverlayLines();
+      return;
+    }
+    if (!state.pendingDrawingPoint) {
+      state.pendingDrawingPoint = point;
+      drawOverlayLines();
+    } else {
+      state.drawings.push({x1:state.pendingDrawingPoint.x,y1:state.pendingDrawingPoint.y,x2:point.x,y2:point.y});
+      state.pendingDrawingPoint = null;
+      drawOverlayLines();
+    }
+  });
+  canvas.addEventListener("mousemove",e => {
+    if (state.drawingMode !== "trend" || !state.pendingDrawingPoint) return;
+    drawOverlayLines();
+    const rect=canvas.getBoundingClientRect(),ctx=canvas.getContext("2d");
+    ctx.beginPath();
+    ctx.moveTo(state.pendingDrawingPoint.x,state.pendingDrawingPoint.y);
+    ctx.lineTo(e.clientX-rect.left,e.clientY-rect.top);
+    ctx.strokeStyle="#e3a33b99";ctx.lineWidth=1;ctx.stroke();
+  });
+}
+
 function initCharts() {
   if (state.chart && state.volumeChart && state.candleSeries && state.volumeSeries && state.rsiChart && state.macdChart) return true;
   if (!window.LightweightCharts) {
@@ -796,6 +966,7 @@ function initCharts() {
   if (els.some(el => !el)) return false;
   try {
     state.chart = LightweightCharts.createChart(els[0],chartOptions(els[0],390));
+    bindDrawingOverlay();
     state.candleSeries = state.chart.addCandlestickSeries({upColor:"#35b989",downColor:"#e65c72",borderUpColor:"#35b989",borderDownColor:"#e65c72",wickUpColor:"#35b989",wickDownColor:"#e65c72"});
     state.ema20Series = state.chart.addLineSeries({color:"#e3a33b",lineWidth:2,title:"EMA 20",lastValueVisible:true,priceLineVisible:false});
     state.ema50Series = state.chart.addLineSeries({color:"#8b6be8",lineWidth:2,title:"EMA 50",lastValueVisible:true,priceLineVisible:false});
@@ -833,6 +1004,7 @@ function initCharts() {
 
 function resizeCharts() {
   if (state.view !== "chart") return;
+  resizeDrawingOverlay();
   [[state.chart,"priceChart"],[state.volumeChart,"volumeChart"],[state.rsiChart,"rsiChart"],[state.macdChart,"macdChart"]].forEach(([chart,id]) => {
     const el = $(id);
     if (!chart || !el || el.closest(".hidden")) return;
@@ -954,8 +1126,50 @@ function computeTechnicals(candles) {
 
 function lineData(candles,values){return candles.map((c,i)=>({time:c.time,value:values[i]})).filter(x=>Number.isFinite(x.value));}
 
+function renderPrediction(candles,t) {
+  const last = candles[candles.length-1];
+  const close = last && last.close;
+  const i = candles.length-1;
+  const e20=t.ema20[i], e50=t.ema50[i], r=t.rsi[i], m=t.macd[i], ms=t.signal[i];
+  if (!last || close == null || e20 == null || e50 == null || r == null || m == null || ms == null || candles.length < 50) {
+    $("predSignal").textContent="WAIT";
+    $("predEntry").textContent=fmtPrice(close);
+    ["predStop","predTarget1","predTarget2","predTarget3","predRR"].forEach(id => $(id).textContent="—");
+    $("predInvalidation").textContent="Need 50+ candles";
+    $("predictionConfidence").textContent="Insufficient data";
+    $("predictionRationale").textContent="A directional scenario is withheld until enough candle history is available.";
+    return;
+  }
+  const bullish = close > e20 && e20 > e50 && r > 50 && r < 70 && m > ms;
+  const bearish = close < e20 && e20 < e50 && r < 50 && r > 30 && m < ms;
+  const ranges = candles.slice(-15).map((c,j) => {
+    const previous = candles[Math.max(0,candles.length-15+j-1)].close;
+    return Math.max(c.high-c.low,Math.abs(c.high-previous),Math.abs(c.low-previous));
+  });
+  const atr = ranges.reduce((a,b)=>a+b,0)/ranges.length;
+  const distance = Math.max(atr*1.5,close*0.002);
+  const direction = bullish ? 1 : bearish ? -1 : 0;
+  const signal = bullish ? "LONG" : bearish ? "SHORT" : "WAIT";
+  $("predSignal").textContent=signal;
+  $("predSignal").className="prediction-value "+(bullish?"green":bearish?"red":"");
+  $("predEntry").textContent=fmtPrice(close);
+  $("predStop").textContent=direction?fmtPrice(close-direction*distance):"—";
+  $("predTarget1").textContent=direction?fmtPrice(close+direction*distance):"—";
+  $("predTarget2").textContent=direction?fmtPrice(close+direction*distance*2):"—";
+  $("predTarget3").textContent=direction?fmtPrice(close+direction*distance*3):"—";
+  $("predRR").textContent=direction?"1:1 · 1:2 · 1:3":"—";
+  $("predInvalidation").textContent=bullish?"Close below EMA 20":bearish?"Close above EMA 20":"Wait for alignment";
+  const confidence = direction ? Math.min(78,Math.round(55+Math.abs(r-50)*0.35)) : 45;
+  $("predictionConfidence").textContent=confidence+"% heuristic";
+  $("predictionRationale").textContent = bullish
+    ? "Trend, RSI, and MACD conditions align bullishly. Entry uses the latest candle close; reassess as new candles form."
+    : bearish ? "Trend, RSI, and MACD conditions align bearishly. Entry uses the latest candle close; reassess as new candles form."
+    : "Trend and momentum conditions are mixed or extended. Wait for alignment instead of forcing a directional setup.";
+}
+
 function renderComputedTechnicals(candles) {
   const t=computeTechnicals(candles), last=candles.length-1, close=candles[last]?.close;
+  renderPrediction(candles,t);
   state.ema20Series.setData(lineData(candles,t.ema20));
   state.ema50Series.setData(lineData(candles,t.ema50));
   state.supportSeries.setData(t.support===null?[]:candles.map(c=>({time:c.time,value:t.support})));
@@ -1261,6 +1475,29 @@ function resetSettings() {
 
 function bindEvents() {
   bindIndicatorControls();
+  bindDrawingOverlay();
+  document.querySelectorAll("[data-draw]").forEach(btn => btn.addEventListener("click",() => {
+    if (btn.dataset.draw === "clear") {
+      state.drawings = [];
+      state.pendingDrawingPoint = null;
+      drawOverlayLines();
+      setDrawingMode("");
+    } else setDrawingMode(btn.dataset.draw);
+  }));
+  $("xSearchButton").addEventListener("click",() => {
+    const ticker = $("xTicker").value.trim().replace(/^\$/,"");
+    const ca = $("xCA").value.trim();
+    if (!ticker && !ca) { toast("Enter a ticker or contract address first."); return; }
+    const tickerQuery = ticker ? "$" + ticker : "";
+    const combined = [tickerQuery,ca ? '"' + ca + '"' : ""].filter(Boolean).join(" ");
+    const url = "https://x.com/search?q=" + encodeURIComponent(combined);
+    $("xTickerSearch").href = "https://x.com/search?q=" + encodeURIComponent(tickerQuery || ca);
+    $("xCASearch").href = url;
+    window.open(url,"_blank","noopener,noreferrer");
+  });
+  $("chartPair").addEventListener("change",() => {
+    $("xTicker").value = ($("chartPair").value || "BTC_USDT").replace(/_USDT$/,"");
+  });
   $("navigation").addEventListener("click",e => {
     const target = e.target instanceof Element
       ? e.target.closest("[data-view]")
@@ -1376,6 +1613,12 @@ async function init() {
 
   bindEvents();
   applySettingsUI();
+  const xScript = document.createElement("script");
+  xScript.src = "https://platform.twitter.com/widgets.js";
+  xScript.async = true;
+  xScript.charset = "utf-8";
+  xScript.onerror = () => { $("xSearchHint").textContent = "X timeline embed could not load. Ticker and contract-address search links remain available."; };
+  document.head.appendChild(xScript);
   startRefreshTimer();
   await refreshMarket(false);
 }
