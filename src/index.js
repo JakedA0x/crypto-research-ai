@@ -68,7 +68,7 @@ export default {
 
         const result = await response.json();
 
-        if (result.status?.error_code !== 0 || !Array.isArray(result.data)) {
+       if (Number(result.status?.error_code) !== 0 || !Array.isArray(result.data)) {
           return json({
             success: false,
             error: "Invalid market data response",
