@@ -11,7 +11,7 @@ function json(data, status = 200) {
     headers: {
       ...corsHeaders,
       "Content-Type": "application/json; charset=utf-8",
-      "Cache-Control": "public, max-age=30",
+      "Cache-Control": "public, max-age=15",
     },
   });
 }
@@ -25,7 +25,10 @@ export default {
     }
 
     if (request.method !== "GET") {
-      return json({ success: false, error: "Method not allowed" }, 405);
+      return json({
+        success: false,
+        error: "Method not allowed",
+      }, 405);
     }
 
     if (url.pathname === "/") {
@@ -33,7 +36,7 @@ export default {
         success: true,
         name: "Crypto Research AI",
         status: "online",
-        version: "1.3.0",
+        version: "1.3.1",
         provider: "CoinMarketCap",
         endpoints: ["/health", "/api/market"],
       });
@@ -55,7 +58,9 @@ export default {
           "?symbol=BTC,ETH,SOL&convert=USD";
 
         const response = await fetch(apiUrl, {
-          headers: { Accept: "application/json" },
+          headers: {
+            Accept: "application/json",
+          },
         });
 
         if (!response.ok) {
@@ -68,11 +73,17 @@ export default {
 
         const result = await response.json();
 
-       if (Number(result.status?.error_code) !== 0 || !Array.isArray(result.data)) {
+        if (
+          Number(result.status?.error_code) !== 0 ||
+          !Array.isArray(result.data)
+        ) {
           return json({
             success: false,
             error: "Invalid market data response",
-            provider_message: result.status?.error_message ?? null,
+            provider_message:
+              result.status?.error_message ?? null,
+            provider_code:
+              result.status?.error_code ?? null,
           }, 502);
         }
 
@@ -85,9 +96,12 @@ export default {
 
         return json({
           success: true,
+          name: "Crypto Research AI",
           provider: "CoinMarketCap",
-          timestamp: result.status.timestamp,
+          timestamp:
+            result.status.timestamp ?? new Date().toISOString(),
           currency: "USD",
+          count: data.length,
           data,
         });
       } catch (error) {
@@ -102,6 +116,7 @@ export default {
     return json({
       success: false,
       error: "Endpoint not found",
+      available_endpoints: ["/", "/health", "/api/market"],
     }, 404);
   },
 };
