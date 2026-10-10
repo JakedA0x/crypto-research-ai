@@ -1,13 +1,14 @@
 
 import { analyzeCandles } from "./indicators.js";
 
+const VERSION = "3.2.0";
+const API_BASE = "https://api.mexc.com/api/v1/contract";
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type",
 };
-
-const API_BASE = "https://contract.mexc.com/api/v1/contract";
 
 const intervals = {
   "1m": { api: "Min1", seconds: 60 },
@@ -21,27 +22,65 @@ const intervals = {
   "1w": { api: "Week1", seconds: 604800 },
 };
 
-function json(data, status = 200) {
+function json(data, status = 200, extraHeaders = {}) {
   return new Response(JSON.stringify(data, null, 2), {
     status,
     headers: {
       ...corsHeaders,
       "Content-Type": "application/json; charset=utf-8",
       "Cache-Control": "no-store",
+      ...extraHeaders,
     },
   });
 }
 
-async function fetchJson(url) {
-  const response = await fetch(url, {
-    headers: { Accept: "application/json" },
-  });
+function errorResponse(error, status = 502, extra = {}) {
+  return json(
+    {
+      success: false,
+      error,
+      message: String(extra.message || "Upstream request failed."),
+      provider: "MEXC Futures",
+      api_base: API_BASE,
+      timestamp: new Date().toISOString(),
+      ...extra,
+    },
+    status
+  );
+}
 
-  if (!response.ok) {
-    throw new Error(`HTTP ${response.status}: ${url}`);
+async function fetchJson(url) {
+  let response;
+
+  try {
+    response = await fetch(url, {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+      },
+      redirect: "follow",
+    });
+  } catch (error) {
+    throw new Error(`Network error: ${String(error)}`);
   }
 
-  return response.json();
+  if (!response.ok) {
+    throw new Error(`Upstream HTTP ${response.status}`);
+  }
+
+  let body;
+
+  try {
+    body = await response.json();
+  } catch {
+    throw new Error("Upstream returned invalid JSON.");
+  }
+
+  if (!body || typeof body !== "object") {
+    throw new Error("Unexpected upstream response format.");
+  }
+
+  return body;
 }
 
 function numberOrNull(value) {
@@ -58,7 +97,6 @@ function normalizeChange(value) {
 
   if (number === null) return null;
 
-  // Rasio 0.05 = 5%.
   return Math.abs(number) <= 1 ? number * 100 : number;
 }
 
@@ -78,15 +116,23 @@ function logoUrl(symbol) {
 
 function getBaseSymbol(contract) {
   return String(
-    contract.baseCoin ||
-    contract.symbol?.replace(/_USDT$/i, "") ||
+    contract?.baseCoin ||
+    contract?.symbol?.replace(/_USDT$/i, "") ||
     ""
   ).toUpperCase();
 }
 
+function validSymbol(symbol) {
+  return /^[A-Z0-9]+_USDT$/.test(symbol);
+}
+
+function readArrayData(response) {
+  return Array.isArray(response?.data) ? response.data : [];
+}
+
 // ======================================================
 // MARKET EXPLORER
-// GET /api/market
+// GET /api/market?page=1&limit=100
 // ======================================================
 
 async function getMarket(url) {
@@ -115,25 +161,34 @@ async function getMarket(url) {
   ]);
 
   if (tickerResult.status === "rejected") {
-    throw new Error(
-      `Gagal mengambil ticker MEXC: ${String(tickerResult.reason)}`
+    return errorResponse(
+      "Unable to fetch market data.",
+      502,
+      {
+        message: String(tickerResult.reason),
+        endpoint: "ticker",
+      }
     );
   }
 
   const tickerResponse = tickerResult.value;
-
-  const tickerData = Array.isArray(tickerResponse.data)
-    ? tickerResponse.data
-    : [];
+  const tickerData = readArrayData(tickerResponse);
 
   if (tickerResponse.success !== true || tickerData.length === 0) {
-    throw new Error("MEXC tidak mengembalikan data ticker.");
+    return errorResponse(
+      "MEXC returned no market ticker data.",
+      502,
+      {
+        message: "Ticker response was empty or unsuccessful.",
+        endpoint: "ticker",
+      }
+    );
   }
 
   const detailData =
     detailResult.status === "fulfilled" &&
-    Array.isArray(detailResult.value.data)
-      ? detailResult.value.data
+    detailResult.value.success === true
+      ? readArrayData(detailResult.value)
       : [];
 
   const detailsBySymbol = new Map(
@@ -148,7 +203,7 @@ async function getMarket(url) {
       const symbol = String(ticker.symbol || "").toUpperCase();
 
       return (
-        /^[A-Z0-9]+_USDT$/.test(symbol) &&
+        validSymbol(symbol) &&
         numberOrNull(ticker.lastPrice) !== null
       );
     })
@@ -169,15 +224,13 @@ async function getMarket(url) {
         contract_symbol: contractSymbol,
         quote_asset: contract.quoteCoin || "USDT",
 
-        // Kompatibilitas dengan frontend lama.
         price_usd: price,
-
         price,
+
         change_24h_percent: normalizeChange(ticker.riseFallRate),
         volume_24h: numberOrNull(ticker.volume24),
         turnover_24h: numberOrNull(ticker.amount24),
 
-        // Tidak disediakan langsung oleh ticker futures ini.
         market_cap: null,
 
         high_24h: numberOrNull(ticker.high24Price),
@@ -186,9 +239,6 @@ async function getMarket(url) {
         fair_price: numberOrNull(ticker.fairPrice),
         index_price: numberOrNull(ticker.indexPrice),
         funding_rate: numberOrNull(ticker.fundingRate),
-
-        // Nilai mentah holdVol; satuan harus ditafsirkan
-        // berdasarkan spesifikasi kontrak MEXC.
         open_interest: numberOrNull(ticker.holdVol),
 
         logo_url: logoUrl(base),
@@ -236,7 +286,9 @@ async function getMarket(url) {
   return {
     success: true,
     name: "BlobSignal",
+    version: VERSION,
     provider: "MEXC Futures",
+    api_base: API_BASE,
     timestamp: new Date().toISOString(),
     currency: "USDT",
     market_type: "USDT Perpetual",
@@ -256,10 +308,10 @@ async function getMarket(url) {
 
     dataLimitations: [
       "Daftar berisi kontrak USDT perpetual yang dikembalikan MEXC.",
-      "Market cap tidak tersedia pada endpoint ticker futures ini.",
+      "Market cap tidak tersedia dari endpoint ticker futures.",
       "Funding dan open interest mengikuti definisi serta ketersediaan data MEXC.",
-      "Open interest ditampilkan sebagai nilai holdVol mentah; jangan menganggapnya USDT tanpa konversi yang terverifikasi.",
-      "Logo menggunakan repositori ikon publik berdasarkan simbol dan tidak dijamin tersedia untuk setiap token.",
+      "Open interest ditampilkan sebagai holdVol mentah.",
+      "Logo publik tidak dijamin tersedia untuk setiap token.",
       "Harga dan statistik market dapat berubah setiap saat.",
     ],
   };
@@ -275,7 +327,7 @@ async function getTickerDetail(url) {
     url.searchParams.get("symbol") || "BTC_USDT"
   ).toUpperCase();
 
-  if (!/^[A-Z0-9]+_USDT$/.test(symbol)) {
+  if (!validSymbol(symbol)) {
     return json({
       success: false,
       error: "Invalid symbol. Use a format such as BTC_USDT.",
@@ -295,11 +347,11 @@ async function getTickerDetail(url) {
       Array.isArray(ticker) ||
       String(ticker.symbol || "").toUpperCase() !== symbol
     ) {
-      return json({
-        success: false,
-        error: "Invalid MEXC ticker response.",
-        symbol,
-      }, 502);
+      return errorResponse(
+        "Invalid MEXC ticker response.",
+        502,
+        { symbol }
+      );
     }
 
     const fundingRate = numberOrNull(ticker.fundingRate);
@@ -308,6 +360,7 @@ async function getTickerDetail(url) {
     return json({
       success: true,
       name: "BlobSignal",
+      version: VERSION,
       provider: "MEXC Futures",
       symbol,
 
@@ -323,8 +376,6 @@ async function getTickerDetail(url) {
       index_price: numberOrNull(ticker.indexPrice),
 
       funding_rate: fundingRate,
-
-      // Contoh 0.000031 menjadi 0.0031 (%).
       funding_rate_percent: fundingRate === null
         ? null
         : fundingRate * 100,
@@ -339,25 +390,28 @@ async function getTickerDetail(url) {
       change_24h_percent: normalizeChange(ticker.riseFallRate),
 
       dataLimitations: [
-        "Open interest menggunakan nilai holdVol dari MEXC; satuan dan konversinya perlu dikonfirmasi.",
-        "Funding rate berasal dari snapshot ticker; interval funding tidak diasumsikan.",
-        "Endpoint ini tidak menyediakan riwayat funding rate atau riwayat open interest.",
-        "Ticker merupakan snapshot dan dapat berubah setelah respons dikirim.",
+        "Open interest memakai nilai holdVol mentah.",
+        "Funding rate berasal dari snapshot ticker.",
+        "Ticker tidak menyediakan riwayat OI atau funding.",
+        "Data dapat berubah setelah respons dikirim.",
       ],
     });
   } catch (error) {
-    return json({
-      success: false,
-      error: "Unable to fetch ticker detail.",
-      message: String(error),
-      symbol,
-    }, 502);
+    return errorResponse(
+      "Unable to fetch ticker detail.",
+      502,
+      {
+        message: String(error),
+        symbol,
+        endpoint: "ticker",
+      }
+    );
   }
 }
 
 // ======================================================
 // TECHNICAL ANALYSIS
-// GET /api/technicals?symbol=BTC_USDT&interval=15m
+// GET /api/technicals?symbol=BTC_USDT&interval=1h
 // ======================================================
 
 async function getTechnicals(url) {
@@ -367,7 +421,7 @@ async function getTechnicals(url) {
 
   const interval = url.searchParams.get("interval") || "15m";
 
-  if (!/^[A-Z0-9]+_USDT$/.test(symbol)) {
+  if (!validSymbol(symbol)) {
     return json({
       success: false,
       error: "Invalid symbol. Use a format such as BTC_USDT.",
@@ -382,50 +436,48 @@ async function getTechnicals(url) {
     }, 400);
   }
 
+  const requestedCandles = Math.min(
+    500,
+    Math.max(
+      50,
+      Number.parseInt(url.searchParams.get("limit") || "250", 10) || 250
+    )
+  );
+
+  const end = Math.floor(Date.now() / 1000);
+  const candleDuration = intervals[interval].seconds;
+  const start = end - candleDuration * requestedCandles;
+
+  const endpoint =
+    `${API_BASE}/kline/${encodeURIComponent(symbol)}` +
+    `?interval=${intervals[interval].api}` +
+    `&start=${start}&end=${end}`;
+
   try {
-    const end = Math.floor(Date.now() / 1000);
-    const candleDuration = intervals[interval].seconds;
-
-    const requestedCandles = Math.min(
-      500,
-      Math.max(
-        50,
-        Number.parseInt(
-          url.searchParams.get("limit") || "250",
-          10
-        ) || 250
-      )
-    );
-
-    const start = end - candleDuration * requestedCandles;
-
-    const endpoint =
-      `${API_BASE}/kline/${encodeURIComponent(symbol)}` +
-      `?interval=${intervals[interval].api}` +
-      `&start=${start}&end=${end}`;
-
     const result = await fetchJson(endpoint);
+    const raw = result.data;
 
     if (
       result.success !== true ||
-      !result.data ||
-      !Array.isArray(result.data.time) ||
-      !Array.isArray(result.data.open) ||
-      !Array.isArray(result.data.high) ||
-      !Array.isArray(result.data.low) ||
-      !Array.isArray(result.data.close) ||
-      !Array.isArray(result.data.vol)
+      !raw ||
+      !Array.isArray(raw.time) ||
+      !Array.isArray(raw.open) ||
+      !Array.isArray(raw.high) ||
+      !Array.isArray(raw.low) ||
+      !Array.isArray(raw.close) ||
+      !Array.isArray(raw.vol)
     ) {
-      return json({
-        success: false,
-        error: "Invalid MEXC candle response.",
-        provider_message: result.message ?? null,
-        symbol,
-        interval,
-      }, 502);
+      return errorResponse(
+        "Invalid MEXC candle response.",
+        502,
+        {
+          symbol,
+          interval,
+          endpoint: "kline",
+          message: String(result.message || "Unexpected candle format."),
+        }
+      );
     }
-
-    const raw = result.data;
 
     const candles = raw.time
       .map((time, i) => ({
@@ -448,44 +500,57 @@ async function getTechnicals(url) {
       .sort((a, b) => a.time - b.time);
 
     if (candles.length === 0) {
-      return json({
-        success: false,
-        error: "MEXC returned no usable candles.",
-        symbol,
-        interval,
-      }, 502);
+      return errorResponse(
+        "MEXC returned no usable candles.",
+        502,
+        {
+          symbol,
+          interval,
+          message: "No valid OHLCV candles were returned.",
+        }
+      );
     }
 
-    // Chart menyertakan candle yang sedang berjalan.
-    // Indikator hanya memakai candle yang sudah selesai.
     const completedCandles = candles.filter(
       (c) => c.time + candleDuration <= end
     );
 
     if (completedCandles.length === 0) {
-      return json({
-        success: false,
-        error: "No completed candles available for analysis.",
-        symbol,
-        interval,
-      }, 502);
+      return errorResponse(
+        "No completed candles available for analysis.",
+        502,
+        { symbol, interval }
+      );
     }
 
-    const analysis = analyzeCandles(completedCandles);
+    let analysis;
 
-    const latestCandle =
-      completedCandles[completedCandles.length - 1];
+    try {
+      analysis = analyzeCandles(completedCandles);
+    } catch (error) {
+      return errorResponse(
+        "Technical indicator calculation failed.",
+        500,
+        {
+          message: String(error),
+          symbol,
+          interval,
+        }
+      );
+    }
 
     return json({
       success: true,
       name: "BlobSignal",
+      version: VERSION,
       provider: "MEXC Futures",
+      api_base: API_BASE,
       symbol,
       interval,
       timestamp: new Date().toISOString(),
 
       candleCount: completedCandles.length,
-      latestCandle,
+      latestCandle: completedCandles[completedCandles.length - 1],
       candles: completedCandles,
 
       chartCandles: candles,
@@ -497,20 +562,23 @@ async function getTechnicals(url) {
 
       dataLimitations: [
         "Candle berasal dari endpoint kontrak futures MEXC.",
-        "Candle yang belum selesai hanya disertakan pada chartCandles.",
-        "Frontend perlu melakukan polling atau memakai WebSocket agar chart diperbarui.",
-        "Funding rate dan open interest tidak dihitung dari data candle.",
-        "Indikator teknikal bukan jaminan profit atau probabilitas keberhasilan trading.",
+        "Candle aktif hanya disertakan pada chartCandles.",
+        "Frontend perlu melakukan polling atau memakai WebSocket.",
+        "Funding rate dan open interest tidak dihitung dari candle.",
+        "Indikator bukan jaminan profit.",
       ],
     });
   } catch (error) {
-    return json({
-      success: false,
-      error: "Technical analysis request failed.",
-      message: String(error),
-      symbol,
-      interval,
-    }, 502);
+    return errorResponse(
+      "Technical analysis request failed.",
+      502,
+      {
+        message: String(error),
+        symbol,
+        interval,
+        endpoint: "kline",
+      }
+    );
   }
 }
 
@@ -533,13 +601,9 @@ export default {
       return json({
         success: false,
         error: "Method not allowed.",
-      }, 405);
-    }
-
-    if (url.pathname === "/" || url.pathname === "/index.html") {
-      return env.ASSETS.fetch(
-        new Request(new URL("/index.html", request.url), request)
-      );
+      }, 405, {
+        Allow: "GET, OPTIONS",
+      });
     }
 
     if (url.pathname === "/health") {
@@ -547,9 +611,10 @@ export default {
         success: true,
         status: "healthy",
         service: "blobsignal",
-        version: "3.1.0",
+        version: VERSION,
+        provider: "MEXC Futures",
+        api_base: API_BASE,
         timestamp: new Date().toISOString(),
-
         endpoints: [
           "/health",
           "/api/market",
@@ -567,14 +632,17 @@ export default {
 
     if (url.pathname === "/api/market") {
       try {
-        return json(await getMarket(url));
+        const result = await getMarket(url);
+
+        if (result instanceof Response) return result;
+
+        return json(result);
       } catch (error) {
-        return json({
-          success: false,
-          error: "Unable to fetch market data.",
-          message: String(error),
-          provider: "MEXC Futures",
-        }, 502);
+        return errorResponse(
+          "Unable to fetch market data.",
+          502,
+          { message: String(error) }
+        );
       }
     }
 
@@ -586,6 +654,15 @@ export default {
       return getTechnicals(url);
     }
 
-    return env.ASSETS.fetch(request);
+    // Aset statis seperti index.html dan mascot.png.
+    if (env?.ASSETS) {
+      return env.ASSETS.fetch(request);
+    }
+
+    return json({
+      success: false,
+      error: "Not found.",
+      path: url.pathname,
+    }, 404);
   },
 };
