@@ -11,7 +11,7 @@ function json(data, status = 200) {
     headers: {
       ...corsHeaders,
       "Content-Type": "application/json; charset=utf-8",
-      "Cache-Control": "public, max-age=30",
+      "Cache-Control": "public, max-age=15",
     },
   });
 }
@@ -33,7 +33,8 @@ export default {
         success: true,
         name: "Crypto Research AI",
         status: "online",
-        version: "1.1.0",
+        version: "1.2.0",
+        provider: "Binance",
         endpoints: ["/health", "/api/market"],
       });
     }
@@ -49,10 +50,10 @@ export default {
 
     if (url.pathname === "/api/market") {
       try {
-        const ids = "bitcoin,ethereum,solana";
+        const symbols = ["BTCUSDT", "ETHUSDT", "SOLUSDT"];
         const apiUrl =
-          "https://api.coingecko.com/api/v3/simple/price" +
-          `?ids=${ids}&vs_currencies=usd&include_24hr_change=true`;
+          "https://api.binance.com/api/v3/ticker/24hr?symbols=" +
+          encodeURIComponent(JSON.stringify(symbols));
 
         const response = await fetch(apiUrl, {
           headers: { Accept: "application/json" },
@@ -61,31 +62,37 @@ export default {
         if (!response.ok) {
           return json({
             success: false,
-            error: "Market data provider returned an error",
+            error: "Binance market data request failed",
             provider_status: response.status,
           }, 502);
         }
 
-        const prices = await response.json();
+        const tickers = await response.json();
 
-        const coins = [
-          { id: "bitcoin", symbol: "BTC", name: "Bitcoin" },
-          { id: "ethereum", symbol: "ETH", name: "Ethereum" },
-          { id: "solana", symbol: "SOL", name: "Solana" },
-        ];
+        const names = {
+          BTCUSDT: { symbol: "BTC", name: "Bitcoin" },
+          ETHUSDT: { symbol: "ETH", name: "Ethereum" },
+          SOLUSDT: { symbol: "SOL", name: "Solana" },
+        };
 
-        const data = coins.map((coin) => ({
-          ...coin,
-          price_usd: prices[coin.id]?.usd ?? null,
-          change_24h_percent:
-            prices[coin.id]?.usd_24h_change ?? null,
+        const data = tickers.map((ticker) => ({
+          ...names[ticker.symbol],
+          pair: ticker.symbol,
+          price_usdt: Number(ticker.lastPrice),
+          change_24h_percent: Number(ticker.priceChangePercent),
+          high_24h: Number(ticker.highPrice),
+          low_24h: Number(ticker.lowPrice),
+          volume_24h: Number(ticker.volume),
+          quote_volume_24h: Number(ticker.quoteVolume),
+          bid_price: Number(ticker.bidPrice),
+          ask_price: Number(ticker.askPrice),
         }));
 
         return json({
           success: true,
-          provider: "CoinGecko",
+          provider: "Binance",
           timestamp: new Date().toISOString(),
-          currency: "USD",
+          currency: "USDT",
           data,
         });
       } catch (error) {
