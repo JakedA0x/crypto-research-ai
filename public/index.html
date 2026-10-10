@@ -1,1127 +1,1572 @@
 
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" data-theme="dark">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#090d14">
-<meta name="application-name" content="BlobSignal">
-<meta name="description" content="BlobSignal — Crypto futures market terminal, live candlestick charts, and technical analysis.">
-<link rel="icon" type="image/png" href="/mascot.png">
-<title>BlobSignal — Crypto Market Terminal</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#10151d">
+  <title>BlobSignal — Crypto Futures Dashboard</title>
+  <meta name="description" content="BlobSignal crypto futures market dashboard and technical analysis.">
 
-<script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.2.2/dist/lightweight-charts.standalone.production.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.2.2/dist/lightweight-charts.standalone.production.js"></script>
 
-<style>
-:root{
-  color-scheme:dark;
-  --bg:#090d14;
-  --surface:#101722;
-  --surface2:#172131;
-  --border:#253347;
-  --text:#edf4ff;
-  --muted:#8998ad;
-  --green:#45d6a0;
-  --red:#f16d7a;
-  --blue:#54c8ff;
-  --amber:#e8bd69;
-}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font:13px/1.6 Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-button,input,select{font:inherit}
-button,select{cursor:pointer}
-button:focus-visible,input:focus-visible,select:focus-visible{outline:1px solid var(--blue);outline-offset:2px}
-button:disabled{opacity:.55;cursor:wait}
-a{color:inherit;text-decoration:none}
-.topbar{min-height:66px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:10px 24px;gap:18px;background:#0b111b;position:sticky;top:0;z-index:5}
-.brand{display:flex;align-items:center;gap:11px;min-width:0}
-.brand-mascot{width:42px;height:42px;object-fit:contain;border-radius:11px;flex-shrink:0}
-.brand-copy{display:flex;flex-direction:column;gap:1px}
-.brand-name{font-size:19px;line-height:1.2;font-weight:800;letter-spacing:-.7px}
-.brand-name span{color:var(--blue)}
-.brand-subtitle{font-size:9px;letter-spacing:1.6px;color:var(--muted)}
-.top-right,.inline,.actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-.status{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:7px}
-.dot{width:7px;height:7px;border-radius:50%;background:var(--amber);display:inline-block;flex-shrink:0}
-.dot.ok{background:var(--green)}.dot.bad{background:var(--red)}
-.clock{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
-.layout{max-width:1600px;margin:auto;padding:24px 24px 42px}
-.page-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;margin-bottom:22px}
-.eyebrow{font-size:10px;color:var(--blue);letter-spacing:1.8px;text-transform:uppercase;font-weight:750}
-h1{font-size:25px;letter-spacing:-.8px;margin:5px 0 3px;font-weight:750}
-.sub{color:var(--muted);font-size:12px}
-.pill{display:inline-flex;align-items:center;gap:7px;padding:6px 9px;border:1px solid var(--border);border-radius:5px;color:var(--muted);font-size:10px;white-space:nowrap}
-.ticker{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border:1px solid var(--border);border-radius:9px;overflow:hidden;margin-bottom:22px;background:var(--surface)}
-.ticker-item{padding:16px 18px;border-right:1px solid var(--border);min-width:0}
-.ticker-item:last-child{border-right:0}
-.ticker-top{display:flex;justify-content:space-between;gap:8px;align-items:center}
-.ticker-name{font-size:11px;font-weight:700}
-.ticker-symbol{font-size:10px;color:var(--muted);margin-left:5px}
-.ticker-price{font-size:21px;font-weight:700;letter-spacing:-.5px;margin-top:8px;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
-.ticker-source{font-size:10px;color:var(--muted);margin-top:3px}
-.green{color:var(--green)!important}.red{color:var(--red)!important}.muted{color:var(--muted)}
-.section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
-.section-title{font-size:13px;font-weight:700}
-.section-note{font-size:10px;color:var(--muted)}
-.panel,.workspace{border:1px solid var(--border);border-radius:9px;overflow:hidden;margin-bottom:22px;min-width:0}
-.panel-head,.toolbar{padding:15px 17px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
-.controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-select,input{background:#0c121c;color:var(--text);border:1px solid #304057;border-radius:6px;padding:9px 10px;min-width:100px}
-input{cursor:text}
-.search-input{width:min(300px,100%);min-width:180px}
-.btn{border:1px solid #304057;background:#182333;color:var(--text);border-radius:6px;padding:9px 13px;font-size:11px;font-weight:650}
-.btn:hover{border-color:var(--blue)}
-.btn-primary{background:var(--blue);border-color:var(--blue);color:#06111a}
-.btn-primary:hover{background:#7bd6ff}
-.btn-quiet{background:transparent}
-.btn:disabled{cursor:not-allowed}
-.market-tools{display:flex;gap:9px;flex-wrap:wrap;align-items:center}
-.market-count{font-size:10px;color:var(--muted)}
-.market-scroll{overflow:auto;max-height:520px}
-.market-table{width:100%;border-collapse:collapse;white-space:nowrap;font-size:11px}
-.market-table th{position:sticky;top:0;z-index:1;background:#111a27;color:var(--muted);font-size:10px;font-weight:550;text-align:right;padding:11px 15px;border-bottom:1px solid var(--border)}
-.market-table th:first-child,.market-table td:first-child{text-align:left}
-.market-table td{text-align:right;padding:11px 15px;border-bottom:1px solid #202b3b;font-variant-numeric:tabular-nums}
-.market-row{cursor:pointer;transition:background .15s}
-.market-row:hover,.market-row.selected{background:#152338}
-.market-row.selected td:first-child{box-shadow:inset 2px 0 var(--blue)}
-.coin-cell{display:flex;align-items:center;gap:10px;min-width:175px;text-align:left}
-.coin-logo{width:29px;height:29px;border-radius:50%;object-fit:contain;background:#202b3b;flex-shrink:0}
-.coin-fallback{width:29px;height:29px;border-radius:50%;display:grid;place-items:center;background:#202b3b;color:var(--blue);font-weight:750;font-size:10px;flex-shrink:0}
-.coin-name{font-weight:650}
-.coin-symbol{color:var(--muted);font-size:10px}
-.badge{font-size:10px;border-radius:4px;padding:3px 6px;display:inline-block;background:#222e40;color:var(--muted)}
-.pagination{padding:12px 15px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;background:#0d141e}
-.workspace{overflow:hidden}
-.workspace-body{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(265px,.8fr)}
-.chart-side{padding:18px;border-right:1px solid var(--border);min-width:0}
-.chart-meta{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px}
-.asset-heading{display:flex;align-items:center;gap:10px}
-.asset-logo{width:35px;height:35px;border-radius:50%;object-fit:contain;background:#202b3b}
-.asset-title{font-size:15px;font-weight:750}
-.asset-sub{font-size:10px;color:var(--muted);margin-top:3px}
-.last-price{text-align:right;font-size:20px;font-weight:700;font-variant-numeric:tabular-nums}
-.last-price small{display:block;color:var(--muted);font-size:10px;font-weight:400;margin-top:2px}
-.chart-box{height:390px;position:relative;background:#0c121c;border:1px solid #253347;border-radius:7px;overflow:hidden}
-.chart-placeholder{position:absolute;inset:0;display:grid;place-items:center;color:var(--muted);font-size:11px;text-align:center;padding:20px;z-index:0}
-.chart-legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:12px;color:var(--muted);font-size:10px}
-.legend-dot{display:inline-block;width:7px;height:7px;border-radius:2px;margin-right:5px}
-.side-panel{padding:18px;min-width:0}
-.signal-card{border:1px solid var(--border);border-radius:8px;padding:15px;background:#111a27}
-.signal-top{display:flex;justify-content:space-between;align-items:center;gap:8px}
-.signal-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
-.signal-value{font-size:25px;font-weight:800;letter-spacing:-.7px;margin:12px 0 4px}
-.signal-desc{font-size:11px;color:var(--muted);line-height:1.8}
-.signal-tag{font-size:10px;border-radius:4px;padding:4px 7px;background:#222831;color:var(--muted)}
-.signal-tag.long{background:#15352b;color:var(--green)}
-.signal-tag.short{background:#3a2027;color:var(--red)}
-.signal-tag.wait{background:#352d1d;color:var(--amber)}
-.signal-facts{margin-top:14px;display:grid}
-.fact{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--border);font-size:11px}
-.fact:last-child{border-bottom:0}
-.fact span:first-child{color:var(--muted)}
-.fact strong{text-align:right;font-weight:600;overflow-wrap:anywhere}
-.data-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:18px 0 23px}
-.metric{padding:14px;border:1px solid var(--border);border-radius:7px;background:var(--surface);min-width:0}
-.metric-label{color:var(--muted);font-size:10px}
-.metric-value{font-size:17px;font-weight:700;margin-top:7px;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
-.metric-note{font-size:10px;color:var(--muted);margin-top:4px}
-.lower-grid{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:16px}
-.panel-content{padding:15px}
-.data-table{width:100%;border-collapse:collapse;font-size:11px}
-.data-table th{text-align:left;color:var(--muted);font-weight:500;font-size:10px;padding:9px 8px;border-bottom:1px solid var(--border)}
-.data-table td{padding:10px 8px;border-bottom:1px solid #202b3b;overflow-wrap:anywhere}
-.data-table tr:last-child td{border-bottom:0}
-.data-table td:last-child,.data-table th:last-child{text-align:right}
-.table-scroll{overflow-x:auto}
-.key{color:var(--muted)}.val{font-variant-numeric:tabular-nums;text-align:right}
-.disclaimer{margin-top:18px;border:1px solid var(--border);border-radius:7px;padding:13px 15px;color:var(--muted);font-size:10px;line-height:1.9;background:#0e141e}
-footer{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:20px 0 0;color:#64738a;font-size:10px}
-.loading{color:var(--muted);padding:18px 0;font-size:11px}
-.error-text{color:var(--red)}
-@media(max-width:1000px){
- .workspace-body{grid-template-columns:minmax(0,1.3fr) minmax(245px,.8fr)}
- .data-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
- .layout{padding:18px 15px 30px}.topbar{padding:10px 15px}
-}
-@media(max-width:700px){
- .topbar{min-height:58px;padding:10px 12px}
- .brand-mascot{width:36px;height:36px}.brand-name{font-size:16px}
- .brand-subtitle{font-size:8px;letter-spacing:1px}
- .top-right{justify-content:flex-end;gap:8px}.clock{display:none}
- .status{font-size:10px}.layout{padding:18px 12px 25px}
- .page-heading{align-items:flex-start}h1{font-size:21px}
- .ticker-item{padding:11px 9px}.ticker-price{font-size:15px}
- .ticker-name{font-size:10px}.ticker-symbol{display:block;margin:2px 0 0}
- .workspace-body{grid-template-columns:1fr}
- .chart-side{border-right:0;border-bottom:1px solid var(--border);padding:12px}
- .side-panel{padding:12px}.chart-box{height:330px}
- .toolbar,.panel-head{padding:12px}.controls{width:100%}
- .controls select{flex:1;min-width:0}.controls .btn{flex:1}
- .lower-grid{grid-template-columns:1fr}.data-grid{gap:8px}
- .metric{padding:11px}.metric-value{font-size:15px}
- .section-note{display:none}.pill{font-size:9px}
- .market-tools{width:100%}.search-input{width:100%;min-width:0;flex:1}
-}
-</style>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #10151d;
+      --panel: #171e29;
+      --panel2: #202a38;
+      --text: #edf3fb;
+      --muted: #9ba9ba;
+      --border: #2b3747;
+      --blue: #54c8ff;
+      --green: #20c997;
+      --red: #ff687b;
+      --yellow: #f5bd4f;
+      --purple: #c49aff;
+      --shadow: 0 8px 28px rgba(0,0,0,.12);
+    }
+
+    html[data-theme="light"] {
+      color-scheme: light;
+      --bg: #f5f7fa;
+      --panel: #ffffff;
+      --panel2: #eef3f8;
+      --text: #172334;
+      --muted: #68788b;
+      --border: #dce4ed;
+      --blue: #087eb5;
+      --green: #079669;
+      --red: #d94a5c;
+      --yellow: #a36c00;
+      --purple: #8054c8;
+      --shadow: 0 8px 28px rgba(30,55,80,.06);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font: 14px/1.5 Inter, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", sans-serif;
+      transition: background .2s, color .2s;
+    }
+
+    button, input, select { font: inherit; }
+    button { cursor: pointer; }
+    button:focus-visible, input:focus-visible, select:focus-visible {
+      outline: 2px solid var(--blue);
+      outline-offset: 2px;
+    }
+
+    .wrap { width: min(1500px, 100% - 32px); margin: auto; }
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: var(--panel);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .topinner {
+      min-height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .brand { display: flex; align-items: center; gap: 11px; }
+    .brand-icon {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border-radius: 13px;
+      color: #07121b;
+      background: var(--blue);
+      font-weight: 900;
+      font-size: 22px;
+    }
+
+    .brand-name { font-size: 20px; font-weight: 850; letter-spacing: -.6px; }
+    .brand-sub { color: var(--muted); font-size: 11px; }
+
+    .header-actions { display: flex; align-items: center; gap: 9px; }
+    .pill, .btn, .select, .search {
+      border: 1px solid var(--border);
+      color: var(--text);
+      background: var(--panel2);
+      border-radius: 10px;
+    }
+
+    .pill { padding: 7px 10px; font-size: 12px; }
+    .btn { padding: 9px 12px; }
+    .btn:hover { border-color: var(--blue); }
+    .btn.primary { background: var(--blue); color: #06131b; border-color: var(--blue); font-weight: 750; }
+    .btn.active { background: var(--blue); color: #06131b; border-color: var(--blue); font-weight: 750; }
+
+    .dot {
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      margin-right: 5px;
+      border-radius: 50%;
+      background: var(--green);
+    }
+
+    .tape {
+      overflow: hidden;
+      background: var(--panel);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .tape-head {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 0;
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: .9px;
+      white-space: nowrap;
+    }
+
+    .tape-window { overflow: hidden; }
+    .tape-track {
+      display: flex;
+      width: max-content;
+      animation: ticker 65s linear infinite;
+    }
+
+    .tape-window:hover .tape-track { animation-play-state: paused; }
+
+    .tape-group { display: flex; align-items: center; flex-shrink: 0; }
+    .tape-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 11px 19px 11px 0;
+      margin-right: 19px;
+      border-right: 1px solid var(--border);
+      white-space: nowrap;
+      background: none;
+      border-top: 0;
+      border-bottom: 0;
+      border-left: 0;
+      color: var(--text);
+    }
+
+    .tape-item:hover { color: var(--blue); }
+    .tape-symbol { font-weight: 800; }
+    .tape-price { color: var(--muted); }
+    @keyframes ticker {
+      from { transform: translateX(0); }
+      to { transform: translateX(-50%); }
+    }
+
+    main { padding: 23px 0 45px; }
+    .page-heading {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    h1 { margin: 0; font-size: clamp(23px, 3vw, 31px); letter-spacing: -.8px; }
+    h2 { margin: 0; font-size: 18px; letter-spacing: -.3px; }
+    h3 { margin: 0; font-size: 14px; }
+    p { margin: 6px 0 0; }
+    .muted { color: var(--muted); }
+    .small { font-size: 12px; }
+
+    .grid { display: grid; gap: 14px; }
+    .overview { grid-template-columns: repeat(4, minmax(0, 1fr)); margin-bottom: 24px; }
+
+    .panel, .stat-card, .category-card {
+      border: 1px solid var(--border);
+      background: var(--panel);
+      border-radius: 15px;
+      box-shadow: var(--shadow);
+    }
+
+    .stat-card { padding: 17px; min-width: 0; }
+    .stat-label { color: var(--muted); font-size: 12px; }
+    .stat-value { margin-top: 6px; font-size: 23px; font-weight: 800; overflow-wrap: anywhere; }
+    .stat-foot { margin-top: 3px; font-size: 11px; color: var(--muted); }
+
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 13px;
+    }
+
+    .categories {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 25px;
+    }
+
+    .category-card {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+      min-height: 122px;
+      padding: 14px 12px;
+      text-align: left;
+      color: var(--text);
+      transition: border-color .15s, transform .15s;
+    }
+
+    .category-card:hover { border-color: var(--blue); transform: translateY(-2px); }
+    .category-card.active { border-color: var(--blue); box-shadow: inset 0 0 0 1px var(--blue); }
+    .category-icon { font-size: 22px; }
+    .category-title { font-weight: 800; font-size: 13px; }
+    .category-desc { font-size: 11px; color: var(--muted); line-height: 1.4; }
+    .category-count { font-size: 11px; color: var(--blue); }
+
+    .panel { padding: 18px; margin-bottom: 22px; min-width: 0; }
+    .market-controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 9px;
+      margin: 15px 0;
+    }
+
+    .search { flex: 1 1 220px; padding: 10px 12px; min-width: 0; }
+    .select { padding: 10px 12px; max-width: 100%; }
+    input, select { color: var(--text); }
+    input::placeholder { color: var(--muted); }
+
+    .table-wrap { width: 100%; overflow: auto; }
+    table { border-collapse: collapse; width: 100%; min-width: 790px; }
+    th, td {
+      padding: 13px 12px;
+      border-bottom: 1px solid var(--border);
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    th {
+      color: var(--muted);
+      background: var(--panel);
+      font-size: 11px;
+      font-weight: 750;
+      position: sticky;
+      top: 0;
+    }
+
+    th:first-child, td:first-child,
+    th:nth-child(2), td:nth-child(2) { text-align: left; }
+
+    tbody tr { cursor: pointer; }
+    tbody tr:hover { background: var(--panel2); }
+    tbody tr.selected { background: color-mix(in srgb, var(--blue) 10%, var(--panel)); }
+
+    .coin-cell { display: flex; align-items: center; gap: 10px; }
+    .coin-logo {
+      width: 31px;
+      height: 31px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--panel2);
+      color: var(--blue);
+      font-size: 11px;
+      font-weight: 900;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    .coin-logo img { width: 100%; height: 100%; object-fit: cover; }
+    .coin-name { font-weight: 800; }
+    .coin-sub { font-size: 11px; color: var(--muted); }
+    .positive { color: var(--green); }
+    .negative { color: var(--red); }
+    .neutral { color: var(--muted); }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 7px;
+      border-radius: 6px;
+      background: var(--panel2);
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .market-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      padding-top: 14px;
+    }
+
+    .chart-layout { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(290px, 1fr); gap: 15px; }
+    .chart-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .selected-price { font-size: 25px; font-weight: 850; margin-top: 5px; }
+    .intervals { display: flex; flex-wrap: wrap; gap: 5px; }
+    .intervals .btn { padding: 6px 9px; font-size: 12px; }
+    #chart { width: 100%; height: 390px; margin-top: 14px; }
+    .chart-legend { display: flex; flex-wrap: wrap; gap: 13px; margin-top: 10px; font-size: 11px; color: var(--muted); }
+    .legend-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 4px; }
+
+    .metric-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; margin-top: 15px; }
+    .metric {
+      background: var(--panel2);
+      border-radius: 10px;
+      padding: 12px;
+      min-width: 0;
+    }
+
+    .metric-label { color: var(--muted); font-size: 11px; }
+    .metric-value { margin-top: 5px; font-size: 16px; font-weight: 800; overflow-wrap: anywhere; }
+    .levels-list { display: grid; gap: 8px; margin-top: 13px; }
+    .level-row { display: flex; justify-content: space-between; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--border); }
+    .level-row:last-child { border-bottom: 0; }
+
+    .notice {
+      border: 1px solid var(--border);
+      background: var(--panel2);
+      border-radius: 10px;
+      padding: 12px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .loading, .empty { padding: 28px 12px; text-align: center; color: var(--muted); }
+    .footer { padding: 20px 0; border-top: 1px solid var(--border); color: var(--muted); font-size: 12px; }
+
+    @media (max-width: 1100px) {
+      .categories { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+      .overview { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 760px) {
+      .wrap { width: calc(100% - 20px); }
+      .topinner { min-height: 62px; }
+      .brand-sub, .connection-label { display: none; }
+      .brand-name { font-size: 17px; }
+      .brand-icon { width: 36px; height: 36px; }
+      .pill { padding: 7px; }
+      main { padding-top: 17px; }
+      .categories { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+      .category-card { min-height: 105px; padding: 11px; }
+      .chart-layout { grid-template-columns: 1fr; }
+      #chart { height: 320px; }
+      .panel { padding: 13px; }
+      .stat-card { padding: 12px; }
+      .stat-value { font-size: 19px; }
+      .page-heading { flex-direction: column; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+    }
+  </style>
 </head>
 
 <body>
-<header class="topbar">
-  <a class="brand" href="/" aria-label="BlobSignal Home">
-    <img src="/mascot.png" alt="BlobSignal mascot" class="brand-mascot">
-    <span class="brand-copy">
-      <span class="brand-name">Blob<span>Signal</span></span>
-      <span class="brand-subtitle">CRYPTO MARKET TERMINAL</span>
-    </span>
-  </a>
-  <div class="top-right">
-    <div class="status"><span class="dot" id="apiDot"></span><span id="connection">Connecting...</span></div>
-    <span class="clock" id="clock">--:--:-- UTC</span>
+  <header class="topbar">
+    <div class="wrap topinner">
+      <div class="brand">
+        <div class="brand-icon">B</div>
+        <div>
+          <div class="brand-name">BlobSignal</div>
+          <div class="brand-sub">Read the market. Manage the risk.</div>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <span class="pill"><span class="dot" id="connectionDot"></span><span id="connectionText">Connecting</span></span>
+        <button class="btn" id="themeButton" type="button">☀️ White Mode</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="tape">
+    <div class="wrap">
+      <div class="tape-head">
+        <span>●</span> FUTURES MARKET
+        <span class="muted" id="tapeStatus">Waiting for market data...</span>
+      </div>
+    </div>
+    <div class="tape-window">
+      <div class="tape-track" id="tapeTrack">
+        <div class="tape-group"><span class="tape-item">Loading MEXC Futures...</span></div>
+      </div>
+    </div>
   </div>
-</header>
 
-<main class="layout">
-  <section class="page-heading">
-    <div>
-      <div class="eyebrow">BLOBSIGNAL INTELLIGENCE</div>
-      <h1>Crypto Market Terminal</h1>
-      <div class="sub">Read the market. Manage the risk. Futures data, candlestick charts, and technical analysis.</div>
-    </div>
-    <div class="pill"><span class="dot ok"></span> REST data · Auto-refresh</div>
-  </section>
-
-  <section class="ticker" id="marketTicker">
-    <div class="ticker-item"><div class="loading">Loading BTC...</div></div>
-    <div class="ticker-item"><div class="loading">Loading ETH...</div></div>
-    <div class="ticker-item"><div class="loading">Loading SOL...</div></div>
-  </section>
-
-  <section class="panel" id="marketExplorer">
-    <div class="panel-head">
+  <main class="wrap">
+    <section class="page-heading">
       <div>
-        <div class="section-title">All Futures Markets</div>
-        <div class="section-note">USDT perpetual contracts returned by MEXC</div>
+        <h1>Crypto Futures Market</h1>
+        <p class="muted">Pantau pergerakan harga, aktivitas pasar, dan indikator teknikal.</p>
       </div>
-      <span class="badge" id="marketProvider">MEXC Futures</span>
-    </div>
-    <div class="panel-head" style="background:#0d141e">
-      <div class="market-tools">
-        <input class="search-input" id="marketSearch" type="search" placeholder="Search coin or symbol..." aria-label="Search crypto market">
-        <select id="marketSort" aria-label="Sort markets">
-          <option value="volume">Highest turnover</option>
-          <option value="gainers">Top gainers</option>
-          <option value="losers">Top losers</option>
-          <option value="price">Highest price</option>
+      <div class="header-actions">
+        <span class="pill">MEXC Perpetual</span>
+        <button class="btn" id="refreshButton" type="button">↻ Refresh</button>
+      </div>
+    </section>
+
+    <section class="grid overview">
+      <div class="stat-card">
+        <div class="stat-label">Market Loaded</div>
+        <div class="stat-value" id="statMarkets">—</div>
+        <div class="stat-foot">Kontrak dari API market</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Top Gainer</div>
+        <div class="stat-value" id="statGainer">—</div>
+        <div class="stat-foot" id="statGainerChange">Menunggu data</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Top Trading</div>
+        <div class="stat-value" id="statVolume">—</div>
+        <div class="stat-foot">Turnover 24 jam tertinggi</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Market Update</div>
+        <div class="stat-value" id="statUpdated">—</div>
+        <div class="stat-foot">Waktu lokal perangkat</div>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <div>
+          <h2>Market Categories</h2>
+          <p class="muted small">Pilih kategori untuk menyaring kontrak futures.</p>
+        </div>
+      </div>
+
+      <div class="categories" id="categories">
+        <button class="category-card active" data-category="all">
+          <span class="category-icon">🌐</span>
+          <span class="category-title">All Markets</span>
+          <span class="category-desc">Semua kontrak yang dimuat</span>
+          <span class="category-count" id="count-all">—</span>
+        </button>
+        <button class="category-card" data-category="gainers">
+          <span class="category-icon">🚀</span>
+          <span class="category-title">Top Gainers</span>
+          <span class="category-desc">Kenaikan 24 jam tertinggi</span>
+          <span class="category-count" id="count-gainers">—</span>
+        </button>
+        <button class="category-card" data-category="trading">
+          <span class="category-icon">📊</span>
+          <span class="category-title">Top Trading</span>
+          <span class="category-desc">Turnover 24 jam tertinggi</span>
+          <span class="category-count" id="count-trading">—</span>
+        </button>
+        <button class="category-card" data-category="bullish">
+          <span class="category-icon">🟢</span>
+          <span class="category-title">Bullish</span>
+          <span class="category-desc">Kandidat tren positif 24 jam</span>
+          <span class="category-count" id="count-bullish">—</span>
+        </button>
+        <button class="category-card" data-category="bearish">
+          <span class="category-icon">🔴</span>
+          <span class="category-title">Bearish</span>
+          <span class="category-desc">Kandidat tren negatif 24 jam</span>
+          <span class="category-count" id="count-bearish">—</span>
+        </button>
+        <button class="category-card" data-category="new">
+          <span class="category-icon">✨</span>
+          <span class="category-title">New Listings</span>
+          <span class="category-desc">Token baru terverifikasi</span>
+          <span class="category-count" id="count-new">Belum tersedia</span>
+        </button>
+        <button class="category-card" data-category="meme">
+          <span class="category-icon">🐸</span>
+          <span class="category-title">Meme Coins</span>
+          <span class="category-desc">Token meme berdasarkan daftar simbol</span>
+          <span class="category-count" id="count-meme">—</span>
+        </button>
+        <button class="category-card" data-category="others">
+          <span class="category-icon">🧩</span>
+          <span class="category-title">Others</span>
+          <span class="category-desc">Market di luar kategori meme</span>
+          <span class="category-count" id="count-others">—</span>
+        </button>
+      </div>
+    </section>
+
+    <section class="panel" id="marketPanel">
+      <div class="section-head">
+        <div>
+          <h2 id="marketTitle">All Futures Markets</h2>
+          <p class="muted small" id="marketSubtitle">Data market dari MEXC Futures.</p>
+        </div>
+        <span class="pill" id="marketCount">0 markets</span>
+      </div>
+
+      <div class="market-controls">
+        <input class="search" id="searchInput" type="search" placeholder="Cari token, misalnya BTC, JUP, PEPE...">
+        <select class="select" id="sortSelect" aria-label="Urutkan market">
+          <option value="default">Urutan default</option>
+          <option value="gainers">Gainers tertinggi</option>
+          <option value="losers">Losers terbesar</option>
+          <option value="turnover">Turnover tertinggi</option>
+          <option value="price">Harga tertinggi</option>
         </select>
-        <button class="btn" id="refreshMarketBtn" type="button">Refresh</button>
-      </div>
-      <div class="market-count" id="marketCount">Loading markets...</div>
-    </div>
-    <div class="market-scroll">
-      <table class="market-table">
-        <thead>
-          <tr>
-            <th>Asset</th>
-            <th>Last price</th>
-            <th>24h change</th>
-            <th>24h turnover</th>
-            <th>24h high</th>
-            <th>24h low</th>
-          </tr>
-        </thead>
-        <tbody id="marketBody">
-          <tr><td colspan="6" class="muted">Loading MEXC futures markets...</td></tr>
-        </tbody>
-      </table>
-    </div>
-    <div class="pagination">
-      <span class="market-count" id="marketPageInfo">—</span>
-      <button class="btn" id="loadMoreBtn" type="button">Load more markets</button>
-    </div>
-  </section>
-
-  <section class="workspace">
-    <div class="toolbar">
-      <div>
-        <div class="section-title">Live Futures Chart</div>
-        <div class="section-note">Candlesticks · Volume · Technical indicators</div>
-      </div>
-      <div class="controls">
-        <select id="symbol" aria-label="Futures symbol">
-          <option value="BTC_USDT">BTC / USDT</option>
-          <option value="ETH_USDT">ETH / USDT</option>
-          <option value="SOL_USDT">SOL / USDT</option>
-        </select>
-        <select id="interval" aria-label="Chart timeframe">
-          <option value="1m">1m</option>
-          <option value="5m">5m</option>
-          <option value="15m" selected>15m</option>
-          <option value="30m">30m</option>
-          <option value="1h">1H</option>
-          <option value="4h">4H</option>
-          <option value="8h">8H</option>
-          <option value="1d">1D</option>
-          <option value="1w">1W</option>
-        </select>
-        <button class="btn btn-primary" id="analyzeBtn" type="button">Load chart ↗</button>
-      </div>
-    </div>
-
-    <div class="workspace-body">
-      <div class="chart-side">
-        <div class="chart-meta">
-          <div class="asset-heading">
-            <img id="chartAssetLogo" class="asset-logo" src="/mascot.png" alt="Selected asset">
-            <div>
-              <div class="asset-title" id="assetTitle">BTC / USDT</div>
-              <div class="asset-sub" id="chartSubtitle">MEXC perpetual · 15m</div>
-            </div>
-          </div>
-          <div class="last-price" id="lastPrice">—<small id="lastTime">Waiting for candles</small></div>
-        </div>
-        <div class="chart-box" id="chartBox">
-          <div class="chart-placeholder" id="chartPlaceholder">Loading candlestick data...</div>
-        </div>
-        <div class="chart-legend">
-          <span><i class="legend-dot" style="background:var(--green)"></i>Bullish candle</span>
-          <span><i class="legend-dot" style="background:var(--red)"></i>Bearish candle</span>
-          <span><i class="legend-dot" style="background:var(--blue)"></i>Volume</span>
-          <span id="chartRefreshStatus">Waiting for chart data</span>
-        </div>
+        <button class="btn" id="loadButton" type="button">Muat ulang market</button>
       </div>
 
-      <aside class="side-panel">
-        <div class="section-head">
-          <div class="section-title">Technical bias</div>
-          <span class="badge">Rule-based</span>
-        </div>
-        <div class="signal-card">
-          <div class="signal-top">
-            <span class="signal-label">Indicator summary</span>
-            <span class="signal-tag wait" id="signalTag">WAIT</span>
-          </div>
-          <div class="signal-value" id="signalValue">WAIT</div>
-          <div class="signal-desc" id="signalDesc">Loading available technical indicators.</div>
-          <div class="signal-facts">
-            <div class="fact"><span>Last completed close</span><strong id="factPrice">—</strong></div>
-            <div class="fact"><span>RSI (14)</span><strong id="factRsi">—</strong></div>
-            <div class="fact"><span>MACD histogram</span><strong id="factMacd">—</strong></div>
-            <div class="fact"><span>EMA trend</span><strong id="factEma">—</strong></div>
-            <div class="fact"><span>Data provider</span><strong>MEXC Futures</strong></div>
-          </div>
-        </div>
-        <div class="disclaimer" style="margin-top:12px">
-          This is a transparent indicator rule, not an AI prediction or guaranteed signal. Confirm market structure, fees, funding and liquidation risk before trading.
-        </div>
-      </aside>
-    </div>
-  </section>
-
-  <section class="section-head">
-    <div class="section-title">Technical indicators</div>
-    <div class="section-note" id="technicalUpdated">Waiting for analysis</div>
-  </section>
-  <section class="data-grid" id="metrics">
-    <div class="metric"><div class="metric-label">EMA 20</div><div class="metric-value">—</div></div>
-    <div class="metric"><div class="metric-label">EMA 50</div><div class="metric-value">—</div></div>
-    <div class="metric"><div class="metric-label">EMA 200</div><div class="metric-value">—</div></div>
-    <div class="metric"><div class="metric-label">RSI 14</div><div class="metric-value">—</div></div>
-    <div class="metric"><div class="metric-label">MACD Histogram</div><div class="metric-value">—</div></div>
-    <div class="metric"><div class="metric-label">ATR 14</div><div class="metric-value">—</div></div>
-    <div class="metric"><div class="metric-label">Bollinger Upper</div><div class="metric-value">—</div></div>
-    <div class="metric"><div class="metric-label">Bollinger Lower</div><div class="metric-value">—</div></div>
-  </section>
-
-  <section class="lower-grid">
-    <div class="panel">
-      <div class="panel-head">
-        <span class="section-title">Key price levels</span>
-        <span class="badge">Calculated from candles</span>
+      <div id="newListingNotice" class="notice" hidden>
+        <strong>New Listings belum dapat diverifikasi.</strong>
+        API market yang digunakan saat ini belum menyediakan tanggal listing kontrak.
+        Daftar ini tidak akan diisi dengan token baru yang hanya ditebak dari simbol.
       </div>
-      <div class="panel-content table-scroll">
-        <table class="data-table">
-          <thead><tr><th>Level</th><th>Type</th><th>Price</th></tr></thead>
-          <tbody id="levelsBody"><tr><td colspan="3" class="muted">Loading levels...</td></tr></tbody>
-        </table>
-      </div>
-    </div>
 
-    <div class="panel">
-      <div class="panel-head">
-        <span class="section-title">Market data status</span>
-        <span class="badge" id="dataStatus">Not loaded</span>
-      </div>
-      <div class="panel-content">
-        <table class="data-table">
-          <tbody id="statusBody">
-            <tr><td class="key">Candle count</td><td class="val">—</td></tr>
-            <tr><td class="key">Selected timeframe</td><td class="val">15m</td></tr>
-            <tr><td class="key">Funding rate</td><td class="val">Not connected</td></tr>
-            <tr><td class="key">Open interest</td><td class="val">Not connected</td></tr>
-            <tr><td class="key">Liquidation data</td><td class="val">Not connected</td></tr>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Token / Contract</th>
+              <th>Price (USDT)</th>
+              <th>24h Change</th>
+              <th>24h Turnover</th>
+              <th>24h Volume</th>
+              <th>Funding Rate</th>
+            </tr>
+          </thead>
+          <tbody id="marketRows">
+            <tr><td colspan="7" class="loading">Menghubungkan ke API market...</td></tr>
           </tbody>
         </table>
-        <div id="limitations" class="muted" style="font-size:10px;line-height:1.8;margin-top:13px">
-          Funding, open interest and liquidation feeds are not connected.
+      </div>
+
+      <div class="market-footer">
+        <span class="muted small" id="tableInfo">Menunggu data market...</span>
+        <button class="btn" id="showMoreButton" type="button">Tampilkan lebih banyak</button>
+      </div>
+    </section>
+
+    <section class="chart-layout">
+      <div class="panel">
+        <div class="chart-top">
+          <div>
+            <h2 id="selectedSymbol">BTC_USDT</h2>
+            <div class="selected-price" id="selectedPrice">—</div>
+            <div id="selectedChange" class="muted small">Pilih kontrak untuk melihat analisis</div>
+          </div>
+          <div class="intervals" id="intervalButtons">
+            <button class="btn" data-interval="5m">5m</button>
+            <button class="btn active" data-interval="15m">15m</button>
+            <button class="btn" data-interval="1h">1H</button>
+            <button class="btn" data-interval="4h">4H</button>
+            <button class="btn" data-interval="1d">1D</button>
+            <button class="btn" data-interval="1w">1W</button>
+          </div>
+        </div>
+        <div id="chart"></div>
+        <div class="chart-legend">
+          <span><i class="legend-dot" style="background:#20c997"></i>Candle naik</span>
+          <span><i class="legend-dot" style="background:#ff687b"></i>Candle turun</span>
+          <span>Chart dari data candle API</span>
         </div>
       </div>
+
+      <div class="panel">
+        <div class="section-head">
+          <div>
+            <h2>Technical Analysis</h2>
+            <p class="muted small">Indikator dari endpoint teknikal.</p>
+          </div>
+          <span class="pill" id="analysisInterval">15m</span>
+        </div>
+
+        <div class="metric-grid" id="metricGrid">
+          <div class="metric"><div class="metric-label">RSI</div><div class="metric-value">—</div></div>
+          <div class="metric"><div class="metric-label">MACD</div><div class="metric-value">—</div></div>
+          <div class="metric"><div class="metric-label">EMA</div><div class="metric-value">—</div></div>
+          <div class="metric"><div class="metric-label">ATR</div><div class="metric-value">—</div></div>
+        </div>
+
+        <div style="margin-top:20px">
+          <h3>Support & Resistance</h3>
+          <div class="levels-list" id="levelsList">
+            <div class="muted small">Menunggu data teknikal...</div>
+          </div>
+        </div>
+
+        <div style="margin-top:18px">
+          <h3>Market Data Status</h3>
+          <div class="levels-list" id="marketStatus">
+            <div class="level-row"><span class="muted">Funding rate</span><span>—</span></div>
+            <div class="level-row"><span class="muted">Open interest</span><span>—</span></div>
+            <div class="level-row"><span class="muted">Liquidations</span><span>Not connected</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="notice" style="margin-top:20px">
+      <strong>Catatan risiko:</strong>
+      Kategori Bullish/Bearish berdasarkan perubahan 24 jam hanya penyaring awal,
+      bukan sinyal entry. Konfirmasi dengan timeframe, struktur candle, indikator,
+      likuiditas, funding, dan manajemen risiko. Data funding/OI dapat memiliki
+      keterbatasan satuan atau cakupan sesuai API sumber.
     </div>
-  </section>
+  </main>
 
-  <section class="disclaimer">
-    <strong style="color:var(--text)">Risk disclosure</strong><br>
-    BlobSignal is a research and educational interface, not financial advice. Candles are refreshed by periodic API polling, not a direct exchange WebSocket connection. Market availability, logo coverage, data delays and indicator accuracy depend on their respective sources. Verify exchange data independently before trading.
-  </section>
-
-  <footer>
-    <span>BlobSignal · Crypto Market Terminal</span>
-    <span id="footerUpdate">Market: MEXC Futures · Chart: MEXC Futures</span>
+  <footer class="footer">
+    <div class="wrap">
+      BlobSignal · MEXC Futures Market Dashboard · Data disediakan oleh endpoint API yang dikonfigurasi.
+      Bukan nasihat keuangan.
+    </div>
   </footer>
-</main>
 
 <script>
-"use strict";
+(() => {
+  "use strict";
 
-const BASE = "https://crypto-research-ai.mhd-aldirahman-56.workers.dev";
-const MARKET_URL = BASE + "/api/market";
-const TECH_URL = BASE + "/api/technicals";
-const $ = id => document.getElementById(id);
+  const BASE = "https://crypto-research-ai.mhd-aldirahman-56.workers.dev";
+  const MARKET_URL = BASE + "/api/market";
+  const TECH_URL = BASE + "/api/technicals";
 
-const state = {
-  markets: [],
-  page: 1,
-  limit: 100,
-  total: 0,
-  totalPages: 1,
-  loadingMore: false,
-  chart: null,
-  candleSeries: null,
-  volumeSeries: null,
-  selectedLogo: null,
-  refreshTimer: null,
-  searchTimer: null,
-  requestId: 0,
-  marketRequestId: 0,
-  lastChartData: null
-};
+  const $ = id => document.getElementById(id);
 
-function num(value) {
-  if (value === null || value === undefined || value === "") return null;
-  const n = Number(value);
-  return Number.isFinite(n) ? n : null;
-}
-
-function escapeHtml(value) {
-  return String(value ?? "").replace(/[&<>"']/g, char => ({
-    "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;"
-  })[char]);
-}
-
-function fmt(value, digits) {
-  const n = num(value);
-  if (n === null) return "—";
-  return n.toLocaleString("en-US", {
-    maximumFractionDigits: digits ?? (Math.abs(n) < 1 ? 6 : 2)
-  });
-}
-
-function price(value) {
-  const n = num(value);
-  if (n === null) return "—";
-  return "$" + n.toLocaleString("en-US", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: Math.abs(n) < 1 ? 8 : 2
-  });
-}
-
-function compact(value) {
-  const n = num(value);
-  if (n === null) return "—";
-  return new Intl.NumberFormat("en-US", {
-    notation: "compact",
-    maximumFractionDigits: 2
-  }).format(n);
-}
-
-function safeTime(value) {
-  if (!value) return "Time unavailable";
-  const d = new Date(value);
-  return Number.isNaN(d.getTime()) ? String(value) : d.toLocaleString("id-ID");
-}
-
-function setConnection(text, status) {
-  $("connection").textContent = text;
-  $("apiDot").className = "dot " + (status || "");
-}
-
-async function getJson(url) {
-  const response = await fetch(url, { cache: "no-store" });
-  const data = await response.json();
-  if (!response.ok || data.success === false) {
-    throw new Error(data.error || "API request failed (" + response.status + ")");
-  }
-  return data;
-}
-
-function fallbackLogo(symbol) {
-  return `<span class="coin-fallback">${escapeHtml(String(symbol || "?").slice(0, 4))}</span>`;
-}
-
-function logoMarkup(url, symbol) {
-  if (!url) return fallbackLogo(symbol);
-  return `<img class="coin-logo" src="${escapeHtml(url)}" alt="${escapeHtml(symbol)}"
-    loading="lazy" referrerpolicy="no-referrer"
-    onerror="this.outerHTML='<span class=&quot;coin-fallback&quot;>${escapeHtml(String(symbol || "?").slice(0, 4))}</span>'">`;
-}
-
-function setChartLogo(url) {
-  const img = $("chartAssetLogo");
-  img.onerror = () => {
-    img.onerror = null;
-    img.src = "/mascot.png";
-  };
-  img.src = url || "/mascot.png";
-}
-
-function renderTicker(markets) {
-  const preferred = ["BTC", "ETH", "SOL"];
-  const chosen = preferred.map(symbol =>
-    markets.find(coin => coin.symbol === symbol)
-  ).filter(Boolean);
-
-  if (!chosen.length) {
-    $("marketTicker").innerHTML =
-      '<div class="ticker-item"><div class="muted">No ticker data available.</div></div>';
-    return;
-  }
-
-  $("marketTicker").innerHTML = chosen.map(coin => {
-    const change = num(coin.change_24h_percent);
-    const changeClass = change === null ? "" : change >= 0 ? "green" : "red";
-    return `<article class="ticker-item">
-      <div class="ticker-top">
-        <div style="display:flex;align-items:center;gap:8px">
-          ${logoMarkup(coin.logo_url, coin.symbol)}
-          <div><span class="ticker-name">${escapeHtml(coin.name || coin.symbol)}</span>
-          <span class="ticker-symbol">${escapeHtml(coin.symbol)}</span></div>
-        </div>
-        <span class="badge">PERP</span>
-      </div>
-      <div class="ticker-price">${price(coin.price)}</div>
-      <div class="ticker-source">
-        <span class="${changeClass}">${change === null ? "—" : (change > 0 ? "+" : "") + fmt(change, 2) + "%"}</span>
-        · MEXC Futures
-      </div>
-    </article>`;
-  }).join("");
-}
-
-function renderMarketRows(markets, append) {
-  const body = $("marketBody");
-  const html = markets.map(coin => {
-    const symbol = String(coin.symbol || "");
-    const contract = String(coin.contract_symbol || "");
-    const change = num(coin.change_24h_percent);
-    const changeClass = change === null ? "" : change >= 0 ? "green" : "red";
-    const selected = contract === $("symbol").value ? " selected" : "";
-
-    return `<tr class="market-row${selected}" data-contract="${escapeHtml(contract)}"
-      data-symbol="${escapeHtml(symbol)}" tabindex="0" role="button"
-      aria-label="Select ${escapeHtml(symbol)} market">
-      <td><div class="coin-cell">
-        ${logoMarkup(coin.logo_url, symbol)}
-        <div><div class="coin-name">${escapeHtml(coin.name || symbol)}</div>
-        <div class="coin-symbol">${escapeHtml(symbol)} / ${escapeHtml(coin.quote_asset || "USDT")}</div></div>
-      </div></td>
-      <td>${price(coin.price)}</td>
-      <td class="${changeClass}">${change === null ? "—" : (change > 0 ? "+" : "") + fmt(change, 2) + "%"}</td>
-      <td>${compact(coin.turnover_24h)}</td>
-      <td>${price(coin.high_24h)}</td>
-      <td>${price(coin.low_24h)}</td>
-    </tr>`;
-  }).join("");
-
-  if (append) {
-    body.insertAdjacentHTML("beforeend", html);
-  } else {
-    body.innerHTML = html || '<tr><td colspan="6" class="muted">No matching markets found.</td></tr>';
-  }
-
-  $("marketCount").textContent =
-    `${state.markets.length.toLocaleString()} loaded · ${state.total.toLocaleString()} available`;
-
-  $("marketPageInfo").textContent =
-    `Page ${state.page} of ${Math.max(state.totalPages, 1)}`;
-
-  $("loadMoreBtn").disabled =
-    state.loadingMore || state.page >= state.totalPages || !state.total;
-
-  $("loadMoreBtn").textContent =
-    state.page >= state.totalPages ? "All loaded" :
-    state.loadingMore ? "Loading..." : "Load more markets";
-}
-
-async function loadMarket(reset = true) {
-  if (state.loadingMore) return;
-
-  const requestId = ++state.marketRequestId;
-  if (reset) {
-    state.page = 1;
-    state.markets = [];
-    $("marketBody").innerHTML =
-      '<tr><td colspan="6" class="muted">Loading futures markets...</td></tr>';
-  }
-
-  const search = $("marketSearch").value.trim();
-  const sort = $("marketSort").value;
-  const page = reset ? 1 : state.page + 1;
-
-  state.loadingMore = !reset;
-  $("loadMoreBtn").disabled = true;
-  $("marketCount").textContent = "Loading market data...";
-
-  try {
-    const params = new URLSearchParams({
-      page: String(page),
-      limit: String(state.limit),
-      sort
-    });
-    if (search) params.set("search", search);
-
-    const result = await getJson(MARKET_URL + "?" + params.toString());
-    if (requestId !== state.marketRequestId) return;
-
-    const incoming = Array.isArray(result.data) ? result.data : [];
-    state.page = Number(result.page || page);
-    state.total = Number(result.total ?? incoming.length);
-    state.totalPages = Number(result.total_pages || 1);
-    state.markets = reset ? incoming : state.markets.concat(incoming);
-
-    if (reset) {
-      renderTicker(state.markets);
-      $("footerUpdate").textContent =
-        "Market: MEXC Futures · Updated " + safeTime(result.timestamp);
-    }
-
-    renderMarketRows(incoming, !reset);
-    if (reset) renderMarketRows(state.markets, false);
-    setConnection("Market API connected", "ok");
-  } catch (error) {
-    if (requestId !== state.marketRequestId) return;
-    $("marketBody").innerHTML =
-      `<tr><td colspan="6" class="error-text">${escapeHtml(error.message)}</td></tr>`;
-    $("marketCount").textContent = "Market request failed";
-    setConnection("Market API error", "bad");
-  } finally {
-    if (requestId === state.marketRequestId) {
-      state.loadingMore = false;
-      $("loadMoreBtn").disabled = state.page >= state.totalPages || !state.total;
-      $("loadMoreBtn").textContent =
-        state.page >= state.totalPages ? "All loaded" : "Load more markets";
-    }
-  }
-}
-
-function initChart() {
-  if (!window.LightweightCharts) {
-    $("chartBox").innerHTML =
-      '<div class="chart-placeholder error-text">Chart library failed to load. Check your connection or CDN access.</div>';
-    return false;
-  }
-
-  state.chart = LightweightCharts.createChart($("chartBox"), {
-    width: $("chartBox").clientWidth,
-    height: $("chartBox").clientHeight,
-    layout: {
-      background: { color: "#0c121c" },
-      textColor: "#8998ad",
-      fontFamily: 'Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif'
-    },
-    grid: {
-      vertLines: { color: "#172131" },
-      horzLines: { color: "#172131" }
-    },
-    crosshair: {
-      mode: LightweightCharts.CrosshairMode.Normal
-    },
-    rightPriceScale: {
-      borderColor: "#253347",
-      scaleMargins: { top: 0.08, bottom: 0.25 }
-    },
-    timeScale: {
-      borderColor: "#253347",
-      timeVisible: true,
-      secondsVisible: false,
-      rightOffset: 5
-    },
-    localization: {
-      locale: "en-US",
-      priceFormatter: value => "$" + Number(value).toLocaleString("en-US", {
-        maximumFractionDigits: Math.abs(value) < 1 ? 6 : 2
-      })
-    },
-    handleScroll: true,
-    handleScale: true
-  });
-
-  state.candleSeries = state.chart.addCandlestickSeries({
-    upColor: "#45d6a0",
-    downColor: "#f16d7a",
-    borderUpColor: "#45d6a0",
-    borderDownColor: "#f16d7a",
-    wickUpColor: "#45d6a0",
-    wickDownColor: "#f16d7a",
-    priceLineVisible: true,
-    lastValueVisible: true
-  });
-
-  state.volumeSeries = state.chart.addHistogramSeries({
-    color: "#54c8ff",
-    priceFormat: { type: "volume" },
-    priceScaleId: "",
-    lastValueVisible: false,
-    priceLineVisible: false
-  });
-
-  state.volumeSeries.priceScale().applyOptions({
-    scaleMargins: { top: 0.78, bottom: 0 }
-  });
-
-  const resize = () => {
-    if (!state.chart) return;
-    state.chart.applyOptions({
-      width: $("chartBox").clientWidth,
-      height: $("chartBox").clientHeight
-    });
+  const state = {
+    markets: [],
+    filtered: [],
+    category: "all",
+    selectedSymbol: "BTC_USDT",
+    interval: "15m",
+    search: "",
+    sort: "default",
+    pageLimit: 50,
+    chart: null,
+    candleSeries: null,
+    volumeSeries: null,
+    chartCandles: [],
+    refreshTimer: null,
+    requestId: 0,
+    marketRequestId: 0,
+    loading: false
   };
 
-  if ("ResizeObserver" in window) {
-    new ResizeObserver(resize).observe($("chartBox"));
-  } else {
-    window.addEventListener("resize", resize);
+  const MEME_SYMBOLS = new Set([
+    "DOGE", "SHIB", "PEPE", "BONK", "FLOKI", "WIF", "FARTCOIN",
+    "MEME", "TURBO", "BOME", "BRETT", "POPCAT", "NEIRO", "PONKE",
+    "MOG", "1000SATS", "1000PEPE", "1000SHIB", "PENGU", "TRUMP",
+    "MOTHER", "GOAT", "ACT", "PNUT", "WHY", "CAT", "BAN", "MEW"
+  ]);
+
+  const CATEGORY_TITLES = {
+    all: "All Futures Markets",
+    gainers: "Top Gainers",
+    trading: "Top Trading",
+    bullish: "Bullish Candidates",
+    bearish: "Bearish Candidates",
+    new: "New Listings",
+    meme: "Meme Coins",
+    others: "Other Futures Markets"
+  };
+
+  function esc(value) {
+    return String(value ?? "").replace(/[&<>"']/g, char => ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;"
+    })[char]);
   }
 
-  return true;
-}
+  function number(value) {
+    if (value === null || value === undefined || value === "") return NaN;
+    const result = Number(value);
+    return Number.isFinite(result) ? result : NaN;
+  }
 
-function normalizeCandles(candles) {
-  const map = new Map();
+  function firstNumber(...values) {
+    for (const value of values) {
+      const n = number(value);
+      if (Number.isFinite(n)) return n;
+    }
+    return NaN;
+  }
 
-  for (const c of candles || []) {
-    const time = num(c.time ?? c.timestamp ?? c.t);
-    const open = num(c.open ?? c.o);
-    const high = num(c.high ?? c.h);
-    const low = num(c.low ?? c.l);
-    const close = num(c.close ?? c.c);
-    const volume = num(c.volume ?? c.vol ?? c.v);
-
-    if ([time, open, high, low, close].some(v => v === null)) continue;
-
-    map.set(time, {
-      time: Math.floor(time),
-      open, high, low, close,
-      volume: volume ?? 0
+  function money(value) {
+    const n = number(value);
+    if (!Number.isFinite(n)) return "—";
+    return n.toLocaleString("en-US", {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: n >= 100 ? 2 : n >= 1 ? 5 : 8
     });
   }
 
-  return [...map.values()].sort((a, b) => a.time - b.time);
-}
-
-function renderCandles(candles) {
-  if (!state.chart || !state.candleSeries || !state.volumeSeries) {
-    if (!initChart()) return;
+  function compact(value) {
+    const n = number(value);
+    if (!Number.isFinite(n)) return "—";
+    return new Intl.NumberFormat("en-US", {
+      notation: "compact",
+      maximumFractionDigits: 2
+    }).format(n);
   }
 
-  const valid = normalizeCandles(candles);
-  if (!valid.length) {
-    $("chartRefreshStatus").textContent = "No candle data";
-    return;
+  function pct(value) {
+    const n = number(value);
+    if (!Number.isFinite(n)) return "—";
+    return (n > 0 ? "+" : "") + n.toFixed(2) + "%";
   }
 
-  state.candleSeries.setData(valid.map(c => ({
-    time: c.time,
-    open: c.open,
-    high: c.high,
-    low: c.low,
-    close: c.close
-  })));
-
-  state.volumeSeries.setData(valid.map(c => ({
-    time: c.time,
-    value: c.volume,
-    color: c.close >= c.open ? "rgba(69,214,160,0.42)" : "rgba(241,109,122,0.42)"
-  })));
-
-  state.chart.timeScale().fitContent();
-
-  const last = valid[valid.length - 1];
-  $("lastPrice").innerHTML =
-    `${price(last.close)}<small>${new Date(last.time * 1000).toLocaleString("id-ID")}</small>`;
-  $("chartRefreshStatus").textContent =
-    "Last candle " + new Date(last.time * 1000).toLocaleTimeString("id-ID");
-
-  state.lastChartData = valid;
-}
-
-function flatten(obj, prefix = "", out = [], depth = 0) {
-  if (!obj || typeof obj !== "object" || depth > 6) return out;
-
-  for (const [key, value] of Object.entries(obj)) {
-    const path = prefix ? prefix + "." + key : key;
-    if (value === null || value === undefined) continue;
-
-    if (typeof value === "number" ||
-        (typeof value === "string" && value.trim() !== "" && Number.isFinite(Number(value)))) {
-      out.push({ key, path, value: Number(value) });
-    } else if (typeof value === "object" && !Array.isArray(value)) {
-      flatten(value, path, out, depth + 1);
-    }
-  }
-  return out;
-}
-
-function norm(value) {
-  return String(value).toLowerCase().replace(/[^a-z0-9]/g, "");
-}
-
-function findValue(entries, aliases) {
-  for (const alias of aliases) {
-    const exact = entries.find(e => norm(e.key) === norm(alias));
-    if (exact) return exact.value;
-  }
-  for (const alias of aliases) {
-    const match = entries.find(e => norm(e.path).endsWith(norm(alias)));
-    if (match) return match.value;
-  }
-  return null;
-}
-
-function renderMetrics(entries) {
-  const definitions = [
-    ["EMA 20",["ema20"],"Trend"],
-    ["EMA 50",["ema50"],"Trend"],
-    ["EMA 200",["ema200"],"Long-term trend"],
-    ["RSI 14",["rsi14","rsi"],"Momentum"],
-    ["MACD Histogram",["macdHistogram","histogram","macdHist"],"Momentum"],
-    ["ATR 14",["atr14","atr"],"Volatility"],
-    ["Bollinger Upper",["bollingerUpper","bbUpper","upperBand"],"Band"],
-    ["Bollinger Lower",["bollingerLower","bbLower","lowerBand"],"Band"]
-  ];
-
-  $("metrics").innerHTML = definitions.map(([label, aliases, note]) => {
-    const value = findValue(entries, aliases);
-    return `<article class="metric">
-      <div class="metric-label">${label}</div>
-      <div class="metric-value">${value === null ? "—" : fmt(value, label.includes("RSI") ? 2 : 6)}</div>
-      <div class="metric-note">${note}</div>
-    </article>`;
-  }).join("");
-}
-
-function updateSignal(entries, close) {
-  const rsi = findValue(entries, ["rsi14","rsi"]);
-  const macd = findValue(entries, ["macdHistogram","histogram","macdHist"]);
-  const ema20 = findValue(entries, ["ema20"]);
-  const ema50 = findValue(entries, ["ema50"]);
-  const ema200 = findValue(entries, ["ema200"]);
-
-  let score = 0;
-  const reasons = [];
-
-  if (rsi !== null) {
-    if (rsi >= 50 && rsi < 70) {
-      score++; reasons.push("RSI above 50");
-    } else if (rsi < 50 && rsi > 30) {
-      score--; reasons.push("RSI below 50");
-    } else if (rsi >= 70) {
-      reasons.push("RSI elevated; momentum may be stretched");
-    } else if (rsi <= 30) {
-      reasons.push("RSI oversold; reversal is not confirmed");
-    }
+  function pctClass(value) {
+    const n = number(value);
+    if (!Number.isFinite(n) || n === 0) return "neutral";
+    return n > 0 ? "positive" : "negative";
   }
 
-  if (macd !== null && macd !== 0) {
-    score += macd > 0 ? 1 : -1;
-    reasons.push(macd > 0 ? "MACD histogram positive" : "MACD histogram negative");
+  function marketSymbol(market) {
+    return String(
+      market?.contract_symbol || market?.symbol || market?.id || ""
+    ).toUpperCase();
   }
 
-  if (ema20 !== null && ema50 !== null && ema20 !== ema50) {
-    score += ema20 > ema50 ? 1 : -1;
-    reasons.push(ema20 > ema50 ? "EMA20 above EMA50" : "EMA20 below EMA50");
+  function baseSymbol(market) {
+    const symbol = marketSymbol(market);
+    return symbol.replace(/_USDT$|USDT$|[-/]USDT$/i, "").toUpperCase();
   }
 
-  if (ema200 !== null && close !== null && close !== ema200) {
-    score += close > ema200 ? 1 : -1;
-    reasons.push(close > ema200 ? "Price above EMA200" : "Price below EMA200");
+  function marketPrice(market) {
+    return firstNumber(
+      market?.price,
+      market?.price_usd,
+      market?.lastPrice,
+      market?.last_price
+    );
   }
 
-  let signal = "WAIT", cls = "wait";
-  let desc = "Insufficient or mixed indicator evidence. Wait for confirmation.";
-
-  if (score >= 2) {
-    signal = "LONG BIAS";
-    cls = "long";
-    desc = "Bullish conditions from available indicators. This is a bias, not an entry instruction.";
-  } else if (score <= -2) {
-    signal = "SHORT BIAS";
-    cls = "short";
-    desc = "Bearish conditions from available indicators. This is a bias, not an entry instruction.";
+  function marketChange(market) {
+    return firstNumber(
+      market?.change_24h_percent,
+      market?.change24hPercent,
+      market?.priceChangePercent,
+      market?.changePercent
+    );
   }
 
-  $("signalValue").textContent = signal;
-  $("signalTag").textContent = signal.replace(" BIAS", "");
-  $("signalTag").className = "signal-tag " + cls;
-  $("signalDesc").textContent =
-    reasons.length ? desc + " Factors: " + reasons.join("; ") + "." : desc;
-  $("factPrice").textContent = price(close);
-  $("factRsi").textContent = rsi === null ? "—" : fmt(rsi, 2);
-  $("factMacd").textContent = macd === null ? "—" : fmt(macd, 6);
-  $("factEma").textContent =
-    ema20 === null || ema50 === null ? "—" :
-    ema20 > ema50 ? "Bullish alignment" :
-    ema20 < ema50 ? "Bearish alignment" : "Neutral";
-}
-
-function renderLevels(data, entries) {
-  const analysis = data.analysis || {};
-  const possible = [
-    analysis.levels,
-    analysis.supportResistance,
-    analysis.support_resistance,
-    analysis.pivots,
-    analysis.fibonacci
-  ];
-
-  let found = [];
-  for (const item of possible) {
-    const list = flatten(item);
-    if (list.length) found.push(...list);
+  function marketTurnover(market) {
+    return firstNumber(
+      market?.turnover_24h,
+      market?.turnover24,
+      market?.quoteVolume,
+      market?.amount24
+    );
   }
 
-  if (!found.length) {
-    const keywords = ["support","resistance","pivot","fib","fibonacci"];
-    found = entries.filter(e => keywords.some(k => norm(e.path).includes(k)));
+  function marketVolume(market) {
+    return firstNumber(
+      market?.volume_24h,
+      market?.volume24,
+      market?.volume,
+      market?.vol24
+    );
   }
 
-  const unique = new Map();
-  for (const item of found) unique.set(item.path, item);
+  function isMeme(market) {
+    const symbol = baseSymbol(market);
+    const name = String(market?.name || "").toLowerCase();
 
-  const levels = [...unique.values()];
-  if (!levels.length) {
-    $("levelsBody").innerHTML =
-      '<tr><td colspan="3" class="muted">Price levels are not available in the API response.</td></tr>';
-    return;
+    return MEME_SYMBOLS.has(symbol) ||
+      /dogecoin|shiba inu|pepe|bonk|floki|fartcoin|meme coin|dogwifhat|popcat|brett/.test(name);
   }
 
-  $("levelsBody").innerHTML = levels.slice(0, 30).map(item => {
-    const name = item.path.split(".").slice(-2).join(" · ");
-    const key = norm(item.path);
-    const type = key.includes("support") ? "Support" :
-      key.includes("resistance") ? "Resistance" :
-      key.includes("pivot") ? "Pivot" :
-      key.includes("fib") ? "Fibonacci" : "Level";
-
-    return `<tr><td>${escapeHtml(name)}</td>
-      <td><span class="badge">${type}</span></td>
-      <td class="val">${price(item.value)}</td></tr>`;
-  }).join("");
-}
-
-function renderStatus(data, candles, interval) {
-  $("dataStatus").textContent = "Connected";
-  $("statusBody").innerHTML = `
-    <tr><td class="key">Completed candles</td><td class="val">${data.candleCount ?? candles.length}</td></tr>
-    <tr><td class="key">Chart candles</td><td class="val">${data.chartCandleCount ?? candles.length}</td></tr>
-    <tr><td class="key">Selected timeframe</td><td class="val">${escapeHtml(interval)}</td></tr>
-    <tr><td class="key">Funding rate</td><td class="val">Not connected</td></tr>
-    <tr><td class="key">Open interest</td><td class="val">Not connected</td></tr>
-    <tr><td class="key">Liquidation data</td><td class="val">Not connected</td></tr>`;
-
-  const limits = data.dataLimitations;
-  $("limitations").textContent = Array.isArray(limits) && limits.length
-    ? limits.join(" ")
-    : "Market derivatives feeds beyond candle data may not be available.";
-}
-
-async function loadTechnicals(options = {}) {
-  const refreshOnly = options.refreshOnly === true;
-  const requestId = ++state.requestId;
-  const symbol = $("symbol").value;
-  const interval = $("interval").value;
-  const button = $("analyzeBtn");
-
-  if (!refreshOnly) {
-    button.disabled = true;
-    button.textContent = "Loading...";
-    $("technicalUpdated").textContent = "Requesting candle data...";
+  function safeText(value, fallback = "—") {
+    if (value === null || value === undefined || value === "") return fallback;
+    if (typeof value === "object") return JSON.stringify(value);
+    return String(value);
   }
 
-  $("assetTitle").textContent = symbol.replace("_", " / ");
-  $("chartSubtitle").textContent = "MEXC perpetual · " + interval;
-  $("chartRefreshStatus").textContent = "Updating chart data...";
+  async function getJson(url) {
+    const response = await fetch(url, {
+      headers: { "Accept": "application/json" },
+      cache: "no-store"
+    });
 
-  try {
-    const params = new URLSearchParams({ symbol, interval, limit: "250" });
-    const data = await getJson(TECH_URL + "?" + params.toString());
-    if (requestId !== state.requestId) return;
-
-    const analysis = data.analysis || {};
-    const source = analysis.indicators || analysis.technicals || analysis;
-    const entries = flatten(source);
-    const chartCandles = Array.isArray(data.chartCandles)
-      ? data.chartCandles
-      : Array.isArray(data.candles) ? data.candles : [];
-
-    if (!chartCandles.length) {
-      throw new Error("The API returned no chart candles.");
+    if (!response.ok) {
+      throw new Error("HTTP " + response.status);
     }
 
-    renderCandles(chartCandles);
-
-    const completed = Array.isArray(data.candles) ? data.candles : [];
-    const latest = data.latestCandle || completed[completed.length - 1];
-    const close = num(latest?.close) ?? num(latest?.c) ??
-      (completed.length ? num(completed[completed.length - 1].close) : null);
-
-    if (close !== null && !$("lastPrice").textContent.includes("$")) {
-      $("lastPrice").textContent = price(close);
+    const data = await response.json();
+    if (data?.success === false) {
+      throw new Error(data.error || "API returned success=false");
     }
-
-    renderMetrics(entries);
-    updateSignal(entries, close);
-    renderLevels(data, entries);
-    renderStatus(data, chartCandles, interval);
-
-    $("technicalUpdated").textContent =
-      "Updated " + safeTime(data.timestamp) + " · " + (data.provider || "MEXC Futures");
-
-    $("footerUpdate").textContent =
-      "Market: MEXC Futures · Chart refreshed " +
-      new Date().toLocaleTimeString("id-ID");
-
-    setConnection("Market and futures connected", "ok");
-  } catch (error) {
-    if (requestId !== state.requestId) return;
-
-    $("dataStatus").textContent = "Request failed";
-    $("technicalUpdated").textContent = "Could not load technical data";
-    $("chartRefreshStatus").textContent = "Chart update failed";
-
-    if (!state.lastChartData) {
-      $("chartBox").innerHTML =
-        `<div class="chart-placeholder error-text">${escapeHtml(error.message)}<br><br>Check the symbol, timeframe, API and chart library.</div>`;
-    }
-
-    $("signalValue").textContent = "UNAVAILABLE";
-    $("signalTag").textContent = "ERROR";
-    $("signalTag").className = "signal-tag wait";
-    $("signalDesc").textContent =
-      "No new analysis was produced because the API request failed.";
-    setConnection("Technical data unavailable", "bad");
-  } finally {
-    if (!refreshOnly && requestId === state.requestId) {
-      button.disabled = false;
-      button.textContent = "Load chart ↗";
-    }
-  }
-}
-
-function selectMarket(contract, logo, name) {
-  if (!/^[A-Z0-9]+_USDT$/.test(contract)) return;
-
-  const symbolSelect = $("symbol");
-  let option = [...symbolSelect.options].find(o => o.value === contract);
-
-  if (!option) {
-    option = new Option(contract.replace("_USDT", " / USDT"), contract);
-    symbolSelect.add(option);
+    return data;
   }
 
-  symbolSelect.value = contract;
-  state.selectedLogo = logo || null;
-  setChartLogo(logo);
-  $("assetTitle").textContent = name || contract.replace("_", " / ");
-  document.querySelectorAll(".market-row").forEach(row => {
-    row.classList.toggle("selected", row.dataset.contract === contract);
+  function setConnection(ok, message) {
+    $("connectionText").textContent = message;
+    $("connectionDot").style.background = ok ? "var(--green)" : "var(--red)";
+  }
+
+  function setTheme(theme) {
+    const selected = theme === "light" ? "light" : "dark";
+    document.documentElement.dataset.theme = selected;
+
+    try {
+      localStorage.setItem("blobsignal-theme", selected);
+    } catch (_) {}
+
+    $("themeButton").textContent =
+      selected === "dark" ? "☀️ White Mode" : "🌙 Dark Mode";
+
+    if (state.chart) {
+      const isDark = selected === "dark";
+      state.chart.applyOptions({
+        layout: {
+          background: { color: isDark ? "#171e29" : "#ffffff" },
+          textColor: isDark ? "#a9b6c8" : "#68788b"
+        },
+        grid: {
+          vertLines: { color: isDark ? "#263343" : "#e6ebf1" },
+          horzLines: { color: isDark ? "#263343" : "#e6ebf1" }
+        },
+        rightPriceScale: {
+          borderColor: isDark ? "#2b3747" : "#dce4ed"
+        },
+        timeScale: {
+          borderColor: isDark ? "#2b3747" : "#dce4ed"
+        }
+      });
+    }
+  }
+
+  function loadSavedTheme() {
+    let saved = "dark";
+    try {
+      saved = localStorage.getItem("blobsignal-theme") || "dark";
+    } catch (_) {}
+    setTheme(saved);
+  }
+
+  function logoHtml(market) {
+    const symbol = baseSymbol(market);
+    const logo = market?.logo_url || market?.logo || "";
+    const initial = esc(symbol.slice(0, 2) || "CR");
+
+    if (logo && /^https?:\/\//i.test(logo)) {
+      return `<span class="coin-logo"><img src="${esc(logo)}" alt=""
+        loading="lazy" referrerpolicy="no-referrer"
+        onerror="this.style.display='none'"></span>`;
+    }
+
+    return `<span class="coin-logo">${initial}</span>`;
+  }
+
+  function findMarket(symbol) {
+    return state.markets.find(market => marketSymbol(market) === symbol);
+  }
+
+  function setSelectedMarket(symbol) {
+    const market = findMarket(symbol);
+    if (!market) {
+      state.selectedSymbol = symbol;
+    } else {
+      state.selectedSymbol = marketSymbol(market);
+    }
+
+    $("selectedSymbol").textContent = state.selectedSymbol;
+    updateSelectedPrice();
+    loadTechnicals();
+    document.querySelector(".chart-layout")?.scrollIntoView({
+      behavior: "smooth",
+      block: "start"
+    });
+  }
+
+  function updateSelectedPrice() {
+    const market = findMarket(state.selectedSymbol);
+
+    if (!market) {
+      $("selectedPrice").textContent = "—";
+      $("selectedChange").textContent = "Data harga belum tersedia di daftar market yang dimuat.";
+      return;
+    }
+
+    const p = marketPrice(market);
+    const c = marketChange(market);
+
+    $("selectedPrice").textContent = Number.isFinite(p) ? money(p) + " USDT" : "—";
+    $("selectedChange").className = "small " + pctClass(c);
+    $("selectedChange").textContent =
+      (Number.isFinite(c) ? pct(c) + " (24h)" : "Perubahan 24 jam tidak tersedia") +
+      " · MEXC Futures";
+  }
+
+  function getSortedMarkets(markets) {
+    const result = [...markets];
+
+    switch (state.sort) {
+      case "gainers":
+        result.sort((a, b) => finiteOr(marketChange(b), -Infinity) -
+          finiteOr(marketChange(a), -Infinity));
+        break;
+      case "losers":
+        result.sort((a, b) => finiteOr(marketChange(a), Infinity) -
+          finiteOr(marketChange(b), Infinity));
+        break;
+      case "turnover":
+        result.sort((a, b) => finiteOr(marketTurnover(b), -Infinity) -
+          finiteOr(marketTurnover(a), -Infinity));
+        break;
+      case "price":
+        result.sort((a, b) => finiteOr(marketPrice(b), -Infinity) -
+          finiteOr(marketPrice(a), -Infinity));
+        break;
+    }
+    return result;
+  }
+
+  function finiteOr(value, fallback) {
+    return Number.isFinite(value) ? value : fallback;
+  }
+
+  function categoryMarkets() {
+    let result = [...state.markets];
+
+    switch (state.category) {
+      case "gainers":
+        result.sort((a, b) => finiteOr(marketChange(b), -Infinity) -
+          finiteOr(marketChange(a), -Infinity));
+        result = result.filter(m => Number.isFinite(marketChange(m)));
+        break;
+
+      case "trading":
+        result.sort((a, b) => finiteOr(marketTurnover(b), -Infinity) -
+          finiteOr(marketTurnover(a), -Infinity));
+        result = result.filter(m => Number.isFinite(marketTurnover(m)));
+        break;
+
+      case "bullish":
+        result = result.filter(m => marketChange(m) > 0)
+          .sort((a, b) => marketChange(b) - marketChange(a));
+        break;
+
+      case "bearish":
+        result = result.filter(m => marketChange(m) < 0)
+          .sort((a, b) => marketChange(a) - marketChange(b));
+        break;
+
+      case "meme":
+        result = result.filter(isMeme)
+          .sort((a, b) => finiteOr(marketTurnover(b), 0) -
+            finiteOr(marketTurnover(a), 0));
+        break;
+
+      case "others":
+        result = result.filter(m => !isMeme(m));
+        break;
+
+      case "new":
+        result = [];
+        break;
+    }
+
+    if (state.search) {
+      const query = state.search.toLowerCase();
+      result = result.filter(m =>
+        marketSymbol(m).toLowerCase().includes(query) ||
+        String(m.name || "").toLowerCase().includes(query)
+      );
+    }
+
+    return getSortedMarkets(result);
+  }
+
+  function renderCategories() {
+    const counts = {
+      all: state.markets.length,
+      gainers: state.markets.filter(m => Number.isFinite(marketChange(m))).length,
+      trading: state.markets.filter(m => Number.isFinite(marketTurnover(m))).length,
+      bullish: state.markets.filter(m => marketChange(m) > 0).length,
+      bearish: state.markets.filter(m => marketChange(m) < 0).length,
+      new: null,
+      meme: state.markets.filter(isMeme).length,
+      others: state.markets.filter(m => !isMeme(m)).length
+    };
+
+    for (const [category, count] of Object.entries(counts)) {
+      const element = $("count-" + category);
+      if (element) {
+        element.textContent = count === null ? "Belum tersedia" : count + " kontrak";
+      }
+    }
+
+    document.querySelectorAll("[data-category]").forEach(button => {
+      button.classList.toggle("active", button.dataset.category === state.category);
+    });
+  }
+
+  function renderOverview() {
+    $("statMarkets").textContent = compact(state.markets.length);
+
+    const gainers = [...state.markets]
+      .filter(m => Number.isFinite(marketChange(m)))
+      .sort((a, b) => marketChange(b) - marketChange(a));
+
+    if (gainers.length) {
+      const top = gainers[0];
+      $("statGainer").textContent = baseSymbol(top);
+      $("statGainerChange").textContent = pct(marketChange(top));
+      $("statGainerChange").className = "stat-foot " + pctClass(marketChange(top));
+    }
+
+    const turnover = [...state.markets]
+      .filter(m => Number.isFinite(marketTurnover(m)))
+      .sort((a, b) => marketTurnover(b) - marketTurnover(a));
+
+    if (turnover.length) {
+      $("statVolume").textContent = baseSymbol(turnover[0]);
+      $("statVolume").title = "Turnover: " + money(marketTurnover(turnover[0]));
+    }
+
+    $("statUpdated").textContent = new Date().toLocaleTimeString("id-ID", {
+      hour: "2-digit", minute: "2-digit", second: "2-digit"
+    });
+  }
+
+  function renderTape() {
+    const markets = [...state.markets]
+      .filter(m => Number.isFinite(marketPrice(m)))
+      .sort((a, b) => finiteOr(marketTurnover(b), 0) -
+        finiteOr(marketTurnover(a), 0));
+
+    if (!markets.length) {
+      $("tapeTrack").innerHTML =
+        '<div class="tape-group"><span class="tape-item">No market data</span></div>';
+      return;
+    }
+
+    const items = markets.map(m => {
+      const symbol = marketSymbol(m);
+      const change = marketChange(m);
+      return `<button class="tape-item" type="button" data-select-symbol="${esc(symbol)}">
+        <span class="tape-symbol">${esc(baseSymbol(m))}</span>
+        <span class="tape-price">${esc(money(marketPrice(m)))}</span>
+        <span class="${pctClass(change)}">${esc(pct(change))}</span>
+      </button>`;
+    }).join("");
+
+    // Dua grup identik untuk animasi ticker berulang.
+    $("tapeTrack").innerHTML =
+      `<div class="tape-group">${items}</div><div class="tape-group" aria-hidden="true">${items}</div>`;
+    $("tapeStatus").textContent = markets.length + " contracts loaded";
+  }
+
+  function renderMarketRows() {
+    const rows = categoryMarkets();
+    state.filtered = rows;
+
+    $("marketTitle").textContent = CATEGORY_TITLES[state.category];
+    $("marketCount").textContent = rows.length + " markets";
+    $("newListingNotice").hidden = state.category !== "new";
+
+    $("marketSubtitle").textContent = state.category === "bullish" || state.category === "bearish"
+      ? "Filter berdasarkan perubahan harga 24 jam; bukan sinyal entry terkonfirmasi."
+      : state.category === "others"
+      ? "Kontrak non-meme dalam daftar market yang dimuat."
+      : state.category === "new"
+      ? "Tanggal listing tidak tersedia dari API saat ini."
+      : "Data yang ditampilkan berasal dari kontrak yang tersedia pada API.";
+
+    const visible = rows.slice(0, state.pageLimit);
+    const tbody = $("marketRows");
+
+    if (!visible.length) {
+      const message = state.category === "new"
+        ? "Tanggal listing belum tersedia. Tidak ada token yang akan ditandai sebagai baru tanpa verifikasi."
+        : "Tidak ada kontrak yang cocok dengan filter ini.";
+      tbody.innerHTML = `<tr><td colspan="7" class="empty">${esc(message)}</td></tr>`;
+    } else {
+      tbody.innerHTML = visible.map((m, index) => {
+        const symbol = marketSymbol(m);
+        const change = marketChange(m);
+        const funding = firstNumber(m.funding_rate_percent,
+          Number.isFinite(number(m.funding_rate)) ? number(m.funding_rate) * 100 : NaN);
+
+        return `<tr data-row-symbol="${esc(symbol)}"
+          class="${symbol === state.selectedSymbol ? "selected" : ""}">
+          <td>${index + 1}</td>
+          <td>
+            <div class="coin-cell">
+              ${logoHtml(m)}
+              <div>
+                <div class="coin-name">${esc(baseSymbol(m))}</div>
+                <div class="coin-sub">${esc(symbol)}</div>
+              </div>
+            </div>
+          </td>
+          <td>${esc(money(marketPrice(m)))}</td>
+          <td class="${pctClass(change)}">${esc(pct(change))}</td>
+          <td>${esc(compact(marketTurnover(m)))}</td>
+          <td>${esc(compact(marketVolume(m)))}</td>
+          <td class="${pctClass(funding)}">${esc(pct(funding))}</td>
+        </tr>`;
+      }).join("");
+    }
+
+    $("tableInfo").textContent = `Menampilkan ${visible.length} dari ${rows.length} hasil filter. Total data API: ${state.markets.length}.`;
+    $("showMoreButton").hidden = visible.length >= rows.length;
+    renderCategories();
+  }
+
+  async function loadMarket() {
+    if (state.loading) return;
+    state.loading = true;
+    const requestId = ++state.marketRequestId;
+
+    $("loadButton").disabled = true;
+    $("refreshButton").disabled = true;
+    setConnection(false, "Updating");
+
+    try {
+      const url = MARKET_URL + "?page=1&limit=100";
+      const response = await getJson(url);
+      if (requestId !== state.marketRequestId) return;
+
+      let markets = Array.isArray(response)
+        ? response
+        : response.data || response.markets || response.result || [];
+
+      if (!Array.isArray(markets)) markets = [];
+
+      state.markets = markets.filter(m =>
+        marketSymbol(m) && Number.isFinite(marketPrice(m))
+      );
+
+      renderOverview();
+      renderTape();
+      renderCategories();
+      renderMarketRows();
+      updateSelectedPrice();
+
+      setConnection(true, "Connected");
+      $("tableInfo").textContent += " · Updated " + new Date().toLocaleTimeString("id-ID");
+
+      if (!findMarket(state.selectedSymbol) && state.markets.length) {
+        const preferred = state.markets.find(m => baseSymbol(m) === "BTC");
+        if (preferred) state.selectedSymbol = marketSymbol(preferred);
+        else state.selectedSymbol = marketSymbol(state.markets[0]);
+        $("selectedSymbol").textContent = state.selectedSymbol;
+        updateSelectedPrice();
+        loadTechnicals();
+      }
+    } catch (error) {
+      console.error("Market API:", error);
+      setConnection(false, "API error");
+      $("tableInfo").textContent = "Gagal mengambil data market: " + error.message;
+      if (!state.markets.length) {
+        $("marketRows").innerHTML =
+          `<tr><td colspan="7" class="empty">Tidak dapat memuat market. Periksa endpoint API atau koneksi.</td></tr>`;
+      }
+    } finally {
+      state.loading = false;
+      $("loadButton").disabled = false;
+      $("refreshButton").disabled = false;
+    }
+  }
+
+  function createChart() {
+    if (!window.LightweightCharts) {
+      $("chart").innerHTML = '<div class="empty">Chart library tidak berhasil dimuat.</div>';
+      return;
+    }
+
+    const dark = document.documentElement.dataset.theme !== "light";
+    state.chart = LightweightCharts.createChart($("chart"), {
+      width: $("chart").clientWidth,
+      height: 390,
+      layout: {
+        background: { color: dark ? "#171e29" : "#ffffff" },
+        textColor: dark ? "#a9b6c8" : "#68788b"
+      },
+      grid: {
+        vertLines: { color: dark ? "#263343" : "#e6ebf1" },
+        horzLines: { color: dark ? "#263343" : "#e6ebf1" }
+      },
+      rightPriceScale: { borderColor: dark ? "#2b3747" : "#dce4ed" },
+      timeScale: {
+        borderColor: dark ? "#2b3747" : "#dce4ed",
+        timeVisible: true,
+        secondsVisible: false
+      },
+      crosshair: { mode: LightweightCharts.CrosshairMode.Normal },
+      localization: { locale: "id-ID" }
+    });
+
+    state.candleSeries = state.chart.addCandlestickSeries({
+      upColor: "#20c997",
+      downColor: "#ff687b",
+      borderUpColor: "#20c997",
+      borderDownColor: "#ff687b",
+      wickUpColor: "#20c997",
+      wickDownColor: "#ff687b"
+    });
+
+    state.volumeSeries = state.chart.addHistogramSeries({
+      priceFormat: { type: "volume" },
+      priceScaleId: "",
+      lastValueVisible: false,
+      priceLineVisible: false
+    });
+
+    state.volumeSeries.priceScale().applyOptions({
+      scaleMargins: { top: 0.82, bottom: 0 }
+    });
+
+    window.addEventListener("resize", () => {
+      if (state.chart) state.chart.applyOptions({
+        width: $("chart").clientWidth
+      });
+    });
+  }
+
+  function normalizeCandles(data) {
+    if (!Array.isArray(data)) return [];
+
+    const normalized = data.map(c => {
+      let time = c.time ?? c.timestamp ?? c.t;
+      if (typeof time === "string") time = Date.parse(time) / 1000;
+      else time = Number(time);
+      if (time > 1e12) time = Math.floor(time / 1000);
+
+      const open = firstNumber(c.open, c.o, c[1]);
+      const high = firstNumber(c.high, c.h, c[2]);
+      const low = firstNumber(c.low, c.l, c[3]);
+      const close = firstNumber(c.close, c.c, c[4]);
+      const volume = firstNumber(c.volume, c.vol, c.v, c[5], 0);
+
+      if (![time, open, high, low, close].every(Number.isFinite)) return null;
+
+      return {
+        time: Math.floor(time),
+        open, high, low, close,
+        volume: Number.isFinite(volume) ? volume : 0
+      };
+    }).filter(Boolean);
+
+    const unique = new Map();
+    for (const candle of normalized) unique.set(candle.time, candle);
+
+    return [...unique.values()].sort((a, b) => a.time - b.time);
+  }
+
+  function unwrapCandles(data) {
+    const candidates = [
+      data?.chartCandles,
+      data?.candles,
+      data?.data?.chartCandles,
+      data?.data?.candles,
+      data?.result?.candles,
+      data?.result
+    ];
+
+    for (const candidate of candidates) {
+      if (Array.isArray(candidate)) return normalizeCandles(candidate);
+    }
+
+    // Dukungan format candle berupa array terpisah time/open/high/low/close.
+    const source = data?.data || data;
+    if (Array.isArray(source?.time) && Array.isArray(source?.open) &&
+        Array.isArray(source?.high) && Array.isArray(source?.low) &&
+        Array.isArray(source?.close)) {
+      return source.time.map((time, i) => ({
+        time,
+        open: source.open[i],
+        high: source.high[i],
+        low: source.low[i],
+        close: source.close[i],
+        volume: source.vol?.[i] ?? source.volume?.[i] ?? 0
+      })).map(c => ({
+        ...c,
+        time: typeof c.time === "string" ? Date.parse(c.time) / 1000 : Number(c.time)
+      })).filter(c => [c.time, c.open, c.high, c.low, c.close].every(v => Number.isFinite(Number(v))))
+        .map(c => ({ ...c, time: Math.floor(c.time) }));
+    }
+
+    return [];
+  }
+
+  function renderCandles(candles) {
+    if (!state.candleSeries || !candles.length) return;
+
+    const candleData = candles.map(c => ({
+      time: c.time,
+      open: c.open,
+      high: c.high,
+      low: c.low,
+      close: c.close
+    }));
+
+    state.candleSeries.setData(candleData);
+    state.volumeSeries.setData(candles.map(c => ({
+      time: c.time,
+      value: c.volume,
+      color: c.close >= c.open ? "rgba(32,201,151,.45)" : "rgba(255,104,123,.45)"
+    })));
+
+    state.chart.timeScale().fitContent();
+  }
+
+  function flattenObject(obj, prefix = "", output = []) {
+    if (obj === null || obj === undefined || output.length > 180) return output;
+
+    if (typeof obj !== "object") {
+      output.push({ key: prefix, value: obj });
+      return output;
+    }
+
+    if (Array.isArray(obj)) {
+      if (obj.length && obj.length <= 8 && obj.every(v => typeof v !== "object")) {
+        output.push({ key: prefix, value: obj.join(", ") });
+      }
+      return output;
+    }
+
+    for (const [key, value] of Object.entries(obj)) {
+      const next = prefix ? prefix + "." + key : key;
+      if (value && typeof value === "object" && !Array.isArray(value)) {
+        flattenObject(value, next, output);
+      } else {
+        output.push({ key: next, value });
+      }
+      if (output.length > 180) break;
+    }
+
+    return output;
+  }
+
+  function findMetric(flat, patterns) {
+    const found = flat.find(item =>
+      patterns.some(pattern => pattern.test(item.key)) &&
+      item.value !== null && item.value !== undefined &&
+      typeof item.value !== "object"
+    );
+    return found ? found.value : null;
+  }
+
+  function renderMetrics(analysis) {
+    const flat = flattenObject(analysis || {});
+    const metrics = [
+      { label: "RSI", patterns: [/(^|[._])rsi([._]|$)/i] },
+      { label: "MACD", patterns: [/(^|[._])macd([._]|$)/i] },
+      { label: "EMA", patterns: [/(^|[._])ema(20|21)?([._]|$)/i] },
+      { label: "ATR", patterns: [/(^|[._])atr([._]|$)/i] },
+      { label: "Bollinger", patterns: [/bollinger/i, /(^|[._])bb([._]|$)/i] },
+      { label: "Ichimoku", patterns: [/ichimoku/i, /tenkan/i, /kijun/i] },
+      { label: "Trend", patterns: [/trend/i, /signal/i, /bias/i] },
+      { label: "Volume", patterns: [/volume/i, /volumema/i] }
+    ];
+
+    $("metricGrid").innerHTML = metrics.map(metric => {
+      const value = findMetric(flat, metric.patterns);
+      return `<div class="metric">
+        <div class="metric-label">${esc(metric.label)}</div>
+        <div class="metric-value">${esc(safeText(value))}</div>
+      </div>`;
+    }).join("");
+  }
+
+  function renderLevels(analysis) {
+    const flat = flattenObject(analysis || {});
+    const levels = flat.filter(item =>
+      /(support|resistance|pivot|fibonacci|fib)/i.test(item.key) &&
+      item.value !== null && item.value !== undefined &&
+      typeof item.value !== "object"
+    ).slice(0, 16);
+
+    if (!levels.length) {
+      $("levelsList").innerHTML =
+        '<div class="muted small">Data support/resistance belum ditemukan dalam respons API.</div>';
+      return;
+    }
+
+    $("levelsList").innerHTML = levels.map(item => {
+      const label = item.key.split(".").slice(-2).join(" ");
+      return `<div class="level-row">
+        <span class="muted">${esc(label)}</span>
+        <strong>${esc(safeText(item.value))}</strong>
+      </div>`;
+    }).join("");
+  }
+
+  function renderStatus(data) {
+    const market = findMarket(state.selectedSymbol);
+    const fundingRaw = firstNumber(
+      data?.funding_rate_percent,
+      Number.isFinite(number(data?.funding_rate)) ? number(data.funding_rate) * 100 : NaN,
+      market?.funding_rate_percent,
+      Number.isFinite(number(market?.funding_rate)) ? number(market.funding_rate) * 100 : NaN
+    );
+
+    const oi = firstNumber(data?.open_interest, market?.open_interest);
+    const limitations = Array.isArray(data?.dataLimitations) ? data.dataLimitations : [];
+
+    $("marketStatus").innerHTML = `
+      <div class="level-row">
+        <span class="muted">Funding rate</span>
+        <strong class="${pctClass(fundingRaw)}">${Number.isFinite(fundingRaw) ? esc(pct(fundingRaw)) : "Not available"}</strong>
+      </div>
+      <div class="level-row">
+        <span class="muted">Open interest</span>
+        <strong>${Number.isFinite(oi) ? esc(compact(oi)) : "Not available"}</strong>
+      </div>
+      <div class="level-row">
+        <span class="muted">Liquidations</span>
+        <strong>Not connected</strong>
+      </div>
+      ${limitations.length ? `<div class="notice">${limitations.map(esc).join("<br>")}</div>` : ""}
+      <div class="muted small">Funding rate ditampilkan sebagai persentase. Satuan open interest mengikuti respons API dan mungkin memerlukan verifikasi.</div>
+    `;
+  }
+
+  async function loadTechnicals() {
+    const symbol = state.selectedSymbol;
+    const interval = state.interval;
+    const requestId = ++state.requestId;
+
+    $("analysisInterval").textContent = interval;
+    $("metricGrid").innerHTML = '<div class="loading">Memuat indikator...</div>';
+    $("levelsList").innerHTML = '<div class="loading">Memuat level...</div>';
+
+    try {
+      const url = TECH_URL + "?symbol=" + encodeURIComponent(symbol) +
+        "&interval=" + encodeURIComponent(interval);
+      const data = await getJson(url);
+
+      if (requestId !== state.requestId) return;
+
+      const candles = unwrapCandles(data);
+      if (candles.length) {
+        state.chartCandles = candles;
+        renderCandles(candles);
+
+        const last = candles[candles.length - 1];
+        if (last) {
+          const market = findMarket(symbol);
+          if (!market || !Number.isFinite(marketPrice(market))) {
+            $("selectedPrice").textContent = money(last.close) + " USDT";
+          }
+        }
+      } else {
+        $("chart").setAttribute("aria-label", "Candle data not available");
+        console.warn("Tidak menemukan array candle pada respons:", data);
+      }
+
+      const analysis = data.analysis || data.technicals || data.indicators ||
+        data.data?.analysis || data.data?.technicals || {};
+
+      renderMetrics(analysis);
+      renderLevels(analysis);
+      renderStatus(data);
+    } catch (error) {
+      if (requestId !== state.requestId) return;
+      console.error("Technical API:", error);
+      $("metricGrid").innerHTML =
+        `<div class="notice">Gagal memuat indikator: ${esc(error.message)}</div>`;
+      $("levelsList").innerHTML =
+        '<div class="muted small">Level belum tersedia.</div>';
+      $("marketStatus").innerHTML =
+        '<div class="notice">Data teknikal atau market status gagal dimuat. Periksa endpoint API.</div>';
+    }
+  }
+
+  function setCategory(category) {
+    state.category = category;
+    state.pageLimit = 50;
+    renderMarketRows();
+
+    $("marketPanel").scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  document.querySelectorAll("[data-category]").forEach(button => {
+    button.addEventListener("click", () => setCategory(button.dataset.category));
   });
 
-  loadTechnicals();
-  document.querySelector(".workspace").scrollIntoView({
-    behavior: "smooth",
-    block: "start"
+  document.querySelectorAll("[data-interval]").forEach(button => {
+    button.addEventListener("click", () => {
+      state.interval = button.dataset.interval;
+      document.querySelectorAll("[data-interval]").forEach(b =>
+        b.classList.toggle("active", b === button)
+      );
+      loadTechnicals();
+    });
   });
-}
 
-$("marketBody").addEventListener("click", event => {
-  const row = event.target.closest(".market-row");
-  if (!row) return;
+  document.addEventListener("click", event => {
+    const tickerButton = event.target.closest("[data-select-symbol]");
+    if (tickerButton) {
+      setSelectedMarket(tickerButton.dataset.selectSymbol);
+      return;
+    }
 
-  const coin = state.markets.find(c => c.contract_symbol === row.dataset.contract);
-  if (!coin) return;
-  selectMarket(coin.contract_symbol, coin.logo_url, coin.name || coin.symbol);
-});
+    const row = event.target.closest("[data-row-symbol]");
+    if (row) setSelectedMarket(row.dataset.rowSymbol);
+  });
 
-$("marketBody").addEventListener("keydown", event => {
-  if (event.key !== "Enter" && event.key !== " ") return;
-  const row = event.target.closest(".market-row");
-  if (!row) return;
-  event.preventDefault();
-  row.click();
-});
+  $("themeButton").addEventListener("click", () => {
+    const current = document.documentElement.dataset.theme;
+    setTheme(current === "dark" ? "light" : "dark");
+  });
 
-$("marketSearch").addEventListener("input", () => {
-  clearTimeout(state.searchTimer);
-  state.searchTimer = setTimeout(() => loadMarket(true), 350);
-});
+  $("refreshButton").addEventListener("click", async () => {
+    await loadMarket();
+    await loadTechnicals();
+  });
 
-$("marketSort").addEventListener("change", () => loadMarket(true));
-$("refreshMarketBtn").addEventListener("click", () => loadMarket(true));
-$("loadMoreBtn").addEventListener("click", () => loadMarket(false));
-$("analyzeBtn").addEventListener("click", () => loadTechnicals());
+  $("loadButton").addEventListener("click", loadMarket);
 
-$("symbol").addEventListener("change", () => {
-  const selected = state.markets.find(c => c.contract_symbol === $("symbol").value);
-  state.selectedLogo = selected?.logo_url || null;
-  setChartLogo(state.selectedLogo);
-  loadTechnicals();
-});
+  $("showMoreButton").addEventListener("click", () => {
+    state.pageLimit += 50;
+    renderMarketRows();
+  });
 
-$("interval").addEventListener("change", () => loadTechnicals());
+  $("searchInput").addEventListener("input", event => {
+    state.search = event.target.value.trim();
+    state.pageLimit = 50;
+    renderMarketRows();
+  });
 
-function updateClock() {
-  $("clock").textContent = new Date().toLocaleTimeString("en-GB", {
-    hour12: false,
-    timeZone: "UTC"
-  }) + " UTC";
-}
+  $("sortSelect").addEventListener("change", event => {
+    state.sort = event.target.value;
+    renderMarketRows();
+  });
 
-updateClock();
-setInterval(updateClock, 1000);
+  loadSavedTheme();
+  createChart();
+  loadMarket().then(loadTechnicals);
 
-loadMarket(true).then(() => {
-  const btc = state.markets.find(c => c.symbol === "BTC");
-  if (btc) setChartLogo(btc.logo_url);
-});
+  // Refresh periodik. Hindari request saat tab tidak terlihat.
+  state.refreshTimer = setInterval(() => {
+    if (document.visibilityState === "visible") loadMarket();
+  }, 30000);
 
-if (window.LightweightCharts) {
-  initChart();
-}
-
-loadTechnicals();
-
-// Polling berkala agar candle berjalan diperbarui dari endpoint REST.
-// Ini bukan WebSocket dan tidak menjamin tick-by-tick updates.
-state.refreshTimer = setInterval(() => {
-  if (!document.hidden) loadTechnicals({ refreshOnly: true });
-}, 15000);
-
-document.addEventListener("visibilitychange", () => {
-  if (!document.hidden) {
-    loadMarket(true);
-    loadTechnicals({ refreshOnly: true });
-  }
-});
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") loadMarket();
+  });
+})();
 </script>
 </body>
 </html>
