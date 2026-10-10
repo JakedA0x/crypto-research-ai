@@ -24,100 +24,100 @@
  --green:#35d49a;--red:#ff657a;--blue:#6688ff;
 }
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;transition:background .15s,color .15s}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
 button,input,select{font:inherit}button{cursor:pointer}button:disabled{opacity:.45;cursor:not-allowed}
-.app{min-height:100vh}
-.sidebar{width:250px;position:fixed;inset:0 auto 0 0;background:var(--panel);border-right:1px solid var(--border);padding:23px 15px;display:flex;flex-direction:column;z-index:30}
+.sidebar{width:250px;position:fixed;inset:0 auto 0 0;background:var(--panel);border-right:1px solid var(--border);padding:22px 15px;display:flex;flex-direction:column;z-index:30;overflow-y:auto}
 .main{margin-left:250px;min-height:100vh}
-.topbar{height:76px;position:sticky;top:0;z-index:20;background:var(--bg);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 30px;gap:14px}
-.content{padding:28px 30px 48px;max-width:1800px;margin:auto}
+.topbar{height:76px;position:sticky;top:0;z-index:20;background:var(--bg);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 25px;gap:14px}
+.content{padding:26px 25px 45px;max-width:1800px;margin:auto}
 .brand{display:flex;align-items:center;gap:11px}
 .brand img{width:39px;height:39px;object-fit:contain}
 .brand-name{font-size:19px;font-weight:800;letter-spacing:-.5px}
-.brand-sub{font-size:10px;color:var(--muted);letter-spacing:1.7px}
-.nav-label{color:var(--muted);font-size:10px;letter-spacing:1.5px;font-weight:800;padding:0 12px;margin:30px 0 10px}
+.brand-sub{font-size:10px;color:var(--muted);letter-spacing:1.5px}
+.nav-label{color:var(--muted);font-size:10px;letter-spacing:1.5px;font-weight:800;padding:12px;margin:24px 0 7px}
 .nav-btn{width:100%;display:flex;align-items:center;gap:12px;padding:12px;margin:3px 0;border-radius:10px;border:1px solid transparent;color:var(--muted);background:transparent;text-align:left;font-size:13px}
 .nav-btn i{width:18px;text-align:center}
 .nav-btn:hover{background:var(--panel2);color:var(--text)}
 .nav-btn.active{background:color-mix(in srgb,var(--blue) 12%,var(--panel));color:var(--blue);border-color:color-mix(in srgb,var(--blue) 30%,var(--border))}
-.side-bottom{margin-top:auto}
+.side-bottom{margin-top:auto;padding-top:20px}
 .api-pill,.status-pill{display:inline-flex;align-items:center;gap:7px;font-size:11px;padding:6px 9px;border-radius:30px;border:1px solid var(--border);color:var(--muted)}
 .dot{width:7px;height:7px;border-radius:50%;background:#7d8aa1;display:inline-block}
 .dot.ok{background:var(--green)}.dot.error{background:var(--red)}.dot.loading{background:#e8ad45}
 .page-title{font-size:27px;font-weight:750;letter-spacing:-.8px}
 .subtitle{color:var(--muted);font-size:13px;margin-top:6px;line-height:1.6}
-.panel{background:var(--panel);border:1px solid var(--border);border-radius:15px;padding:19px;min-width:0}
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:15px;padding:18px;min-width:0}
 .panel-title{font-size:14px;font-weight:700}.panel-note{font-size:11px;color:var(--muted);margin-top:5px}
 .muted{color:var(--muted)}.small{font-size:12px}.tiny{font-size:10px}
-.stat-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:15px}
-.stat-card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:18px}
+.stat-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.stat-card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:17px}
 .stat-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .stat-label{color:var(--muted);font-size:12px}
 .stat-icon{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:color-mix(in srgb,var(--blue) 10%,var(--panel));color:var(--blue)}
-.stat-value{font-size:25px;font-weight:750;margin-top:17px;overflow-wrap:anywhere}
+.stat-value{font-size:24px;font-weight:750;margin-top:15px;overflow-wrap:anywhere}
 .stat-foot{color:var(--muted);font-size:11px;margin-top:6px}
 .green{color:var(--green)!important}.red{color:var(--red)!important}.blue{color:var(--blue)}
-.toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
-.field{color:var(--text);background:var(--bg);border:1px solid var(--border);border-radius:9px;padding:10px 12px;outline:none;min-height:39px;max-width:100%}
+.toolbar{display:flex;flex-wrap:wrap;gap:9px;align-items:center}
+.field{color:var(--text);background:var(--bg);border:1px solid var(--border);border-radius:9px;padding:9px 11px;outline:none;min-height:39px;max-width:100%}
 .field:focus{border-color:var(--blue)}
-.field::placeholder{color:var(--muted)}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--border);border-radius:9px;padding:10px 13px;background:var(--panel2);color:var(--text);font-size:12px;font-weight:650;transition:.15s}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--border);border-radius:9px;padding:10px 12px;background:var(--panel2);color:var(--text);font-size:12px;font-weight:650}
 .btn:hover{filter:brightness(.96)}
 .btn-primary{background:#4169e1;border-color:#4169e1;color:#fff}
-.btn-primary:hover{background:#3156c7}
 .btn-quiet{background:transparent}
-.grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
-.grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
-.mt{margin-top:20px}.mb{margin-bottom:20px}
+.grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}
+.grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.mt{margin-top:19px}.mb{margin-bottom:19px}
 .flex-between{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .table-wrap{width:100%;overflow-x:auto}
 table{width:100%;border-collapse:collapse;font-size:12px;white-space:nowrap}
 th{color:var(--muted);font-size:10px;font-weight:750;text-transform:uppercase;letter-spacing:.7px;text-align:right;padding:13px 12px;border-bottom:1px solid var(--border)}
-td{padding:13px 12px;text-align:right;border-bottom:1px solid var(--border)}
+td{padding:12px;text-align:right;border-bottom:1px solid var(--border)}
 th:first-child,td:first-child{text-align:left}
 tbody tr:hover{background:var(--panel2)}
 tbody tr:last-child td{border-bottom:0}
-.coin-cell{display:flex;align-items:center;gap:10px;text-align:left}
-.coin-icon{width:30px;height:30px;display:grid;place-items:center;border-radius:50%;background:var(--panel2);color:var(--blue);overflow:hidden;font-size:10px;font-weight:800;flex-shrink:0}
+.coin-cell{display:flex;align-items:center;gap:9px;text-align:left}
+.coin-icon{width:29px;height:29px;display:grid;place-items:center;border-radius:50%;background:var(--panel2);color:var(--blue);overflow:hidden;font-size:10px;font-weight:800;flex-shrink:0}
 .coin-icon img{width:100%;height:100%;object-fit:cover}
 .coin-name{font-weight:700}.coin-sub{color:var(--muted);font-size:10px;margin-top:3px}
 .tag{display:inline-block;padding:4px 7px;border-radius:5px;background:var(--panel2);color:var(--muted);font-size:10px}
-.empty{padding:30px 14px;color:var(--muted);text-align:center;font-size:12px}
+.empty{padding:25px 12px;color:var(--muted);text-align:center;font-size:12px}
 .empty i{display:block;font-size:23px;margin-bottom:10px;opacity:.7}
-.notice{border:1px solid #e8d3a2;background:#fff8e8;color:#805b16;padding:13px 14px;border-radius:10px;font-size:12px;line-height:1.6}
+.notice{border:1px solid #cbdcff;background:#eef4ff;color:#31518c;padding:12px 14px;border-radius:10px;font-size:12px;line-height:1.6}
 .notice.error{border-color:#f3c3cb;background:#fff0f2;color:#a92740}
-.notice.info{border-color:#cbdcff;background:#eef4ff;color:#31518c}
-[data-theme="dark"] .notice{background:#282115;border-color:#5a4626;color:#e9c78c}
+[data-theme="dark"] .notice{background:#131f35;border-color:#2d436c;color:#b5caff}
 [data-theme="dark"] .notice.error{background:#2b1720;border-color:#663342;color:#ff9eae}
-[data-theme="dark"] .notice.info{background:#131f35;border-color:#2d436c;color:#b5caff}
-.hidden{display:none!important}.view{animation:appear .18s ease-out}
+.hidden{display:none!important}
+.view{animation:appear .18s ease-out}
 @keyframes appear{from{opacity:.65;transform:translateY(3px)}to{opacity:1;transform:none}}
-.chart-box{width:100%;height:390px}.volume-box{width:100%;height:120px}
-.metric-box{background:var(--bg);border:1px solid var(--border);padding:14px;border-radius:10px}
+.chart-box{width:100%;height:390px;min-width:0}
+.volume-box{width:100%;height:120px;min-width:0}
+.metric-box{background:var(--bg);border:1px solid var(--border);padding:14px;border-radius:10px;min-width:0}
 .metric-label{font-size:11px;color:var(--muted)}
 .metric-value{font-size:19px;font-weight:750;margin-top:9px;overflow-wrap:anywhere}
-.settings-row{padding:17px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:20px}
+.settings-row{padding:16px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:20px}
 .settings-row:last-child{border-bottom:0}
 .switch{width:42px;height:23px;accent-color:var(--blue);cursor:pointer}
-.login-card{max-width:480px;margin:35px auto;text-align:center;padding:35px}
+.login-card{max-width:480px;margin:30px auto;text-align:center;padding:30px}
 .login-logo{width:76px;height:76px;object-fit:contain;margin:0 auto 16px}
 .mobile-menu{display:none}
 .toast{position:fixed;bottom:22px;right:22px;z-index:100;max-width:min(420px,calc(100vw - 36px));padding:13px 16px;border:1px solid var(--border);border-radius:10px;background:var(--panel);color:var(--text);font-size:12px;box-shadow:0 15px 45px #0002}
-.footer{color:var(--muted);font-size:10px;text-align:center;padding-top:35px}
-@media(max-width:1100px){.stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.grid-3{grid-template-columns:repeat(2,minmax(0,1fr))}.content{padding:24px 20px 40px}.topbar{padding:0 20px}}
-@media(max-width:760px){.sidebar{transform:translateX(-100%);transition:transform .2s;box-shadow:15px 0 50px #0002}.sidebar.open{transform:translateX(0)}.main{margin-left:0}.mobile-menu{display:inline-flex}.topbar{height:65px;padding:0 14px}.content{padding:20px 14px 35px}.page-title{font-size:23px}.grid-2,.grid-3{grid-template-columns:1fr}.stat-grid{gap:10px}.stat-card{padding:14px}.stat-value{font-size:21px}.chart-box{height:310px}.panel{padding:14px}.login-card{padding:22px}.topbar-status{display:none}}
+.footer{color:var(--muted);font-size:10px;text-align:center;padding-top:30px}
+@media(max-width:1100px){.stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.grid-3{grid-template-columns:repeat(2,minmax(0,1fr))}.content{padding:22px 18px}.topbar{padding:0 18px}}
+@media(max-width:760px){.sidebar{transform:translateX(-100%);transition:transform .2s;box-shadow:15px 0 50px #0002}.sidebar.open{transform:translateX(0)}.main{margin-left:0}.mobile-menu{display:inline-flex}.topbar{height:65px;padding:0 12px}.content{padding:18px 12px 32px}.page-title{font-size:23px}.grid-2,.grid-3{grid-template-columns:1fr}.stat-grid{gap:9px}.stat-card{padding:12px}.stat-value{font-size:20px}.chart-box{height:310px}.panel{padding:13px}.login-card{padding:20px}.topbar-status{display:none}}
 @media(max-width:400px){.stat-grid{grid-template-columns:1fr}}
 </style>
 
 <script>
-/* Apply saved theme before rendering the dashboard. */
 (function(){
-  let theme = "light";
-  try { theme = localStorage.getItem("blobsignal-theme") || "light"; } catch(e) {}
-  document.documentElement.dataset.theme = theme === "dark" ? "dark" : "light";
+  try {
+    document.documentElement.dataset.theme =
+      localStorage.getItem("blobsignal-theme") === "dark" ? "dark" : "light";
+  } catch(e) {
+    document.documentElement.dataset.theme = "light";
+  }
 })();
 </script>
 </head>
+
 <body>
 <div class="app">
 <aside id="sidebar" class="sidebar">
@@ -128,36 +128,37 @@ tbody tr:last-child td{border-bottom:0}
 
   <div class="nav-label">WORKSPACE</div>
   <nav id="navigation">
-    <button class="nav-btn active" data-view="overview"><i class="fa-solid fa-house"></i>Overview</button>
-    <button class="nav-btn" data-view="chart"><i class="fa-solid fa-chart-column"></i>Live Chart</button>
-    <button class="nav-btn" data-view="scanner"><i class="fa-solid fa-magnifying-glass-chart"></i>Market Scanner</button>
-    <button class="nav-btn" data-view="detail"><i class="fa-solid fa-chart-line"></i>Market Detail</button>
-    <div class="nav-label">PREFERENCES</div>
-    <button class="nav-btn" data-view="settings"><i class="fa-solid fa-sliders"></i>Settings</button>
-    <button class="nav-btn" data-view="login"><i class="fa-regular fa-circle-user"></i>Login Google</button>
+    <button type="button" class="nav-btn active" data-view="overview"><i class="fa-solid fa-house"></i>Overview</button>
+    <button type="button" class="nav-btn" data-view="chart"><i class="fa-solid fa-chart-column"></i>Live Chart</button>
+    <button type="button" class="nav-btn" data-view="scanner"><i class="fa-solid fa-magnifying-glass-chart"></i>Market Scanner</button>
+    <button type="button" class="nav-btn" data-view="detail"><i class="fa-solid fa-chart-line"></i>Market Detail</button>
+
+    <button type="button" class="nav-label" data-view="settings" style="display:block;width:100%;border:0;background:transparent;text-align:left;cursor:pointer;font-family:inherit">PREFERENCES</button>
+    <button type="button" class="nav-btn" data-view="settings"><i class="fa-solid fa-sliders"></i>Settings</button>
+    <button type="button" class="nav-btn" data-view="login"><i class="fa-regular fa-circle-user"></i>Login Google</button>
   </nav>
 
   <div class="side-bottom">
-    <div class="panel" style="padding:13px">
+    <div class="panel" style="padding:12px">
       <div class="flex-between"><span class="small" style="font-weight:700">API Connection</span><span class="dot loading" id="sideApiDot"></span></div>
       <div id="sideApiText" class="panel-note">Checking connection...</div>
-      <button class="btn btn-quiet" style="width:100%;margin-top:12px" id="sideRefresh"><i class="fa-solid fa-rotate"></i> Refresh data</button>
+      <button type="button" class="btn btn-quiet" style="width:100%;margin-top:12px" id="sideRefresh"><i class="fa-solid fa-rotate"></i> Refresh data</button>
     </div>
-    <div class="panel-note" style="padding:15px 5px 0">BlobSignal V2 · Market information only.</div>
+    <div class="panel-note" style="padding:14px 5px 0">BlobSignal · Market information only.</div>
   </div>
 </aside>
 
 <main class="main">
 <header class="topbar">
   <div class="flex-between" style="justify-content:flex-start">
-    <button class="btn mobile-menu" id="mobileMenu" aria-label="Open menu"><i class="fa-solid fa-bars"></i></button>
+    <button type="button" class="btn mobile-menu" id="mobileMenu" aria-label="Open menu"><i class="fa-solid fa-bars"></i></button>
     <div><div class="small muted">Crypto Futures / <span id="breadcrumb">Overview</span></div><div class="small" style="font-weight:700;margin-top:3px" id="headerPair">Market intelligence</div></div>
   </div>
   <div class="toolbar">
     <span class="api-pill topbar-status"><span class="dot loading" id="topApiDot"></span><span id="topApiText">Connecting</span></span>
-    <button class="btn" id="themeToggle" title="Change theme"><i class="fa-solid fa-moon" id="themeToggleIcon"></i><span id="themeToggleText">Dark Mode</span></button>
-    <button class="btn" id="globalRefresh"><i class="fa-solid fa-rotate"></i> Refresh</button>
-    <button class="btn btn-primary" data-goto="login"><i class="fa-brands fa-google"></i> Login</button>
+    <button type="button" class="btn" id="themeToggle" title="Change theme"><i class="fa-solid fa-moon" id="themeToggleIcon"></i><span id="themeToggleText">Dark Mode</span></button>
+    <button type="button" class="btn" id="globalRefresh"><i class="fa-solid fa-rotate"></i> Refresh</button>
+    <button type="button" class="btn btn-primary" data-goto="login"><i class="fa-brands fa-google"></i> Login</button>
   </div>
 </header>
 
@@ -168,8 +169,7 @@ tbody tr:last-child td{border-bottom:0}
     <div><div class="page-title">Market Overview</div><div class="subtitle">Ringkasan pasar kontrak futures berdasarkan data API.</div></div>
     <div class="small muted" id="lastUpdated">Last update: —</div>
   </div>
-  <div id="overviewAlert" class="notice info mb hidden"></div>
-
+  <div id="overviewAlert" class="notice mb hidden"></div>
   <div class="stat-grid">
     <div class="stat-card"><div class="stat-top"><span class="stat-label">Listed Contracts</span><span class="stat-icon"><i class="fa-solid fa-layer-group"></i></span></div><div class="stat-value" id="statContracts">—</div><div class="stat-foot">Kontrak diterima API</div></div>
     <div class="stat-card"><div class="stat-top"><span class="stat-label">Gainers 24H</span><span class="stat-icon"><i class="fa-solid fa-arrow-trend-up"></i></span></div><div class="stat-value green" id="statGainers">—</div><div class="stat-foot">Perubahan positif</div></div>
@@ -183,16 +183,16 @@ tbody tr:last-child td{border-bottom:0}
   </div>
 
   <div class="panel mt">
-    <div class="flex-between mb"><div><div class="panel-title">Market Snapshot</div><div class="panel-note">Kontrak dengan turnover terbesar yang tersedia.</div></div><button class="btn" data-goto="scanner">Open Scanner <i class="fa-solid fa-arrow-right"></i></button></div>
+    <div class="flex-between mb"><div><div class="panel-title">Market Snapshot</div><div class="panel-note">Kontrak dengan turnover terbesar yang tersedia.</div></div><button type="button" class="btn" data-goto="scanner">Open Scanner <i class="fa-solid fa-arrow-right"></i></button></div>
     <div class="table-wrap"><table><thead><tr><th>Contract</th><th>Last Price</th><th>24H Change</th><th>Volume 24H</th><th>Turnover</th><th>Action</th></tr></thead><tbody id="overviewTable"><tr><td colspan="6"><div class="empty">Memuat...</div></td></tr></tbody></table></div>
   </div>
   <div class="footer">Market information only. Not financial advice.</div>
 </section>
 
 <section class="view hidden" id="view-chart">
-  <div class="flex-between mb" style="align-items:flex-start;flex-wrap:wrap"><div><div class="page-title">Live Chart</div><div class="subtitle">Candlestick dan volume berdasarkan respons API.</div></div><button class="btn btn-primary" id="chartRefresh"><i class="fa-solid fa-rotate"></i> Refresh chart</button></div>
+  <div class="flex-between mb" style="align-items:flex-start;flex-wrap:wrap"><div><div class="page-title">Live Chart</div><div class="subtitle">Candlestick dan volume berdasarkan respons API.</div></div><button type="button" class="btn btn-primary" id="chartRefresh"><i class="fa-solid fa-rotate"></i> Refresh chart</button></div>
   <div class="panel mb"><div class="toolbar"><label class="small muted" for="chartPair">Contract</label><select class="field" id="chartPair"><option value="BTC_USDT">BTC_USDT</option></select><label class="small muted" for="chartInterval">Timeframe</label><select class="field" id="chartInterval"><option value="1m">1m</option><option value="5m">5m</option><option value="15m">15m</option><option value="30m">30m</option><option value="1h" selected>1H</option><option value="4h">4H</option><option value="8h">8H</option><option value="1d">1D</option><option value="1w">1W</option></select><span id="chartStatus" class="api-pill"><span class="dot loading"></span>Waiting</span></div></div>
-  <div id="chartAlert" class="notice info mb hidden"></div>
+  <div id="chartAlert" class="notice mb hidden"></div>
   <div class="panel">
     <div class="flex-between mb"><div><div class="panel-title" id="chartHeading">BTC_USDT · 1H</div><div class="panel-note">Candlestick chart</div></div><div class="small muted" id="chartLastPrice">Last close: —</div></div>
     <div id="priceChart" class="chart-box"></div><div class="panel-note" style="margin:10px 0">Volume</div><div id="volumeChart" class="volume-box"></div><div class="panel-note mt" id="chartCandleInfo">Candle data: —</div>
@@ -208,7 +208,7 @@ tbody tr:last-child td{border-bottom:0}
 </section>
 
 <section class="view hidden" id="view-scanner">
-  <div class="flex-between mb" style="align-items:flex-start;flex-wrap:wrap"><div><div class="page-title">Market Scanner</div><div class="subtitle">Cari, filter, dan urutkan kontrak yang tersedia.</div></div><button class="btn btn-primary" id="scannerRefresh"><i class="fa-solid fa-rotate"></i> Refresh</button></div>
+  <div class="flex-between mb" style="align-items:flex-start;flex-wrap:wrap"><div><div class="page-title">Market Scanner</div><div class="subtitle">Cari, filter, dan urutkan kontrak yang tersedia.</div></div><button type="button" class="btn btn-primary" id="scannerRefresh"><i class="fa-solid fa-rotate"></i> Refresh</button></div>
   <div class="panel mb"><div class="toolbar">
     <input class="field" id="marketSearch" placeholder="Search symbol, e.g. BTC..." style="flex:1;min-width:180px">
     <select class="field" id="changeFilter"><option value="all">All changes</option><option value="gainers">Gainers only</option><option value="losers">Losers only</option></select>
@@ -218,14 +218,14 @@ tbody tr:last-child td{border-bottom:0}
   <div class="panel">
     <div class="flex-between mb"><div><div class="panel-title">Futures Contracts</div><div class="panel-note" id="scannerCount">Waiting for market data...</div></div><span class="tag">API data</span></div>
     <div class="table-wrap"><table><thead><tr><th>Contract</th><th>Last Price</th><th>24H Change</th><th>Volume 24H</th><th>Turnover 24H</th><th>Funding</th><th>Open Interest</th><th>Actions</th></tr></thead><tbody id="marketTable"><tr><td colspan="8"><div class="empty">Memuat...</div></td></tr></tbody></table></div>
-    <div class="flex-between mt" style="flex-wrap:wrap"><div class="small muted" id="pageInfo">Page 1</div><div class="toolbar"><select class="field" id="pageSize"><option value="20">20 / page</option><option value="50">50 / page</option><option value="100">100 / page</option></select><button class="btn" id="prevPage"><i class="fa-solid fa-chevron-left"></i> Previous</button><button class="btn" id="nextPage">Next <i class="fa-solid fa-chevron-right"></i></button></div></div>
+    <div class="flex-between mt" style="flex-wrap:wrap"><div class="small muted" id="pageInfo">Page 1</div><div class="toolbar"><select class="field" id="pageSize"><option value="20">20 / page</option><option value="50">50 / page</option><option value="100">100 / page</option></select><button type="button" class="btn" id="prevPage"><i class="fa-solid fa-chevron-left"></i> Previous</button><button type="button" class="btn" id="nextPage">Next <i class="fa-solid fa-chevron-right"></i></button></div></div>
   </div>
 </section>
 
 <section class="view hidden" id="view-detail">
-  <div class="flex-between mb" style="align-items:flex-start;flex-wrap:wrap"><div><div class="page-title">Market Detail</div><div class="subtitle">Informasi kontrak dan indikator teknikal.</div></div><button class="btn btn-primary" id="detailOpenChart"><i class="fa-solid fa-chart-column"></i> Open Live Chart</button></div>
-  <div class="panel mb"><div class="toolbar"><label class="small muted" for="detailPair">Contract</label><select class="field" id="detailPair"><option value="BTC_USDT">BTC_USDT</option></select><button class="btn" id="detailRefresh"><i class="fa-solid fa-rotate"></i> Refresh detail</button></div></div>
-  <div id="detailAlert" class="notice info mb hidden"></div>
+  <div class="flex-between mb" style="align-items:flex-start;flex-wrap:wrap"><div><div class="page-title">Market Detail</div><div class="subtitle">Informasi kontrak dan indikator teknikal.</div></div><button type="button" class="btn btn-primary" id="detailOpenChart"><i class="fa-solid fa-chart-column"></i> Open Live Chart</button></div>
+  <div class="panel mb"><div class="toolbar"><label class="small muted" for="detailPair">Contract</label><select class="field" id="detailPair"><option value="BTC_USDT">BTC_USDT</option></select><button type="button" class="btn" id="detailRefresh"><i class="fa-solid fa-rotate"></i> Refresh detail</button></div></div>
+  <div id="detailAlert" class="notice mb hidden"></div>
   <div class="flex-between mb"><div><div class="page-title" style="font-size:22px" id="detailSymbol">BTC_USDT</div><div class="subtitle" id="detailName">Perpetual contract</div></div><div style="text-align:right"><div class="small muted">Last Price</div><div class="page-title" id="detailPrice">—</div><div id="detailChange" class="small">—</div></div></div>
   <div class="stat-grid">
     <div class="metric-box"><div class="metric-label">24H Volume</div><div class="metric-value" id="detailVolume">—</div></div>
@@ -240,11 +240,11 @@ tbody tr:last-child td{border-bottom:0}
   <div class="grid-2 mt">
     <div class="panel"><div class="panel-title">Technical Snapshot</div><div class="panel-note">Indikator dari backend bila tersedia.</div>
       <div class="mt"><div class="settings-row"><span class="small muted">RSI</span><strong id="detailRSI">—</strong></div><div class="settings-row"><span class="small muted">MACD</span><strong id="detailMACD">—</strong></div><div class="settings-row"><span class="small muted">Moving Average</span><strong id="detailMA">—</strong></div><div class="settings-row"><span class="small muted">Support</span><strong id="detailSupport">—</strong></div><div class="settings-row"><span class="small muted">Resistance</span><strong id="detailResistance">—</strong></div></div>
-      <button class="btn mt" id="detailLoadTechnical">Load technical analysis</button>
+      <button type="button" class="btn mt" id="detailLoadTechnical">Load technical analysis</button>
     </div>
     <div class="panel"><div class="panel-title">Data Status</div><div class="panel-note">Status endpoint dan waktu pembaruan.</div>
       <div class="mt"><div class="settings-row"><span class="small muted">Ticker endpoint</span><span id="detailTickerStatus" class="tag">Not requested</span></div><div class="settings-row"><span class="small muted">Technical endpoint</span><span id="detailTechnicalStatus" class="tag">Not requested</span></div><div class="settings-row"><span class="small muted">Last refresh</span><strong id="detailUpdated" class="small">—</strong></div></div>
-      <div class="notice info mt">Field yang tidak tersedia dari API akan ditampilkan sebagai tanda pisah, bukan dianggap nol.</div>
+      <div class="notice mt">Field yang tidak tersedia dari API ditampilkan sebagai tanda pisah, bukan dianggap nol.</div>
     </div>
   </div>
 </section>
@@ -253,22 +253,22 @@ tbody tr:last-child td{border-bottom:0}
   <div class="mb"><div class="page-title">Settings</div><div class="subtitle">Atur tampilan dan perilaku dashboard.</div></div>
   <div class="panel">
     <div class="panel-title">Appearance & Preferences</div>
-    <div class="settings-row"><div><div class="small" style="font-weight:700">Theme / Tema</div><div class="panel-note">Tema terang atau gelap, tersimpan di browser.</div></div><select class="field" id="themeSelect"><option value="light">Light — Putih</option><option value="dark">Dark — Gelap</option></select></div>
+    <div class="settings-row"><div><div class="small" style="font-weight:700">Theme / Tema</div><div class="panel-note">Tema tersimpan di browser.</div></div><select class="field" id="themeSelect"><option value="light">Light — Putih</option><option value="dark">Dark — Gelap</option></select></div>
     <div class="settings-row"><div><div class="small" style="font-weight:700">Auto-refresh market</div><div class="panel-note">Pembaruan data pasar secara berkala.</div></div><input type="checkbox" class="switch" id="autoRefresh" checked></div>
     <div class="settings-row"><div><div class="small" style="font-weight:700">Refresh interval</div><div class="panel-note">Interval permintaan market API.</div></div><select class="field" id="refreshInterval"><option value="15">15 seconds</option><option value="30" selected>30 seconds</option><option value="60">60 seconds</option><option value="120">120 seconds</option></select></div>
     <div class="settings-row"><div><div class="small" style="font-weight:700">Default timeframe</div><div class="panel-note">Timeframe awal Live Chart.</div></div><select class="field" id="defaultInterval"><option value="1m">1m</option><option value="5m">5m</option><option value="15m">15m</option><option value="30m">30m</option><option value="1h">1H</option><option value="4h">4H</option><option value="8h">8H</option><option value="1d">1D</option><option value="1w">1W</option></select></div>
     <div class="settings-row"><div><div class="small" style="font-weight:700">Default contract</div><div class="panel-note">Pair awal dashboard.</div></div><select class="field" id="defaultPair"><option value="BTC_USDT">BTC_USDT</option></select></div>
     <div class="settings-row"><div><div class="small" style="font-weight:700">Market API</div><div class="panel-note">Menggunakan origin website ini.</div></div><span class="tag">Same-origin</span></div>
-    <div class="toolbar mt"><button class="btn btn-primary" id="saveSettings"><i class="fa-solid fa-check"></i> Save settings</button><button class="btn" id="resetSettings">Reset defaults</button></div>
+    <div class="toolbar mt"><button type="button" class="btn btn-primary" id="saveSettings"><i class="fa-solid fa-check"></i> Save settings</button><button type="button" class="btn" id="resetSettings">Reset defaults</button></div>
   </div>
-  <div class="panel mt"><div class="panel-title">Connection Diagnostics</div><div class="panel-note">Uji endpoint market API.</div><div class="settings-row"><span class="small muted">Website origin</span><code class="small" id="originText"></code></div><div class="settings-row"><span class="small muted">Market endpoint</span><code class="small">/api/market?page=1&amp;limit=20</code></div><div class="settings-row"><span class="small muted">Last API error</span><span class="small" id="lastApiError">None</span></div><button class="btn mt" id="testConnection"><i class="fa-solid fa-plug"></i> Test connection</button></div>
+  <div class="panel mt"><div class="panel-title">Connection Diagnostics</div><div class="panel-note">Uji endpoint market API.</div><div class="settings-row"><span class="small muted">Website origin</span><code class="small" id="originText"></code></div><div class="settings-row"><span class="small muted">Market endpoint</span><code class="small">/api/market?page=1&amp;limit=20</code></div><div class="settings-row"><span class="small muted">Last API error</span><span class="small" id="lastApiError">None</span></div><button type="button" class="btn mt" id="testConnection"><i class="fa-solid fa-plug"></i> Test connection</button></div>
 </section>
 
 <section class="view hidden" id="view-login">
   <div class="mb"><div class="page-title">Account</div><div class="subtitle">Pengaturan akun BlobSignal.</div></div>
   <div class="panel login-card"><img src="/mascot.png" alt="BlobSignal" class="login-logo" onerror="this.style.display='none'"><div class="page-title" style="font-size:23px">Welcome to BlobSignal</div><div class="subtitle" style="margin-bottom:22px">Masuk setelah autentikasi backend diaktifkan.</div>
-    <div class="notice info" style="text-align:left;margin-bottom:18px"><strong>Google OAuth belum dikonfigurasi.</strong><br>Untuk login sungguhan, Worker harus menangani authorization, callback, state validation, dan sesi pengguna. Jangan letakkan Google Client Secret di frontend.</div>
-    <button class="btn" style="width:100%;justify-content:center" id="googleLogin"><i class="fa-brands fa-google"></i> Continue with Google</button><div class="panel-note mt">Status akun: Belum login</div>
+    <div class="notice" style="text-align:left;margin-bottom:18px"><strong>Google OAuth belum dikonfigurasi.</strong><br>Login Google belum aktif. Worker harus menangani authorization, callback, validasi state, dan sesi pengguna. Jangan letakkan Google Client Secret di frontend.</div>
+    <button type="button" class="btn" style="width:100%;justify-content:center" id="googleLogin"><i class="fa-brands fa-google"></i> Continue with Google</button><div class="panel-note mt">Status akun: Belum login</div>
   </div>
 </section>
 
@@ -283,365 +283,1053 @@ tbody tr:last-child td{border-bottom:0}
 
 const API_BASE = window.location.origin;
 const $ = id => document.getElementById(id);
-const DEFAULTS = {autoRefresh:true,refreshInterval:30,defaultInterval:"1h",defaultPair:"BTC_USDT",theme:"light"};
-
-const state = {
- view:"overview",market:[],selectedSymbol:"BTC_USDT",page:1,pageSize:20,
- marketError:"",lastUpdated:null,chart:null,volumeChart:null,candleSeries:null,
- volumeSeries:null,chartSymbol:"",chartInterval:"",chartRequest:0,detailRequest:0,
- refreshTimer:null,refreshBusy:false,toastTimer:null,settings:{...DEFAULTS}
+const DEFAULTS = {
+  autoRefresh:true,
+  refreshInterval:30,
+  defaultInterval:"1h",
+  defaultPair:"BTC_USDT",
+  theme:"light"
 };
 
-function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
-function num(v){if(v===null||v===undefined||v==="")return null;const n=Number(v);return Number.isFinite(n)?n:null;}
-function first(o,keys){for(const k of keys)if(o&&o[k]!==undefined&&o[k]!==null&&o[k]!=="")return o[k];return null;}
-function fmtPrice(v){const n=num(v);return n===null?"—":n.toLocaleString("en-US",{maximumFractionDigits:n>=1000?2:n>=1?5:8});}
-function fmtCompact(v){const n=num(v);if(n===null)return"—";const a=Math.abs(n);if(a>=1e12)return(n/1e12).toFixed(2)+"T";if(a>=1e9)return(n/1e9).toFixed(2)+"B";if(a>=1e6)return(n/1e6).toFixed(2)+"M";if(a>=1e3)return(n/1e3).toFixed(2)+"K";return n.toLocaleString("en-US",{maximumFractionDigits:4});}
-function fmtPercent(v){const n=num(v);return n===null?"—":(n>0?"+":"")+n.toFixed(2)+"%";}
-function fmtRate(v){const n=num(v);return n===null?"—":(n*100).toFixed(5)+"%";}
-function fmtDate(v){const d=v instanceof Date?v:new Date(v);return Number.isFinite(d.getTime())?d.toLocaleString():"—";}
-function symbolOf(x){return String(first(x,["contract_symbol","symbol","contractCode","contract"])||"").trim().toUpperCase();}
-function changeOf(x){return num(first(x,["change_24h_percent","priceChangePercent","changePercent","change24h","change_24h"]));}
-function priceOf(x){return first(x,["price","price_usd","lastPrice","last","last_price"]);}
-function volumeOf(x){return first(x,["volume_24h","volume24","volume","amount24"]);}
-function turnoverOf(x){return first(x,["turnover_24h","turnover24","turnover","quoteVolume"]);}
-function fundingOf(x){return first(x,["funding_rate","fundingRate","funding"]);}
-function oiOf(x){return first(x,["open_interest","holdVol","openInterest","open_interest_value"]);}
+const state = {
+  view:"overview",
+  market:[],
+  selectedSymbol:"BTC_USDT",
+  page:1,
+  pageSize:20,
+  marketError:"",
+  lastUpdated:null,
+  chart:null,
+  volumeChart:null,
+  candleSeries:null,
+  volumeSeries:null,
+  chartSymbol:"",
+  chartInterval:"",
+  chartRequest:0,
+  detailRequest:0,
+  refreshTimer:null,
+  refreshBusy:false,
+  toastTimer:null,
+  resizeObserver:null,
+  settings:{...DEFAULTS}
+};
 
-function toast(message){
- const el=$("toast");el.textContent=message;el.classList.remove("hidden");
- clearTimeout(state.toastTimer);state.toastTimer=setTimeout(()=>el.classList.add("hidden"),4500);
-}
-
-function applyTheme(theme,save=true){
- theme=theme==="dark"?"dark":"light";
- document.documentElement.dataset.theme=theme;
- state.settings.theme=theme;
- const icon=$("themeToggleIcon"),label=$("themeToggleText"),select=$("themeSelect");
- if(icon)icon.className=theme==="light"?"fa-solid fa-moon":"fa-solid fa-sun";
- if(label)label.textContent=theme==="light"?"Dark Mode":"Light Mode";
- if(select)select.value=theme;
- const meta=document.querySelector('meta[name="theme-color"]');
- if(meta)meta.content=theme==="light"?"#f4f7fb":"#090d16";
- if(save){try{localStorage.setItem("blobsignal-theme",theme);}catch(e){}}
- updateChartTheme();
+function esc(v) {
+  return String(v ?? "").replace(/[&<>"']/g, c => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[c]));
 }
 
-function updateChartTheme(){
- if(!state.chart||!state.volumeChart)return;
- const light=document.documentElement.dataset.theme==="light";
- const opts={
-  layout:{background:{color:light?"#ffffff":"#101725"},textColor:light?"#69788e":"#91a0b8"},
-  grid:{vertLines:{color:light?"#edf1f7":"#1c2839"},horzLines:{color:light?"#edf1f7":"#1c2839"}},
-  rightPriceScale:{borderColor:light?"#dfe6f0":"#29364a"},
-  timeScale:{borderColor:light?"#dfe6f0":"#29364a"}
- };
- state.chart.applyOptions(opts);state.volumeChart.applyOptions(opts);
+function num(v) {
+  if (v === null || v === undefined || v === "") return null;
+  const n = Number(v);
+  return Number.isFinite(n) ? n : null;
 }
 
-function setApiStatus(status,message){
- const cls=status==="ok"?"ok":status==="error"?"error":"loading";
- $("sideApiDot").className="dot "+cls;$("topApiDot").className="dot "+cls;
- $("sideApiText").textContent=message;
- $("topApiText").textContent=status==="ok"?"API Connected":status==="error"?"API Error":"Connecting";
-}
-
-function notice(id,message,type="info"){
- const el=$(id);if(!el)return;
- if(!message){el.classList.add("hidden");el.textContent="";return;}
- el.className="notice "+type+" mb";el.textContent=message;el.classList.remove("hidden");
-}
-
-async function apiFetch(path){
- const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),15000);
- try{
-  const r=await fetch(API_BASE+path,{headers:{Accept:"application/json"},cache:"no-store",signal:controller.signal});
-  const raw=await r.text();let data;
-  try{data=raw?JSON.parse(raw):{};}catch{throw new Error("API returned non-JSON response (HTTP "+r.status+").");}
-  if(!r.ok)throw new Error(first(data,["error","message","msg"])||"HTTP "+r.status);
-  if(data&&data.success===false)throw new Error(first(data,["error","message","msg"])||"API request failed.");
-  return data;
- }catch(e){if(e.name==="AbortError")throw new Error("Request timed out after 15 seconds.");throw e;}
- finally{clearTimeout(timer);}
-}
-
-function normalizeMarket(payload){
- let rows=Array.isArray(payload)?payload:first(payload,["data","market","markets","contracts","result"]);
- if(rows&&!Array.isArray(rows)&&typeof rows==="object")rows=first(rows,["data","list","rows","contracts"]);
- return Array.isArray(rows)?rows.filter(x=>x&&typeof x==="object"&&symbolOf(x)):[];
-}
-
-function coinCell(x){
- const symbol=symbolOf(x),name=first(x,["name","baseCoin","base_currency"])||symbol.replace(/[_-]?USDT$/,""),logo=first(x,["logo_url","logoUrl","icon"]);
- return `<div class="coin-cell"><div class="coin-icon">${logo?`<img src="${esc(logo)}" alt="" loading="lazy" onerror="this.style.display='none'">`:esc(String(name).slice(0,3))}</div><div><div class="coin-name">${esc(symbol)}</div><div class="coin-sub">${esc(name)}</div></div></div>`;
-}
-function actions(symbol){
- return `<div class="toolbar" style="justify-content:flex-end;flex-wrap:nowrap"><button class="btn" data-detail="${esc(symbol)}" title="Market detail"><i class="fa-solid fa-list"></i></button><button class="btn btn-primary" data-chart="${esc(symbol)}" title="Open chart"><i class="fa-solid fa-chart-line"></i></button></div>`;
-}
-function marketRow(x,mode="scanner"){
- const c=changeOf(x),cls=c===null?"muted":c>=0?"green":"red";
- const common=`<td>${coinCell(x)}</td><td>${fmtPrice(priceOf(x))}</td><td class="${cls}" style="font-weight:700">${fmtPercent(c)}</td><td>${fmtCompact(volumeOf(x))}</td><td>${fmtCompact(turnoverOf(x))}</td>`;
- return mode==="overview"?`<tr>${common}<td>${actions(symbolOf(x))}</td></tr>`:`<tr>${common}<td>${fmtRate(fundingOf(x))}</td><td>${fmtCompact(oiOf(x))}</td><td>${actions(symbolOf(x))}</td></tr>`;
-}
-
-function leaders(items,positive){
- const sorted=[...items].sort((a,b)=>positive?changeOf(b)-changeOf(a):changeOf(a)-changeOf(b)).slice(0,5);
- if(!sorted.length)return'<div class="empty">Data perubahan harga tidak tersedia.</div>';
- return sorted.map(x=>`<div class="flex-between" style="padding:11px 0;border-bottom:1px solid var(--border);gap:10px"><div>${coinCell(x)}</div><div style="text-align:right"><div class="${positive?"green":"red"}" style="font-weight:750">${fmtPercent(changeOf(x))}</div><div class="panel-note">${fmtPrice(priceOf(x))}</div></div><button class="btn" data-detail="${esc(symbolOf(x))}"><i class="fa-solid fa-arrow-up-right-from-square"></i></button></div>`).join("");
-}
-
-function renderOverview(){
- const rows=state.market;
- $("statContracts").textContent=rows.length?rows.length.toLocaleString():"—";
- if(!rows.length){
-  ["statGainers","statLosers","statTurnover"].forEach(id=>$(id).textContent="—");
-  $("overviewTable").innerHTML=`<tr><td colspan="6"><div class="empty">${esc(state.marketError||"Belum ada data pasar.")}</div></td></tr>`;
-  $("topGainers").innerHTML=`<div class="empty">${esc(state.marketError||"Data belum tersedia.")}</div>`;
-  $("topLosers").innerHTML=`<div class="empty">${esc(state.marketError||"Data belum tersedia.")}</div>`;
-  notice("overviewAlert",state.marketError?"Market API error: "+state.marketError:"Belum ada data kontrak yang valid.","error");return;
- }
- notice("overviewAlert","");
- const g=rows.filter(x=>changeOf(x)!==null&&changeOf(x)>0),l=rows.filter(x=>changeOf(x)!==null&&changeOf(x)<0);
- $("statGainers").textContent=g.length.toLocaleString();$("statLosers").textContent=l.length.toLocaleString();
- $("statTurnover").textContent=fmtCompact(rows.reduce((s,x)=>s+(num(turnoverOf(x))||0),0));
- $("topGainers").innerHTML=leaders(g,true);$("topLosers").innerHTML=leaders(l,false);
- $("overviewTable").innerHTML=[...rows].sort((a,b)=>(num(turnoverOf(b))||0)-(num(turnoverOf(a))||0)).slice(0,10).map(x=>marketRow(x,"overview")).join("");
-}
-
-function filteredMarket(){
- const search=$("marketSearch").value.trim().toUpperCase(),filter=$("changeFilter").value;
- const sort=$("sortBy").value,dir=$("sortDirection").value==="asc"?1:-1;
- let arr=state.market.filter(x=>{
-  const sym=symbolOf(x),name=String(first(x,["name","baseCoin"])||"").toUpperCase(),c=changeOf(x);
-  if(search&&!sym.includes(search)&&!name.includes(search))return false;
-  if(filter==="gainers"&&!(c!==null&&c>0))return false;
-  if(filter==="losers"&&!(c!==null&&c<0))return false;
-  return true;
- });
- const get={turnover:x=>num(turnoverOf(x)),volume:x=>num(volumeOf(x)),price:x=>num(priceOf(x)),change:x=>changeOf(x),symbol:x=>symbolOf(x).toLowerCase()}[sort]||((x)=>num(turnoverOf(x)));
- arr.sort((a,b)=>{const av=get(a),bv=get(b);if(av==null)return 1;if(bv==null)return-1;return(typeof av==="string"?av.localeCompare(bv):av-bv)*dir;});
- return arr;
-}
-function renderScanner(){
- const items=filteredMarket();state.pageSize=Number($("pageSize").value)||20;
- const pages=Math.max(1,Math.ceil(items.length/state.pageSize));state.page=Math.min(Math.max(1,state.page),pages);
- const visible=items.slice((state.page-1)*state.pageSize,state.page*state.pageSize);
- $("scannerCount").textContent=`${items.length} matching contracts · ${state.market.length} total`;
- $("pageInfo").textContent=`Page ${state.page} of ${pages}`;
- $("prevPage").disabled=state.page<=1;$("nextPage").disabled=state.page>=pages;
- $("marketTable").innerHTML=visible.length?visible.map(x=>marketRow(x)).join():`<tr><td colspan="8"><div class="empty">${esc(state.marketError||"Tidak ada kontrak yang cocok.")}</div></td></tr>`;
-}
-function updatePairSelectors(){
- const symbols=[...new Set(state.market.map(symbolOf).filter(Boolean))];
- for(const [id,current] of [["chartPair",state.chartSymbol||state.settings.defaultPair],["detailPair",state.selectedSymbol],["defaultPair",state.settings.defaultPair]]){
-  const el=$(id),opts=[...new Set([...symbols,current||"BTC_USDT"])].sort();
-  el.innerHTML=opts.map(s=>`<option value="${esc(s)}">${esc(s)}</option>`).join("");
-  el.value=opts.includes(current)?current:opts[0];
- }
-}
-
-async function refreshMarket(manual=false){
- if(state.refreshBusy)return;state.refreshBusy=true;setApiStatus("loading","Loading market data");
- try{
-  const payload=await apiFetch("/api/market?page=1&limit=500"),rows=normalizeMarket(payload);
-  if(!rows.length)throw new Error("API returned no recognizable market contracts. Check /api/market response.");
-  state.market=rows;state.marketError="";state.lastUpdated=new Date();
-  $("lastUpdated").textContent="Last update: "+fmtDate(state.lastUpdated);$("lastApiError").textContent="None";
-  setApiStatus("ok",rows.length+" contracts");updatePairSelectors();renderOverview();renderScanner();
-  if(manual)toast("Market data updated: "+rows.length+" contracts.");
- }catch(e){
-  state.marketError=e.message||"Unknown API error";$("lastApiError").textContent=state.marketError;
-  setApiStatus("error",state.marketError);renderOverview();renderScanner();
-  if(manual)toast("Market API error: "+state.marketError);
- }finally{state.refreshBusy=false;}
-}
-
-function switchView(name){
- if(!["overview","chart","scanner","detail","settings","login"].includes(name))return;
- state.view=name;
- document.querySelectorAll(".view").forEach(x=>x.classList.add("hidden"));
- $("view-"+name).classList.remove("hidden");
- document.querySelectorAll(".nav-btn[data-view]").forEach(x=>x.classList.toggle("active",x.dataset.view===name));
- const labels={overview:"Overview",chart:"Live Chart",scanner:"Market Scanner",detail:"Market Detail",settings:"Settings",login:"Account"};
- $("breadcrumb").textContent=labels[name];
- $("headerPair").textContent=name==="chart"?(state.chartSymbol||state.settings.defaultPair):name==="detail"?state.selectedSymbol:"Market intelligence";
- $("sidebar").classList.remove("open");
- if(name==="chart")requestAnimationFrame(loadChart);
- if(name==="detail")loadDetail();
- if(name==="scanner")renderScanner();
- if(name==="overview")renderOverview();
-}
-
-function initCharts(){
- if(state.chart&&state.volumeChart)return true;
- if(!window.LightweightCharts){notice("chartAlert","Chart library gagal dimuat. Periksa koneksi CDN.","error");return false;}
- const light=document.documentElement.dataset.theme==="light";
- const common={layout:{background:{color:light?"#ffffff":"#101725"},textColor:light?"#69788e":"#91a0b8"},grid:{vertLines:{color:light?"#edf1f7":"#1c2839"},horzLines:{color:light?"#edf1f7":"#1c2839"}},rightPriceScale:{borderColor:light?"#dfe6f0":"#29364a"},timeScale:{borderColor:light?"#dfe6f0":"#29364a",timeVisible:true},handleScroll:true,handleScale:true};
- try{
-  state.chart=LightweightCharts.createChart($("priceChart"),{...common,width:$("priceChart").clientWidth||600,height:390});
-  state.candleSeries=state.chart.addCandlestickSeries({upColor:"#35b989",downColor:"#e65c72",borderUpColor:"#35b989",borderDownColor:"#e65c72",wickUpColor:"#35b989",wickDownColor:"#e65c72"});
-  state.volumeChart=LightweightCharts.createChart($("volumeChart"),{...common,width:$("volumeChart").clientWidth||600,height:120});
-  state.volumeSeries=state.volumeChart.addHistogramSeries({priceFormat:{type:"volume"},priceScaleId:"",lastValueVisible:false,priceLineVisible:false});
-  state.volumeChart.priceScale("").applyOptions({scaleMargins:{top:.1,bottom:0}});
-  if(window.ResizeObserver){
-   const observer=new ResizeObserver(()=>{if(state.view!=="chart")return;const w=$("priceChart").clientWidth;if(w>0){state.chart.applyOptions({width:w});state.volumeChart.applyOptions({width:w});}});
-   observer.observe($("priceChart"));observer.observe($("volumeChart"));
+function first(o, keys) {
+  for (const k of keys) {
+    if (o && o[k] !== undefined && o[k] !== null && o[k] !== "") {
+      return o[k];
+    }
   }
-  return true;
- }catch(e){notice("chartAlert","Chart initialization failed: "+e.message,"error");return false;}
+  return null;
 }
 
-function normalizeCandles(payload){
- let rows=first(payload,["candles","chartCandles","klines","list"]);
- if(!Array.isArray(rows)&&payload.data&&typeof payload.data==="object")rows=first(payload.data,["candles","chartCandles","list","klines"]);
- if(!Array.isArray(rows))return[];
- const out=[];
- for(const c of rows){
-  if(!c)continue;
-  let t=first(c,["time","timestamp","t","ts","openTime"]);
-  const o=num(first(c,["open","o"])),h=num(first(c,["high","h"])),l=num(first(c,["low","l"])),cl=num(first(c,["close","c"])),v=num(first(c,["volume","vol","v","amount"]))||0;
-  if([o,h,l,cl].some(x=>x===null))continue;
-  if(typeof t==="string"&&!/^\d+$/.test(t)){const d=new Date(t);if(!Number.isFinite(d.getTime()))continue;t=Math.floor(d.getTime()/1000);}
-  else{t=Number(t);if(!Number.isFinite(t))continue;if(t>1e12)t=Math.floor(t/1000);}
-  out.push({time:Math.floor(t),open:o,high:h,low:l,close:cl,volume:v});
- }
- out.sort((a,b)=>a.time-b.time);
- return out.filter((x,i)=>i===0||x.time>out[i-1].time);
-}
-function analysisOf(payload){return first(payload,["analysis","technicals","indicators","technicalAnalysis"])||{};}
-function indicator(a,keys){
- for(const k of keys){let v=a&&a[k];if(v===undefined||v===null||v==="")continue;if(typeof v==="object"){v=first(v,["value","current","latest","result"]);if(v===null)continue;}return v;}
- return null;
-}
-function indicatorText(v){return v===null?"—":typeof v==="object"?JSON.stringify(v):fmtPrice(v);}
-function renderAnalysis(a){
- const r=indicator(a,["rsi","RSI","rsi14"]),m=indicator(a,["macd","MACD"]),ma=indicator(a,["ma","movingAverage","moving_average","ema","EMA"]),s=indicator(a,["support","supportLevel","support_level"]),r=indicator(a,["resistance","resistanceLevel","resistance_level"]),signal=indicator(a,["signal","trend","bias","recommendation","summary"]);
- $("indicatorRSI").textContent=indicatorText(r);$("indicatorRSINote").textContent=r===null?"Nilai tidak dikembalikan API":(num(r)>=70?"Zona overbought konvensional":num(r)<=30?"Zona oversold konvensional":"Nilai dari backend");
- $("indicatorMACD").textContent=indicatorText(m);$("indicatorMACDNote").textContent=m===null?"Nilai tidak dikembalikan API":"Nilai dari backend";
- $("indicatorMA").textContent=indicatorText(ma);$("indicatorMANote").textContent=ma===null?"Nilai tidak dikembalikan API":"Nilai dari backend";
- $("indicatorSupport").textContent=indicatorText(s);$("indicatorResistance").textContent=indicatorText(r);
- $("indicatorStatus").textContent=signal===null?"Unavailable":typeof signal==="object"?JSON.stringify(signal):String(signal);
- $("detailRSI").textContent=indicatorText(r);$("detailMACD").textContent=indicatorText(m);$("detailMA").textContent=indicatorText(ma);$("detailSupport").textContent=indicatorText(s);$("detailResistance").textContent=indicatorText(r);
+function fmtPrice(v) {
+  const n = num(v);
+  return n === null ? "—" : n.toLocaleString("en-US", {
+    maximumFractionDigits:n >= 1000 ? 2 : n >= 1 ? 5 : 8
+  });
 }
 
-async function loadChart(){
- const symbol=$("chartPair").value||state.settings.defaultPair,interval=$("chartInterval").value||state.settings.defaultInterval,id=++state.chartRequest;
- state.chartSymbol=symbol;state.selectedSymbol=symbol;$("chartHeading").textContent=symbol+" · "+interval.toUpperCase();
- $("chartStatus").innerHTML='<span class="dot loading"></span> Loading';$("chartCandleInfo").textContent="Requesting technical data...";notice("chartAlert","");
- if(!initCharts())return;
- try{
-  const p=await apiFetch("/api/technicals?"+new URLSearchParams({symbol,interval,limit:"250"}));
-  if(id!==state.chartRequest)return;
-  const candles=normalizeCandles(p);if(!candles.length)throw new Error("No valid candles returned. Verify API field names and timestamp format.");
-  state.candleSeries.setData(candles.map(c=>({time:c.time,open:c.open,high:c.high,low:c.low,close:c.close})));
-  state.volumeSeries.setData(candles.map(c=>({time:c.time,value:c.volume,color:c.close>=c.open?"#35b98988":"#e65c7288"})));
-  state.chart.timeScale().fitContent();state.volumeChart.timeScale().fitContent();
-  const last=candles[candles.length-1];
-  $("chartLastPrice").textContent="Last close: "+fmtPrice(last.close);
-  $("chartCandleInfo").textContent=`${candles.length} candles · Last: ${fmtDate(last.time*1000)} · O ${fmtPrice(last.open)} / H ${fmtPrice(last.high)} / L ${fmtPrice(last.low)} / C ${fmtPrice(last.close)}`;
-  $("chartStatus").innerHTML='<span class="dot ok"></span> Data loaded';renderAnalysis(analysisOf(p));notice("chartAlert","");
-  $("headerPair").textContent=symbol;
- }catch(e){
-  if(id!==state.chartRequest)return;
-  $("chartStatus").innerHTML='<span class="dot error"></span> API error';
-  $("chartCandleInfo").textContent="Chart data unavailable.";
-  notice("chartAlert","Technical API error: "+e.message,"error");
-  $("indicatorStatus").textContent="Unavailable";
- }
+function fmtCompact(v) {
+  const n = num(v);
+  if (n === null) return "—";
+  const a = Math.abs(n);
+  if (a >= 1e12) return (n/1e12).toFixed(2)+"T";
+  if (a >= 1e9) return (n/1e9).toFixed(2)+"B";
+  if (a >= 1e6) return (n/1e6).toFixed(2)+"M";
+  if (a >= 1e3) return (n/1e3).toFixed(2)+"K";
+  return n.toLocaleString("en-US",{maximumFractionDigits:4});
 }
 
-async function loadDetail(){
- const symbol=$("detailPair").value||state.selectedSymbol||"BTC_USDT",id=++state.detailRequest;
- state.selectedSymbol=symbol;$("detailSymbol").textContent=symbol;$("detailName").textContent="Loading contract data...";
- $("detailTickerStatus").textContent="Loading";notice("detailAlert","");
- const local=state.market.find(x=>symbolOf(x)===symbol);if(local)renderDetail(local);
- try{
-  const p=await apiFetch("/api/ticker?symbol="+encodeURIComponent(symbol));
-  if(id!==state.detailRequest)return;
-  const ticker=first(p,["data","ticker","result"])||p;
-  if(ticker&&typeof ticker==="object")renderDetail({...local,...ticker});
-  $("detailTickerStatus").textContent="Loaded";$("detailUpdated").textContent=fmtDate(new Date());
- }catch(e){
-  if(id!==state.detailRequest)return;
-  $("detailTickerStatus").textContent="Error";$("detailUpdated").textContent=fmtDate(new Date());
-  notice("detailAlert","Ticker API error: "+e.message+(local?" Showing fields available in market list.":""),"error");
- }
-}
-function renderDetail(x){
- $("detailSymbol").textContent=symbolOf(x)||state.selectedSymbol;$("detailName").textContent=first(x,["name","description"])||"Perpetual contract";
- $("detailPrice").textContent=fmtPrice(priceOf(x));
- const c=changeOf(x);$("detailChange").textContent=fmtPercent(c);$("detailChange").className="small "+(c===null?"muted":c>=0?"green":"red");
- $("detailVolume").textContent=fmtCompact(volumeOf(x));$("detailTurnover").textContent=fmtCompact(turnoverOf(x));$("detailFunding").textContent=fmtRate(fundingOf(x));$("detailOI").textContent=fmtCompact(oiOf(x));
- $("detailHigh").textContent=fmtPrice(first(x,["high_24h","high24Price","high24","highPrice","high"]));
- $("detailLow").textContent=fmtPrice(first(x,["low_24h","lower24Price","low24","lowPrice","low"]));
- $("detailIndex").textContent=fmtPrice(first(x,["index_price","indexPrice"]));$("detailMark").textContent=fmtPrice(first(x,["mark_price","fair_price","fairPrice","markPrice"]));
-}
-async function loadDetailTechnical(){
- const symbol=$("detailPair").value||state.selectedSymbol;$("detailTechnicalStatus").textContent="Loading";
- try{
-  const p=await apiFetch("/api/technicals?"+new URLSearchParams({symbol,interval:$("chartInterval").value||state.settings.defaultInterval,limit:"250"}));
-  renderAnalysis(analysisOf(p));$("detailTechnicalStatus").textContent="Loaded";toast("Technical snapshot loaded.");
- }catch(e){$("detailTechnicalStatus").textContent="Error";notice("detailAlert","Technical API error: "+e.message,"error");}
+function fmtPercent(v) {
+  const n = num(v);
+  return n === null ? "—" : (n > 0 ? "+" : "")+n.toFixed(2)+"%";
 }
 
-function applySettingsUI(){
- $("autoRefresh").checked=state.settings.autoRefresh;$("refreshInterval").value=String(state.settings.refreshInterval);
- $("defaultInterval").value=state.settings.defaultInterval;$("originText").textContent=API_BASE;
- updatePairSelectors();$("defaultPair").value=state.settings.defaultPair;
- $("chartInterval").value=state.settings.defaultInterval;$("chartPair").value=state.settings.defaultPair;$("detailPair").value=state.settings.defaultPair;
- $("themeSelect").value=state.settings.theme;applyTheme(state.settings.theme,false);
-}
-function startRefreshTimer(){
- clearInterval(state.refreshTimer);state.refreshTimer=null;
- if(state.settings.autoRefresh)state.refreshTimer=setInterval(()=>{if(document.visibilityState==="visible")refreshMarket(false);},state.settings.refreshInterval*1000);
-}
-function saveSettings(){
- state.settings.autoRefresh=$("autoRefresh").checked;
- state.settings.refreshInterval=Number($("refreshInterval").value)||30;
- state.settings.defaultInterval=$("defaultInterval").value||"1h";
- state.settings.defaultPair=$("defaultPair").value||"BTC_USDT";
- state.selectedSymbol=state.settings.defaultPair;state.chartSymbol=state.settings.defaultPair;
- $("chartPair").value=state.settings.defaultPair;$("chartInterval").value=state.settings.defaultInterval;$("detailPair").value=state.settings.defaultPair;
- applyTheme($("themeSelect").value||"light",true);startRefreshTimer();
- toast("Settings saved for this session; theme is saved in your browser.");
-}
-function resetSettings(){
- state.settings={...DEFAULTS};applySettingsUI();startRefreshTimer();toast("Settings reset to defaults.");
+function fmtRate(v) {
+  const n = num(v);
+  return n === null ? "—" : (n*100).toFixed(5)+"%";
 }
 
-function bindEvents(){
- $("navigation").addEventListener("click",e=>{const b=e.target.closest("[data-view]");if(b)switchView(b.dataset.view);});
- document.addEventListener("click",e=>{
-  const go=e.target.closest("[data-goto]");if(go)switchView(go.dataset.goto);
-  const d=e.target.closest("[data-detail]");if(d){state.selectedSymbol=d.dataset.detail;$("detailPair").value=d.dataset.detail;switchView("detail");}
-  const c=e.target.closest("[data-chart]");if(c){state.chartSymbol=c.dataset.chart;state.selectedSymbol=c.dataset.chart;updatePairSelectors();$("chartPair").value=c.dataset.chart;switchView("chart");}
- });
- $("mobileMenu").addEventListener("click",()=>$("sidebar").classList.toggle("open"));
- $("globalRefresh").addEventListener("click",()=>refreshMarket(true));$("sideRefresh").addEventListener("click",()=>refreshMarket(true));
- $("scannerRefresh").addEventListener("click",()=>refreshMarket(true));$("chartRefresh").addEventListener("click",loadChart);
- $("detailRefresh").addEventListener("click",loadDetail);$("detailLoadTechnical").addEventListener("click",loadDetailTechnical);
- $("chartPair").addEventListener("change",loadChart);$("chartInterval").addEventListener("change",loadChart);
- $("detailPair").addEventListener("change",()=>{state.selectedSymbol=$("detailPair").value;loadDetail();});
- $("detailOpenChart").addEventListener("click",()=>{state.chartSymbol=$("detailPair").value||state.selectedSymbol;$("chartPair").value=state.chartSymbol;switchView("chart");});
- ["marketSearch","changeFilter","sortBy","sortDirection","pageSize"].forEach(id=>$(id).addEventListener(id==="marketSearch"?"input":"change",()=>{state.page=1;renderScanner();}));
- $("prevPage").addEventListener("click",()=>{state.page=Math.max(1,state.page-1);renderScanner();});
- $("nextPage").addEventListener("click",()=>{state.page++;renderScanner();});
-
- $("themeToggle").addEventListener("click",()=>applyTheme(document.documentElement.dataset.theme==="light"?"dark":"light",true));
- $("themeSelect").addEventListener("change",()=>applyTheme($("themeSelect").value,true));
- $("saveSettings").addEventListener("click",saveSettings);$("resetSettings").addEventListener("click",resetSettings);
- $("testConnection").addEventListener("click",async()=>{
-  try{const p=await apiFetch("/api/market?page=1&limit=20");toast("Connection successful. Contracts: "+normalizeMarket(p).length);}
-  catch(e){toast("Connection failed: "+e.message);}
- });
- $("googleLogin").addEventListener("click",()=>toast("Google OAuth belum aktif. Konfigurasikan endpoint dan callback backend terlebih dahulu."));
+function fmtDate(v) {
+  const d = v instanceof Date ? v : new Date(v);
+  return Number.isFinite(d.getTime()) ? d.toLocaleString() : "—";
 }
 
-async function init(){
- bindEvents();applySettingsUI();startRefreshTimer();await refreshMarket(false);
+function symbolOf(x) {
+  return String(first(x,[
+    "contract_symbol","symbol","contractCode","contract"
+  ]) || "").trim().toUpperCase();
 }
-window.App={refreshMarket};
-init();
+
+function changeOf(x) {
+  return num(first(x,[
+    "change_24h_percent","priceChangePercent","changePercent",
+    "change24h","change_24h"
+  ]));
+}
+
+function priceOf(x) {
+  return first(x,["price","price_usd","lastPrice","last","last_price"]);
+}
+
+function volumeOf(x) {
+  return first(x,["volume_24h","volume24","volume","amount24"]);
+}
+
+function turnoverOf(x) {
+  return first(x,["turnover_24h","turnover24","turnover","quoteVolume"]);
+}
+
+function fundingOf(x) {
+  return first(x,["funding_rate","fundingRate","funding"]);
+}
+
+function oiOf(x) {
+  return first(x,["open_interest","holdVol","openInterest","open_interest_value"]);
+}
+
+function toast(message) {
+  const el = $("toast");
+  el.textContent = message;
+  el.classList.remove("hidden");
+  clearTimeout(state.toastTimer);
+  state.toastTimer = setTimeout(() => el.classList.add("hidden"),4500);
+}
+
+function applyTheme(theme, save=true) {
+  theme = theme === "dark" ? "dark" : "light";
+  document.documentElement.dataset.theme = theme;
+  state.settings.theme = theme;
+
+  const icon = $("themeToggleIcon");
+  const label = $("themeToggleText");
+  const select = $("themeSelect");
+
+  if (icon) icon.className = theme === "light"
+    ? "fa-solid fa-moon" : "fa-solid fa-sun";
+  if (label) label.textContent = theme === "light" ? "Dark Mode" : "Light Mode";
+  if (select) select.value = theme;
+
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.content = theme === "light" ? "#f4f7fb" : "#090d16";
+
+  if (save) {
+    try { localStorage.setItem("blobsignal-theme",theme); } catch(e) {}
+  }
+
+  updateChartTheme();
+}
+
+function updateChartTheme() {
+  if (!state.chart || !state.volumeChart) return;
+
+  const light = document.documentElement.dataset.theme === "light";
+  const opts = {
+    layout:{
+      background:{color:light ? "#ffffff" : "#101725"},
+      textColor:light ? "#69788e" : "#91a0b8"
+    },
+    grid:{
+      vertLines:{color:light ? "#edf1f7" : "#1c2839"},
+      horzLines:{color:light ? "#edf1f7" : "#1c2839"}
+    },
+    rightPriceScale:{borderColor:light ? "#dfe6f0" : "#29364a"},
+    timeScale:{borderColor:light ? "#dfe6f0" : "#29364a"}
+  };
+
+  state.chart.applyOptions(opts);
+  state.volumeChart.applyOptions(opts);
+}
+
+function setApiStatus(status,message) {
+  const cls = status === "ok" ? "ok" : status === "error" ? "error" : "loading";
+  $("sideApiDot").className = "dot "+cls;
+  $("topApiDot").className = "dot "+cls;
+  $("sideApiText").textContent = message;
+  $("topApiText").textContent =
+    status === "ok" ? "API Connected" :
+    status === "error" ? "API Error" : "Connecting";
+}
+
+function notice(id,message,type="info") {
+  const el = $(id);
+  if (!el) return;
+  if (!message) {
+    el.classList.add("hidden");
+    el.textContent = "";
+    return;
+  }
+  el.className = "notice "+(type === "error" ? "error" : "")+" mb";
+  el.textContent = message;
+  el.classList.remove("hidden");
+}
+
+async function apiFetch(path) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(),15000);
+
+  try {
+    const r = await fetch(API_BASE+path,{
+      headers:{Accept:"application/json"},
+      cache:"no-store",
+      signal:controller.signal
+    });
+
+    const raw = await r.text();
+    let data;
+
+    try {
+      data = raw ? JSON.parse(raw) : {};
+    } catch {
+      throw new Error("API returned non-JSON response (HTTP "+r.status+").");
+    }
+
+    if (!r.ok) {
+      throw new Error(first(data,["error","message","msg"]) || "HTTP "+r.status);
+    }
+
+    if (data && data.success === false) {
+      throw new Error(first(data,["error","message","msg"]) || "API request failed.");
+    }
+
+    return data;
+  } catch(e) {
+    if (e.name === "AbortError") {
+      throw new Error("Request timed out after 15 seconds.");
+    }
+    throw e;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+function normalizeMarket(payload) {
+  let rows = Array.isArray(payload)
+    ? payload
+    : first(payload,["data","market","markets","contracts","result"]);
+
+  if (rows && !Array.isArray(rows) && typeof rows === "object") {
+    rows = first(rows,["data","list","rows","contracts"]);
+  }
+
+  return Array.isArray(rows)
+    ? rows.filter(x => x && typeof x === "object" && symbolOf(x))
+    : [];
+}
+
+function coinCell(x) {
+  const symbol = symbolOf(x);
+  const name = first(x,["name","baseCoin","base_currency"]) ||
+    symbol.replace(/[_-]?USDT$/,"");
+  const logo = first(x,["logo_url","logoUrl","icon"]);
+
+  return `<div class="coin-cell">
+    <div class="coin-icon">${
+      logo
+        ? `<img src="${esc(logo)}" alt="" loading="lazy" onerror="this.style.display='none'">`
+        : esc(String(name).slice(0,3))
+    }</div>
+    <div><div class="coin-name">${esc(symbol)}</div>
+    <div class="coin-sub">${esc(name)}</div></div>
+  </div>`;
+}
+
+function actions(symbol) {
+  return `<div class="toolbar" style="justify-content:flex-end;flex-wrap:nowrap">
+    <button type="button" class="btn" data-detail="${esc(symbol)}" title="Market detail"><i class="fa-solid fa-list"></i></button>
+    <button type="button" class="btn btn-primary" data-chart="${esc(symbol)}" title="Open chart"><i class="fa-solid fa-chart-line"></i></button>
+  </div>`;
+}
+
+function marketRow(x,mode="scanner") {
+  const c = changeOf(x);
+  const cls = c === null ? "muted" : c >= 0 ? "green" : "red";
+
+  const common = `<td>${coinCell(x)}</td>
+    <td>${fmtPrice(priceOf(x))}</td>
+    <td class="${cls}" style="font-weight:700">${fmtPercent(c)}</td>
+    <td>${fmtCompact(volumeOf(x))}</td>
+    <td>${fmtCompact(turnoverOf(x))}</td>`;
+
+  return mode === "overview"
+    ? `<tr>${common}<td>${actions(symbolOf(x))}</td></tr>`
+    : `<tr>${common}<td>${fmtRate(fundingOf(x))}</td>
+       <td>${fmtCompact(oiOf(x))}</td><td>${actions(symbolOf(x))}</td></tr>`;
+}
+
+function leaders(items,positive) {
+  const valid = items.filter(x => changeOf(x) !== null);
+  const sorted = [...valid].sort((a,b) =>
+    positive ? changeOf(b)-changeOf(a) : changeOf(a)-changeOf(b)
+  ).slice(0,5);
+
+  if (!sorted.length) {
+    return '<div class="empty">Data perubahan harga tidak tersedia.</div>';
+  }
+
+  return sorted.map(x => `
+    <div class="flex-between" style="padding:11px 0;border-bottom:1px solid var(--border);gap:10px">
+      <div>${coinCell(x)}</div>
+      <div style="text-align:right">
+        <div class="${positive ? "green" : "red"}" style="font-weight:750">${fmtPercent(changeOf(x))}</div>
+        <div class="panel-note">${fmtPrice(priceOf(x))}</div>
+      </div>
+      <button type="button" class="btn" data-detail="${esc(symbolOf(x))}"><i class="fa-solid fa-arrow-up-right-from-square"></i></button>
+    </div>`).join("");
+}
+
+function renderOverview() {
+  const rows = state.market;
+  $("statContracts").textContent = rows.length ? rows.length.toLocaleString() : "—";
+
+  if (!rows.length) {
+    ["statGainers","statLosers","statTurnover"].forEach(id => $(id).textContent="—");
+    $("overviewTable").innerHTML = `<tr><td colspan="6"><div class="empty">${esc(state.marketError || "Belum ada data pasar.")}</div></td></tr>`;
+    $("topGainers").innerHTML = `<div class="empty">${esc(state.marketError || "Data belum tersedia.")}</div>`;
+    $("topLosers").innerHTML = `<div class="empty">${esc(state.marketError || "Data belum tersedia.")}</div>`;
+    notice("overviewAlert",state.marketError ? "Market API error: "+state.marketError : "Belum ada data kontrak yang valid.","error");
+    return;
+  }
+
+  notice("overviewAlert","");
+  const g = rows.filter(x => changeOf(x) !== null && changeOf(x) > 0);
+  const l = rows.filter(x => changeOf(x) !== null && changeOf(x) < 0);
+
+  $("statGainers").textContent = g.length.toLocaleString();
+  $("statLosers").textContent = l.length.toLocaleString();
+  $("statTurnover").textContent = fmtCompact(rows.reduce((s,x) => s+(num(turnoverOf(x)) || 0),0));
+  $("topGainers").innerHTML = leaders(g,true);
+  $("topLosers").innerHTML = leaders(l,false);
+  $("overviewTable").innerHTML = [...rows]
+    .sort((a,b) => (num(turnoverOf(b)) || 0)-(num(turnoverOf(a)) || 0))
+    .slice(0,10).map(x => marketRow(x,"overview")).join("");
+}
+
+function filteredMarket() {
+  const search = $("marketSearch").value.trim().toUpperCase();
+  const filter = $("changeFilter").value;
+  const sort = $("sortBy").value;
+  const dir = $("sortDirection").value === "asc" ? 1 : -1;
+
+  let arr = state.market.filter(x => {
+    const sym = symbolOf(x);
+    const name = String(first(x,["name","baseCoin"]) || "").toUpperCase();
+    const c = changeOf(x);
+
+    if (search && !sym.includes(search) && !name.includes(search)) return false;
+    if (filter === "gainers" && !(c !== null && c > 0)) return false;
+    if (filter === "losers" && !(c !== null && c < 0)) return false;
+    return true;
+  });
+
+  const get = {
+    turnover:x => num(turnoverOf(x)),
+    volume:x => num(volumeOf(x)),
+    price:x => num(priceOf(x)),
+    change:x => changeOf(x),
+    symbol:x => symbolOf(x).toLowerCase()
+  }[sort] || (x => num(turnoverOf(x)));
+
+  arr.sort((a,b) => {
+    const av = get(a), bv = get(b);
+    if (av == null) return 1;
+    if (bv == null) return -1;
+    return (typeof av === "string" ? av.localeCompare(bv) : av-bv)*dir;
+  });
+
+  return arr;
+}
+
+function renderScanner() {
+  const items = filteredMarket();
+  state.pageSize = Number($("pageSize").value) || 20;
+  const pages = Math.max(1,Math.ceil(items.length/state.pageSize));
+  state.page = Math.min(Math.max(1,state.page),pages);
+  const visible = items.slice((state.page-1)*state.pageSize,state.page*state.pageSize);
+
+  $("scannerCount").textContent = `${items.length} matching contracts · ${state.market.length} total`;
+  $("pageInfo").textContent = `Page ${state.page} of ${pages}`;
+  $("prevPage").disabled = state.page <= 1;
+  $("nextPage").disabled = state.page >= pages;
+  $("marketTable").innerHTML = visible.length
+    ? visible.map(x => marketRow(x)).join("")
+    : `<tr><td colspan="8"><div class="empty">${esc(state.marketError || "Tidak ada kontrak yang cocok.")}</div></td></tr>`;
+}
+
+function updatePairSelectors() {
+  const symbols = [...new Set(state.market.map(symbolOf).filter(Boolean))];
+
+  for (const [id,current] of [
+    ["chartPair",state.chartSymbol || state.settings.defaultPair],
+    ["detailPair",state.selectedSymbol],
+    ["defaultPair",state.settings.defaultPair]
+  ]) {
+    const el = $(id);
+    const opts = [...new Set([...symbols,current || "BTC_USDT"])].sort();
+    el.innerHTML = opts.map(s => `<option value="${esc(s)}">${esc(s)}</option>`).join("");
+    el.value = opts.includes(current) ? current : opts[0];
+  }
+}
+
+async function refreshMarket(manual=false) {
+  if (state.refreshBusy) return;
+  state.refreshBusy = true;
+  setApiStatus("loading","Loading market data");
+
+  try {
+    const payload = await apiFetch("/api/market?page=1&limit=500");
+    const rows = normalizeMarket(payload);
+    if (!rows.length) {
+      throw new Error("API returned no recognizable market contracts. Check /api/market response.");
+    }
+
+    state.market = rows;
+    state.marketError = "";
+    state.lastUpdated = new Date();
+    $("lastUpdated").textContent = "Last update: "+fmtDate(state.lastUpdated);
+    $("lastApiError").textContent = "None";
+    setApiStatus("ok",rows.length+" contracts");
+    updatePairSelectors();
+    renderOverview();
+    renderScanner();
+
+    if (manual) toast("Market data updated: "+rows.length+" contracts.");
+  } catch(e) {
+    state.marketError = e.message || "Unknown API error";
+    $("lastApiError").textContent = state.marketError;
+    setApiStatus("error",state.marketError);
+    renderOverview();
+    renderScanner();
+    if (manual) toast("Market API error: "+state.marketError);
+  } finally {
+    state.refreshBusy = false;
+  }
+}
+
+function switchView(name) {
+  const allowed = ["overview","chart","scanner","detail","settings","login"];
+  if (!allowed.includes(name)) return;
+
+  state.view = name;
+  document.querySelectorAll(".view").forEach(el => el.classList.add("hidden"));
+  $("view-"+name).classList.remove("hidden");
+
+  document.querySelectorAll(".nav-btn[data-view]").forEach(el => {
+    el.classList.toggle("active",el.dataset.view === name);
+  });
+
+  $("sidebar").classList.remove("open");
+
+  const labels = {
+    overview:"Overview",chart:"Live Chart",scanner:"Market Scanner",
+    detail:"Market Detail",settings:"Settings",login:"Account"
+  };
+
+  $("breadcrumb").textContent = labels[name];
+  $("headerPair").textContent = name === "chart"
+    ? (state.chartSymbol || state.settings.defaultPair)
+    : name === "detail" ? state.selectedSymbol : "Market intelligence";
+
+  if (name === "chart") {
+    requestAnimationFrame(() => {
+      resizeCharts();
+      loadChart();
+      requestAnimationFrame(resizeCharts);
+    });
+  }
+
+  if (name === "detail") loadDetail();
+  if (name === "scanner") renderScanner();
+  if (name === "overview") renderOverview();
+  if (name === "settings") {
+    $("themeSelect").value = state.settings.theme;
+  }
+}
+
+function initCharts() {
+  if (state.chart && state.volumeChart && state.candleSeries && state.volumeSeries) {
+    return true;
+  }
+
+  if (!window.LightweightCharts) {
+    notice("chartAlert","Chart library gagal dimuat. Periksa koneksi CDN atau browser.","error");
+    return false;
+  }
+
+  const priceEl = $("priceChart");
+  const volumeEl = $("volumeChart");
+  if (!priceEl || !volumeEl) return false;
+
+  const light = document.documentElement.dataset.theme === "light";
+  const common = {
+    layout:{
+      background:{color:light ? "#ffffff" : "#101725"},
+      textColor:light ? "#69788e" : "#91a0b8"
+    },
+    grid:{
+      vertLines:{color:light ? "#edf1f7" : "#1c2839"},
+      horzLines:{color:light ? "#edf1f7" : "#1c2839"}
+    },
+    rightPriceScale:{borderColor:light ? "#dfe6f0" : "#29364a"},
+    timeScale:{
+      borderColor:light ? "#dfe6f0" : "#29364a",
+      timeVisible:true,
+      secondsVisible:false
+    },
+    handleScroll:true,
+    handleScale:true
+  };
+
+  try {
+    state.chart = LightweightCharts.createChart(priceEl,{
+      ...common,
+      width:Math.max(1,priceEl.clientWidth),
+      height:priceEl.clientHeight || 390
+    });
+
+    state.candleSeries = state.chart.addCandlestickSeries({
+      upColor:"#35b989",
+      downColor:"#e65c72",
+      borderUpColor:"#35b989",
+      borderDownColor:"#e65c72",
+      wickUpColor:"#35b989",
+      wickDownColor:"#e65c72"
+    });
+
+    state.volumeChart = LightweightCharts.createChart(volumeEl,{
+      ...common,
+      width:Math.max(1,volumeEl.clientWidth),
+      height:volumeEl.clientHeight || 120
+    });
+
+    state.volumeSeries = state.volumeChart.addHistogramSeries({
+      priceFormat:{type:"volume"},
+      priceScaleId:"",
+      lastValueVisible:false,
+      priceLineVisible:false
+    });
+
+    state.volumeChart.priceScale("").applyOptions({
+      scaleMargins:{top:.1,bottom:0}
+    });
+
+    if (window.ResizeObserver) {
+      state.resizeObserver = new ResizeObserver(() => {
+        if (state.view === "chart") resizeCharts();
+      });
+      state.resizeObserver.observe(priceEl);
+      state.resizeObserver.observe(volumeEl);
+    }
+
+    return true;
+  } catch(e) {
+    console.error("Chart initialization failed:",e);
+    notice("chartAlert","Chart initialization failed: "+e.message,"error");
+    state.chart = null;
+    state.volumeChart = null;
+    state.candleSeries = null;
+    state.volumeSeries = null;
+    return false;
+  }
+}
+
+function resizeCharts() {
+  if (!state.chart || !state.volumeChart || state.view !== "chart") return;
+
+  const priceEl = $("priceChart");
+  const volumeEl = $("volumeChart");
+  if (!priceEl || !volumeEl) return;
+
+  const width = Math.floor(priceEl.getBoundingClientRect().width);
+  const volumeWidth = Math.floor(volumeEl.getBoundingClientRect().width);
+
+  if (width > 0) state.chart.applyOptions({width});
+  if (volumeWidth > 0) state.volumeChart.applyOptions({width:volumeWidth});
+}
+
+function normalizeCandles(payload) {
+  function findRows(obj,depth=0) {
+    if (!obj || depth > 6) return [];
+
+    if (Array.isArray(obj)) {
+      if (!obj.length) return [];
+      if (Array.isArray(obj[0]) ||
+          (obj[0] && typeof obj[0] === "object")) return obj;
+      return [];
+    }
+
+    if (typeof obj !== "object") return [];
+
+    const keys = [
+      "candles","chartCandles","klines","kline",
+      "list","rows","records","items"
+    ];
+
+    for (const key of keys) {
+      if (Array.isArray(obj[key]) && obj[key].length) return obj[key];
+    }
+
+    for (const key of ["data","result","payload"]) {
+      if (obj[key] && typeof obj[key] === "object") {
+        const found = findRows(obj[key],depth+1);
+        if (found.length) return found;
+      }
+    }
+
+    return [];
+  }
+
+  const rows = findRows(payload);
+  const candles = [];
+
+  for (const c of rows) {
+    if (!c) continue;
+
+    let t,o,h,l,cl,v;
+
+    if (Array.isArray(c)) {
+      [t,o,h,l,cl,v] = c;
+    } else {
+      t = first(c,["time","timestamp","t","ts","openTime","startTime","start"]);
+      o = first(c,["open","o"]);
+      h = first(c,["high","h"]);
+      l = first(c,["low","l"]);
+      cl = first(c,["close","c"]);
+      v = first(c,["volume","vol","v","amount"]);
+    }
+
+    o = num(o); h = num(h); l = num(l); cl = num(cl); v = num(v) ?? 0;
+    if ([o,h,l,cl].some(x => x === null)) continue;
+
+    if (typeof t === "string" && !/^\d+(\.\d+)?$/.test(t)) {
+      const parsed = Date.parse(t);
+      if (!Number.isFinite(parsed)) continue;
+      t = Math.floor(parsed/1000);
+    } else {
+      t = Number(t);
+      if (!Number.isFinite(t)) continue;
+      t = t > 1e12 ? Math.floor(t/1000) : Math.floor(t);
+    }
+
+    if (t <= 0) continue;
+
+    candles.push({
+      time:t,open:o,high:h,low:l,close:cl,volume:v
+    });
+  }
+
+  candles.sort((a,b) => a.time-b.time);
+
+  const unique = [];
+  for (const candle of candles) {
+    if (!unique.length || candle.time > unique[unique.length-1].time) {
+      unique.push(candle);
+    }
+  }
+
+  return unique;
+}
+
+function analysisOf(payload) {
+  return first(payload,["analysis","technicals","indicators","technicalAnalysis"]) || {};
+}
+
+function indicator(a,keys) {
+  for (const k of keys) {
+    let v = a && a[k];
+    if (v === undefined || v === null || v === "") continue;
+    if (typeof v === "object") {
+      v = first(v,["value","current","latest","result"]);
+      if (v === null) continue;
+    }
+    return v;
+  }
+  return null;
+}
+
+function indicatorText(v) {
+  if (v === null) return "—";
+  if (typeof v === "object") return JSON.stringify(v);
+  return fmtPrice(v);
+}
+
+function renderAnalysis(a) {
+  const rsi = indicator(a,["rsi","RSI","rsi14"]);
+  const macd = indicator(a,["macd","MACD"]);
+  const ma = indicator(a,["ma","movingAverage","moving_average","ema","EMA"]);
+  const support = indicator(a,["support","supportLevel","support_level"]);
+  const resistance = indicator(a,["resistance","resistanceLevel","resistance_level"]);
+  const signal = indicator(a,["signal","trend","bias","recommendation","summary"]);
+
+  $("indicatorRSI").textContent = indicatorText(rsi);
+  $("indicatorRSINote").textContent = rsi === null
+    ? "Nilai tidak dikembalikan API"
+    : (num(rsi) >= 70 ? "Zona overbought konvensional" :
+       num(rsi) <= 30 ? "Zona oversold konvensional" : "Nilai dari backend");
+
+  $("indicatorMACD").textContent = indicatorText(macd);
+  $("indicatorMACDNote").textContent = macd === null ? "Nilai tidak dikembalikan API" : "Nilai dari backend";
+  $("indicatorMA").textContent = indicatorText(ma);
+  $("indicatorMANote").textContent = ma === null ? "Nilai tidak dikembalikan API" : "Nilai dari backend";
+  $("indicatorSupport").textContent = indicatorText(support);
+  $("indicatorResistance").textContent = indicatorText(resistance);
+  $("indicatorStatus").textContent = signal === null ? "Unavailable" :
+    typeof signal === "object" ? JSON.stringify(signal) : String(signal);
+
+  $("detailRSI").textContent = indicatorText(rsi);
+  $("detailMACD").textContent = indicatorText(macd);
+  $("detailMA").textContent = indicatorText(ma);
+  $("detailSupport").textContent = indicatorText(support);
+  $("detailResistance").textContent = indicatorText(resistance);
+}
+
+async function loadChart() {
+  const symbol = $("chartPair").value || state.settings.defaultPair;
+  const interval = $("chartInterval").value || state.settings.defaultInterval;
+  const id = ++state.chartRequest;
+
+  state.chartSymbol = symbol;
+  state.chartInterval = interval;
+  state.selectedSymbol = symbol;
+  $("chartHeading").textContent = symbol+" · "+interval.toUpperCase();
+  $("chartStatus").innerHTML = '<span class="dot loading"></span> Loading';
+  $("chartCandleInfo").textContent = "Requesting technical data...";
+  $("chartLastPrice").textContent = "Last close: —";
+  notice("chartAlert","");
+
+  if (!initCharts()) return;
+
+  try {
+    const p = await apiFetch("/api/technicals?"+new URLSearchParams({
+      symbol,interval,limit:"250"
+    }));
+
+    if (id !== state.chartRequest) return;
+
+    const candles = normalizeCandles(p);
+
+    console.log("[BlobSignal] Technical response:",p);
+    console.log("[BlobSignal] Normalized candle count:",candles.length);
+
+    if (!candles.length) {
+      console.error("[BlobSignal] No candles recognized. Response:",p);
+      throw new Error("API berhasil, tetapi tidak ada candle yang dikenali. Periksa struktur JSON di Console.");
+    }
+
+    state.candleSeries.setData(candles.map(c => ({
+      time:c.time,
+      open:c.open,
+      high:c.high,
+      low:c.low,
+      close:c.close
+    })));
+
+    state.volumeSeries.setData(candles.map(c => ({
+      time:c.time,
+      value:c.volume,
+      color:c.close >= c.open ? "#35b98988" : "#e65c7288"
+    })));
+
+    resizeCharts();
+    state.chart.timeScale().fitContent();
+    state.volumeChart.timeScale().fitContent();
+
+    const last = candles[candles.length-1];
+    $("chartLastPrice").textContent = "Last close: "+fmtPrice(last.close);
+    $("chartCandleInfo").textContent =
+      `${candles.length} candles · Last: ${fmtDate(last.time*1000)} · `+
+      `O ${fmtPrice(last.open)} / H ${fmtPrice(last.high)} / `+
+      `L ${fmtPrice(last.low)} / C ${fmtPrice(last.close)}`;
+
+    $("chartStatus").innerHTML = '<span class="dot ok"></span> Data loaded';
+    renderAnalysis(analysisOf(p));
+    notice("chartAlert","");
+    $("headerPair").textContent = symbol;
+  } catch(e) {
+    if (id !== state.chartRequest) return;
+
+    console.error("[BlobSignal] Chart error:",e);
+    $("chartStatus").innerHTML = '<span class="dot error"></span> Error';
+    $("chartCandleInfo").textContent = "Chart data unavailable.";
+    notice("chartAlert","Technical API error: "+e.message,"error");
+    $("indicatorStatus").textContent = "Unavailable";
+  }
+}
+
+async function loadDetail() {
+  const symbol = $("detailPair").value || state.selectedSymbol || "BTC_USDT";
+  const id = ++state.detailRequest;
+
+  state.selectedSymbol = symbol;
+  $("detailSymbol").textContent = symbol;
+  $("detailName").textContent = "Loading contract data...";
+  $("detailTickerStatus").textContent = "Loading";
+  notice("detailAlert","");
+
+  const local = state.market.find(x => symbolOf(x) === symbol);
+  if (local) renderDetail(local);
+
+  try {
+    const p = await apiFetch("/api/ticker?symbol="+encodeURIComponent(symbol));
+    if (id !== state.detailRequest) return;
+
+    const ticker = first(p,["data","ticker","result"]) || p;
+    if (ticker && typeof ticker === "object") {
+      renderDetail({...local,...ticker});
+    }
+
+    $("detailTickerStatus").textContent = "Loaded";
+    $("detailUpdated").textContent = fmtDate(new Date());
+  } catch(e) {
+    if (id !== state.detailRequest) return;
+    $("detailTickerStatus").textContent = "Error";
+    $("detailUpdated").textContent = fmtDate(new Date());
+    notice("detailAlert","Ticker API error: "+e.message+
+      (local ? " Showing fields available in market list." : ""),"error");
+  }
+}
+
+function renderDetail(x) {
+  $("detailSymbol").textContent = symbolOf(x) || state.selectedSymbol;
+  $("detailName").textContent = first(x,["name","description"]) || "Perpetual contract";
+  $("detailPrice").textContent = fmtPrice(priceOf(x));
+
+  const c = changeOf(x);
+  $("detailChange").textContent = fmtPercent(c);
+  $("detailChange").className = "small "+(c === null ? "muted" : c >= 0 ? "green" : "red");
+
+  $("detailVolume").textContent = fmtCompact(volumeOf(x));
+  $("detailTurnover").textContent = fmtCompact(turnoverOf(x));
+  $("detailFunding").textContent = fmtRate(fundingOf(x));
+  $("detailOI").textContent = fmtCompact(oiOf(x));
+  $("detailHigh").textContent = fmtPrice(first(x,["high_24h","high24Price","high24","highPrice","high"]));
+  $("detailLow").textContent = fmtPrice(first(x,["low_24h","lower24Price","low24","lowPrice","low"]));
+  $("detailIndex").textContent = fmtPrice(first(x,["index_price","indexPrice"]));
+  $("detailMark").textContent = fmtPrice(first(x,["mark_price","fair_price","fairPrice","markPrice"]));
+}
+
+async function loadDetailTechnical() {
+  const symbol = $("detailPair").value || state.selectedSymbol;
+  $("detailTechnicalStatus").textContent = "Loading";
+
+  try {
+    const p = await apiFetch("/api/technicals?"+new URLSearchParams({
+      symbol,interval:$("chartInterval").value || state.settings.defaultInterval,limit:"250"
+    }));
+
+    renderAnalysis(analysisOf(p));
+    $("detailTechnicalStatus").textContent = "Loaded";
+    toast("Technical snapshot loaded.");
+  } catch(e) {
+    $("detailTechnicalStatus").textContent = "Error";
+    notice("detailAlert","Technical API error: "+e.message,"error");
+  }
+}
+
+function applySettingsUI() {
+  $("autoRefresh").checked = state.settings.autoRefresh;
+  $("refreshInterval").value = String(state.settings.refreshInterval);
+  $("defaultInterval").value = state.settings.defaultInterval;
+  $("originText").textContent = API_BASE;
+
+  updatePairSelectors();
+
+  $("defaultPair").value = state.settings.defaultPair;
+  $("chartInterval").value = state.settings.defaultInterval;
+  $("chartPair").value = state.settings.defaultPair;
+  $("detailPair").value = state.settings.defaultPair;
+  $("themeSelect").value = state.settings.theme;
+
+  applyTheme(state.settings.theme,false);
+}
+
+function startRefreshTimer() {
+  clearInterval(state.refreshTimer);
+  state.refreshTimer = null;
+
+  if (state.settings.autoRefresh) {
+    state.refreshTimer = setInterval(() => {
+      if (document.visibilityState === "visible") refreshMarket(false);
+    },state.settings.refreshInterval*1000);
+  }
+}
+
+function saveSettings() {
+  state.settings.autoRefresh = $("autoRefresh").checked;
+  state.settings.refreshInterval = Number($("refreshInterval").value) || 30;
+  state.settings.defaultInterval = $("defaultInterval").value || "1h";
+  state.settings.defaultPair = $("defaultPair").value || "BTC_USDT";
+  state.selectedSymbol = state.settings.defaultPair;
+  state.chartSymbol = state.settings.defaultPair;
+
+  $("chartPair").value = state.settings.defaultPair;
+  $("chartInterval").value = state.settings.defaultInterval;
+  $("detailPair").value = state.settings.defaultPair;
+
+  applyTheme($("themeSelect").value || "light",true);
+  startRefreshTimer();
+
+  try {
+    localStorage.setItem("blobsignal-settings",JSON.stringify(state.settings));
+  } catch(e) {}
+
+  toast("Settings saved.");
+}
+
+function resetSettings() {
+  state.settings = {...DEFAULTS};
+  applySettingsUI();
+  startRefreshTimer();
+  toast("Settings reset to defaults.");
+}
+
+function bindEvents() {
+  $("navigation").addEventListener("click",e => {
+    const target = e.target instanceof Element
+      ? e.target.closest("[data-view]")
+      : null;
+
+    if (!target || !$("navigation").contains(target)) return;
+    e.preventDefault();
+    switchView(target.dataset.view);
+  });
+
+  document.addEventListener("click",e => {
+    const target = e.target instanceof Element ? e.target : null;
+    if (!target) return;
+
+    const go = target.closest("[data-goto]");
+    if (go) switchView(go.dataset.goto);
+
+    const d = target.closest("[data-detail]");
+    if (d) {
+      state.selectedSymbol = d.dataset.detail;
+      $("detailPair").value = d.dataset.detail;
+      switchView("detail");
+    }
+
+    const c = target.closest("[data-chart]");
+    if (c) {
+      state.chartSymbol = c.dataset.chart;
+      state.selectedSymbol = c.dataset.chart;
+      updatePairSelectors();
+      $("chartPair").value = c.dataset.chart;
+      switchView("chart");
+    }
+  });
+
+  $("mobileMenu").addEventListener("click",() => $("sidebar").classList.toggle("open"));
+
+  $("globalRefresh").addEventListener("click",() => refreshMarket(true));
+  $("sideRefresh").addEventListener("click",() => refreshMarket(true));
+  $("scannerRefresh").addEventListener("click",() => refreshMarket(true));
+  $("chartRefresh").addEventListener("click",loadChart);
+  $("detailRefresh").addEventListener("click",loadDetail);
+  $("detailLoadTechnical").addEventListener("click",loadDetailTechnical);
+
+  $("chartPair").addEventListener("change",loadChart);
+  $("chartInterval").addEventListener("change",loadChart);
+
+  $("detailPair").addEventListener("change",() => {
+    state.selectedSymbol = $("detailPair").value;
+    loadDetail();
+  });
+
+  $("detailOpenChart").addEventListener("click",() => {
+    state.chartSymbol = $("detailPair").value || state.selectedSymbol;
+    $("chartPair").value = state.chartSymbol;
+    switchView("chart");
+  });
+
+  ["marketSearch","changeFilter","sortBy","sortDirection","pageSize"].forEach(id => {
+    $(id).addEventListener(id === "marketSearch" ? "input" : "change",() => {
+      state.page = 1;
+      renderScanner();
+    });
+  });
+
+  $("prevPage").addEventListener("click",() => {
+    state.page = Math.max(1,state.page-1);
+    renderScanner();
+  });
+
+  $("nextPage").addEventListener("click",() => {
+    state.page++;
+    renderScanner();
+  });
+
+  $("themeToggle").addEventListener("click",() => {
+    applyTheme(document.documentElement.dataset.theme === "light" ? "dark" : "light",true);
+  });
+
+  $("themeSelect").addEventListener("change",() => {
+    applyTheme($("themeSelect").value,true);
+  });
+
+  $("saveSettings").addEventListener("click",saveSettings);
+  $("resetSettings").addEventListener("click",resetSettings);
+
+  $("testConnection").addEventListener("click",async() => {
+    try {
+      const p = await apiFetch("/api/market?page=1&limit=20");
+      toast("Connection successful. Contracts: "+normalizeMarket(p).length);
+    } catch(e) {
+      $("lastApiError").textContent = e.message;
+      toast("Connection failed: "+e.message);
+    }
+  });
+
+  $("googleLogin").addEventListener("click",() => {
+    toast("Google OAuth belum aktif. Konfigurasikan endpoint dan callback backend terlebih dahulu.");
+  });
+}
+
+async function init() {
+  try {
+    const saved = localStorage.getItem("blobsignal-settings");
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      state.settings = {...DEFAULTS,...parsed};
+    }
+  } catch(e) {}
+
+  try {
+    const savedTheme = localStorage.getItem("blobsignal-theme");
+    if (savedTheme === "light" || savedTheme === "dark") {
+      state.settings.theme = savedTheme;
+    }
+  } catch(e) {}
+
+  bindEvents();
+  applySettingsUI();
+  startRefreshTimer();
+  await refreshMarket(false);
+}
+
+window.App = {
+  refreshMarket,
+  loadChart,
+  switchView,
+  resizeCharts
+};
+
+init().catch(e => {
+  console.error("[BlobSignal] Startup error:",e);
+  toast("Startup error: "+e.message);
+});
 })();
 </script>
 </body>
