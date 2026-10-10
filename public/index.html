@@ -1,1397 +1,1081 @@
-
-<!DOCTYPE html>
-<html lang="en" data-theme="light">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#f4f7fb">
-<meta name="description" content="BlobSignal Crypto Futures Intelligence Dashboard">
-<title>BlobSignal | Crypto Futures Intelligence</title>
-
-<script src="https://cdn.tailwindcss.com"></script>
-<script src="https://unpkg.com/lightweight-charts@4.2.2/dist/lightweight-charts.standalone.production.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<!-- =========================================================
+     BLOBSIGNAL — LONG / SHORT ENTRY PREDICTION
+     Add this module inside the existing Live Chart page.
+     ========================================================= -->
 
 <style>
-:root,[data-theme="light"]{
- color-scheme:light;--bg:#f4f7fb;--panel:#fff;--panel2:#f0f4fa;
- --border:#dfe6f0;--muted:#69788e;--text:#182338;
- --green:#0b9b70;--red:#dc4058;--blue:#4169e1;
+.entry-prediction {
+  background: var(--panel, #fff);
+  color: var(--text, #182338);
+  border: 1px solid var(--border, #dfe6f0);
+  border-radius: 15px;
+  padding: 18px;
+  margin-top: 19px;
 }
-[data-theme="dark"]{
- color-scheme:dark;--bg:#090d16;--panel:#101725;--panel2:#141d2d;
- --border:#263247;--muted:#91a0b8;--text:#edf3ff;
- --green:#35d49a;--red:#ff657a;--blue:#6688ff;
+
+.entry-prediction * {
+  box-sizing: border-box;
 }
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
-button,input,select{font:inherit}button{cursor:pointer}button:disabled{opacity:.45;cursor:not-allowed}
-.sidebar{width:250px;position:fixed;inset:0 auto 0 0;background:var(--panel);border-right:1px solid var(--border);padding:22px 15px;display:flex;flex-direction:column;z-index:30;overflow-y:auto}
-.main{margin-left:250px;min-height:100vh}
-.topbar{height:76px;position:sticky;top:0;z-index:20;background:var(--bg);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 25px;gap:14px}
-.content{padding:26px 25px 45px;max-width:1800px;margin:auto}
-.brand{display:flex;align-items:center;gap:11px}
-.brand img{width:39px;height:39px;object-fit:contain}
-.brand-name{font-size:19px;font-weight:800;letter-spacing:-.5px}
-.brand-sub{font-size:10px;color:var(--muted);letter-spacing:1.5px}
-.nav-label{color:var(--muted);font-size:10px;letter-spacing:1.5px;font-weight:800;padding:12px;margin:24px 0 7px}
-.nav-btn{width:100%;display:flex;align-items:center;gap:12px;padding:12px;margin:3px 0;border-radius:10px;border:1px solid transparent;color:var(--muted);background:transparent;text-align:left;font-size:13px}
-.nav-btn i{width:18px;text-align:center}
-.nav-btn:hover{background:var(--panel2);color:var(--text)}
-.nav-btn.active{background:color-mix(in srgb,var(--blue) 12%,var(--panel));color:var(--blue);border-color:color-mix(in srgb,var(--blue) 30%,var(--border))}
-.side-bottom{margin-top:auto;padding-top:20px}
-.api-pill,.status-pill{display:inline-flex;align-items:center;gap:7px;font-size:11px;padding:6px 9px;border-radius:30px;border:1px solid var(--border);color:var(--muted)}
-.dot{width:7px;height:7px;border-radius:50%;background:#7d8aa1;display:inline-block}
-.dot.ok{background:var(--green)}.dot.error{background:var(--red)}.dot.loading{background:#e8ad45}
-.page-title{font-size:27px;font-weight:750;letter-spacing:-.8px}
-.subtitle{color:var(--muted);font-size:13px;margin-top:6px;line-height:1.6}
-.panel{background:var(--panel);border:1px solid var(--border);border-radius:15px;padding:18px;min-width:0}
-.panel-title{font-size:14px;font-weight:700}.panel-note{font-size:11px;color:var(--muted);margin-top:5px}
-.muted{color:var(--muted)}.small{font-size:12px}.tiny{font-size:10px}
-.stat-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
-.stat-card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:17px}
-.stat-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
-.stat-label{color:var(--muted);font-size:12px}
-.stat-icon{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:color-mix(in srgb,var(--blue) 10%,var(--panel));color:var(--blue)}
-.stat-value{font-size:24px;font-weight:750;margin-top:15px;overflow-wrap:anywhere}
-.stat-foot{color:var(--muted);font-size:11px;margin-top:6px}
-.green{color:var(--green)!important}.red{color:var(--red)!important}.blue{color:var(--blue)}
-.toolbar{display:flex;flex-wrap:wrap;gap:9px;align-items:center}
-.field{color:var(--text);background:var(--bg);border:1px solid var(--border);border-radius:9px;padding:9px 11px;outline:none;min-height:39px;max-width:100%}
-.field:focus{border-color:var(--blue)}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--border);border-radius:9px;padding:10px 12px;background:var(--panel2);color:var(--text);font-size:12px;font-weight:650}
-.btn:hover{filter:brightness(.96)}
-.btn-primary{background:#4169e1;border-color:#4169e1;color:#fff}
-.btn-quiet{background:transparent}
-.grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}
-.grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
-.mt{margin-top:19px}.mb{margin-bottom:19px}
-.flex-between{display:flex;align-items:center;justify-content:space-between;gap:12px}
-.table-wrap{width:100%;overflow-x:auto}
-table{width:100%;border-collapse:collapse;font-size:12px;white-space:nowrap}
-th{color:var(--muted);font-size:10px;font-weight:750;text-transform:uppercase;letter-spacing:.7px;text-align:right;padding:13px 12px;border-bottom:1px solid var(--border)}
-td{padding:12px;text-align:right;border-bottom:1px solid var(--border)}
-th:first-child,td:first-child{text-align:left}
-tbody tr:hover{background:var(--panel2)}
-tbody tr:last-child td{border-bottom:0}
-.coin-cell{display:flex;align-items:center;gap:9px;text-align:left}
-.coin-icon{width:29px;height:29px;display:grid;place-items:center;border-radius:50%;background:var(--panel2);color:var(--blue);overflow:hidden;font-size:10px;font-weight:800;flex-shrink:0}
-.coin-icon img{width:100%;height:100%;object-fit:cover}
-.coin-name{font-weight:700}.coin-sub{color:var(--muted);font-size:10px;margin-top:3px}
-.tag{display:inline-block;padding:4px 7px;border-radius:5px;background:var(--panel2);color:var(--muted);font-size:10px}
-.empty{padding:25px 12px;color:var(--muted);text-align:center;font-size:12px}
-.empty i{display:block;font-size:23px;margin-bottom:10px;opacity:.7}
-.notice{border:1px solid #cbdcff;background:#eef4ff;color:#31518c;padding:12px 14px;border-radius:10px;font-size:12px;line-height:1.6}
-.notice.error{border-color:#f3c3cb;background:#fff0f2;color:#a92740}
-[data-theme="dark"] .notice{background:#131f35;border-color:#2d436c;color:#b5caff}
-[data-theme="dark"] .notice.error{background:#2b1720;border-color:#663342;color:#ff9eae}
-.hidden{display:none!important}
-.view{animation:appear .18s ease-out}
-@keyframes appear{from{opacity:.65;transform:translateY(3px)}to{opacity:1;transform:none}}
-.chart-box{width:100%;height:390px;min-width:0}
-.volume-box{width:100%;height:120px;min-width:0}
-.indicator-chart{width:100%;height:170px;min-width:0}
-.chart-controls{display:flex;flex-wrap:wrap;gap:14px;align-items:center;padding:12px 0}
-.chart-toggle{display:inline-flex;align-items:center;gap:7px;font-size:12px;color:var(--muted);cursor:pointer}
-.chart-toggle input{accent-color:var(--blue)}
-.metric-box{background:var(--bg);border:1px solid var(--border);padding:14px;border-radius:10px;min-width:0}
-.metric-label{font-size:11px;color:var(--muted)}
-.metric-value{font-size:19px;font-weight:750;margin-top:9px;overflow-wrap:anywhere}
-.settings-row{padding:16px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:20px}
-.settings-row:last-child{border-bottom:0}
-.switch{width:42px;height:23px;accent-color:var(--blue);cursor:pointer}
-.mobile-menu{display:none}
-.toast{position:fixed;bottom:22px;right:22px;z-index:100;max-width:min(420px,calc(100vw - 36px));padding:13px 16px;border:1px solid var(--border);border-radius:10px;background:var(--panel);color:var(--text);font-size:12px;box-shadow:0 15px 45px #0002}
-.footer{color:var(--muted);font-size:10px;text-align:center;padding-top:30px}
-@media(max-width:1100px){.stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.grid-3{grid-template-columns:repeat(2,minmax(0,1fr))}.content{padding:22px 18px}.topbar{padding:0 18px}}
-@media(max-width:760px){.sidebar{transform:translateX(-100%);transition:transform .2s;box-shadow:15px 0 50px #0002}.sidebar.open{transform:translateX(0)}.main{margin-left:0}.mobile-menu{display:inline-flex}.topbar{height:65px;padding:0 12px}.content{padding:18px 12px 32px}.page-title{font-size:23px}.grid-2,.grid-3{grid-template-columns:1fr}.stat-grid{gap:9px}.stat-card{padding:12px}.stat-value{font-size:20px}.chart-box{height:310px}.panel{padding:13px}.topbar-status{display:none}}
-@media(max-width:400px){.stat-grid{grid-template-columns:1fr}}
+
+.ep-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.ep-title {
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.ep-subtitle {
+  font-size: 11px;
+  color: var(--muted, #69788e);
+  margin-top: 5px;
+  line-height: 1.6;
+}
+
+.ep-status {
+  font-size: 10px;
+  font-weight: 800;
+  padding: 7px 10px;
+  border-radius: 7px;
+  background: var(--panel2, #f0f4fa);
+  color: var(--muted, #69788e);
+}
+
+.ep-status.long {
+  background: #d9f8ec;
+  color: #087a56;
+}
+
+.ep-status.short {
+  background: #ffe1e6;
+  color: #b4233d;
+}
+
+.ep-status.wait {
+  background: var(--panel2, #f0f4fa);
+  color: var(--muted, #69788e);
+}
+
+.ep-direction {
+  font-size: 25px;
+  font-weight: 850;
+  margin: 14px 0 18px;
+}
+
+.ep-direction.long {
+  color: var(--green, #0b9b70);
+}
+
+.ep-direction.short {
+  color: var(--red, #dc4058);
+}
+
+.ep-direction.wait {
+  color: #c28b1c;
+}
+
+.ep-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.ep-card {
+  min-width: 0;
+  padding: 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border, #dfe6f0);
+  background: var(--bg, #f4f7fb);
+}
+
+.ep-card span,
+.ep-factor span {
+  display: block;
+  font-size: 11px;
+  color: var(--muted, #69788e);
+  margin-bottom: 8px;
+}
+
+.ep-card strong {
+  display: block;
+  font-size: 15px;
+  overflow-wrap: anywhere;
+}
+
+.ep-confidence {
+  margin: 20px 0;
+}
+
+.ep-confidence-label {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 12px;
+  margin-bottom: 9px;
+}
+
+.ep-progress {
+  width: 100%;
+  height: 8px;
+  background: var(--border, #dfe6f0);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+#epConfidenceBar {
+  width: 0;
+  height: 100%;
+  background: var(--blue, #4169e1);
+  transition: width 0.25s ease;
+}
+
+.ep-summary {
+  font-size: 12px;
+  line-height: 1.8;
+  color: var(--muted, #69788e);
+  margin-top: 11px;
+}
+
+.ep-factors {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border, #dfe6f0);
+  margin-bottom: 16px;
+}
+
+.ep-factor {
+  min-width: 0;
+}
+
+.ep-factor strong {
+  display: block;
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+.ep-disclaimer {
+  font-size: 10px;
+  line-height: 1.7;
+  color: var(--muted, #69788e);
+}
+
+@media (max-width: 600px) {
+  .ep-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .ep-factors {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .ep-direction {
+    font-size: 21px;
+  }
+}
 </style>
 
-<script>
-(function(){
-  try {
-    document.documentElement.dataset.theme =
-      localStorage.getItem("blobsignal-theme") === "dark" ? "dark" : "light";
-  } catch(e) {
-    document.documentElement.dataset.theme = "light";
-  }
-})();
-</script>
-</head>
-
-<body>
-<div class="app">
-<aside id="sidebar" class="sidebar">
-  <div class="brand">
-    <img src="/mascot.png" alt="BlobSignal" onerror="this.style.display='none'">
-    <div><div class="brand-name">BlobSignal<span class="blue">.</span></div><div class="brand-sub">FUTURES INTELLIGENCE</div></div>
-  </div>
-
-  <div class="nav-label">WORKSPACE</div>
-  <nav id="navigation">
-    <button type="button" class="nav-btn active" data-view="overview"><i class="fa-solid fa-house"></i>Overview</button>
-    <button type="button" class="nav-btn" data-view="chart"><i class="fa-solid fa-chart-column"></i>Live Chart</button>
-    <button type="button" class="nav-btn" data-view="scanner"><i class="fa-solid fa-magnifying-glass-chart"></i>Market Scanner</button>
-    <button type="button" class="nav-btn" data-view="detail"><i class="fa-solid fa-chart-line"></i>Market Detail</button>
-
-    <button type="button" class="nav-label" data-view="settings" style="display:block;width:100%;border:0;background:transparent;text-align:left;cursor:pointer;font-family:inherit">PREFERENCES</button>
-    <button type="button" class="nav-btn" data-view="settings"><i class="fa-solid fa-sliders"></i>Settings</button>
-  </nav>
-
-  <div class="side-bottom">
-    <div class="panel" style="padding:12px">
-      <div class="flex-between"><span class="small" style="font-weight:700">API Connection</span><span class="dot loading" id="sideApiDot"></span></div>
-      <div id="sideApiText" class="panel-note">Checking connection...</div>
-      <button type="button" class="btn btn-quiet" style="width:100%;margin-top:12px" id="sideRefresh"><i class="fa-solid fa-rotate"></i> Refresh data</button>
+<section class="entry-prediction" id="entryPredictionPanel">
+  <div class="ep-header">
+    <div>
+      <div class="ep-title">Entry Prediction</div>
+      <div class="ep-subtitle">
+        Rule-based LONG / SHORT analysis using candle data,
+        EMA, RSI, MACD, volume, and support/resistance.
+      </div>
     </div>
-    <div class="panel-note" style="padding:14px 5px 0">BlobSignal · Market information only.</div>
-  </div>
-</aside>
-
-<main class="main">
-<header class="topbar">
-  <div class="flex-between" style="justify-content:flex-start">
-    <button type="button" class="btn mobile-menu" id="mobileMenu" aria-label="Open menu"><i class="fa-solid fa-bars"></i></button>
-    <div><div class="small muted">Crypto Futures / <span id="breadcrumb">Overview</span></div><div class="small" style="font-weight:700;margin-top:3px" id="headerPair">Market intelligence</div></div>
-  </div>
-  <div class="toolbar">
-    <span class="api-pill topbar-status"><span class="dot loading" id="topApiDot"></span><span id="topApiText">Connecting</span></span>
-    <button type="button" class="btn" id="themeToggle" title="Change theme"><i class="fa-solid fa-moon" id="themeToggleIcon"></i><span id="themeToggleText">Dark Mode</span></button>
-    <button type="button" class="btn" id="globalRefresh"><i class="fa-solid fa-rotate"></i> Refresh</button>
-  </div>
-</header>
-
-<div class="content">
-
-<section class="view" id="view-overview">
-  <div class="flex-between mb" style="align-items:flex-start;flex-wrap:wrap">
-    <div><div class="page-title">Market Overview</div><div class="subtitle">An overview of futures contracts based on API data.</div></div>
-    <div class="small muted" id="lastUpdated">Last update: —</div>
-  </div>
-  <div id="overviewAlert" class="notice mb hidden"></div>
-  <div class="stat-grid">
-    <div class="stat-card"><div class="stat-top"><span class="stat-label">Listed Contracts</span><span class="stat-icon"><i class="fa-solid fa-layer-group"></i></span></div><div class="stat-value" id="statContracts">—</div><div class="stat-foot">Contracts returned by the API</div></div>
-    <div class="stat-card"><div class="stat-top"><span class="stat-label">Gainers 24H</span><span class="stat-icon"><i class="fa-solid fa-arrow-trend-up"></i></span></div><div class="stat-value green" id="statGainers">—</div><div class="stat-foot">Positive price changes</div></div>
-    <div class="stat-card"><div class="stat-top"><span class="stat-label">Losers 24H</span><span class="stat-icon"><i class="fa-solid fa-arrow-trend-down"></i></span></div><div class="stat-value red" id="statLosers">—</div><div class="stat-foot">Negative price changes</div></div>
-    <div class="stat-card"><div class="stat-top"><span class="stat-label">Turnover 24H</span><span class="stat-icon"><i class="fa-solid fa-coins"></i></span></div><div class="stat-value" id="statTurnover">—</div><div class="stat-foot">Total reported trading turnover</div></div>
+    <span class="ep-status wait" id="epStatus">WAITING FOR DATA</span>
   </div>
 
-  <div class="grid-2 mt">
-    <div class="panel"><div class="flex-between"><div><div class="panel-title">Top Gainers</div><div class="panel-note">Largest price increases</div></div><span class="tag green">24H</span></div><div id="topGainers" class="mt"><div class="empty">Loading data...</div></div></div>
-    <div class="panel"><div class="flex-between"><div><div class="panel-title">Top Losers</div><div class="panel-note">Largest price declines</div></div><span class="tag red">24H</span></div><div id="topLosers" class="mt"><div class="empty">Loading data...</div></div></div>
+  <div class="ep-direction wait" id="epDirection">
+    WAIT — NO CONFIRMED ENTRY
   </div>
 
-  <div class="panel mt">
-    <div class="flex-between mb"><div><div class="panel-title">Market Snapshot</div><div class="panel-note">Contracts with the highest reported turnover.</div></div><button type="button" class="btn" data-goto="scanner">Open Scanner <i class="fa-solid fa-arrow-right"></i></button></div>
-    <div class="table-wrap"><table><thead><tr><th>Contract</th><th>Last Price</th><th>24H Change</th><th>Volume 24H</th><th>Turnover</th><th>Action</th></tr></thead><tbody id="overviewTable"><tr><td colspan="6"><div class="empty">Loading...</div></td></tr></tbody></table></div>
-  </div>
-  <div class="footer">Market information only. Not financial advice.</div>
-</section>
-
-<section class="view hidden" id="view-chart">
-  <div class="flex-between mb" style="align-items:flex-start;flex-wrap:wrap"><div><div class="page-title">Live Chart</div><div class="subtitle">Candlestick and volume charts based on API responses.</div></div><button type="button" class="btn btn-primary" id="chartRefresh"><i class="fa-solid fa-rotate"></i> Refresh chart</button></div>
-  <div class="panel mb"><div class="toolbar"><label class="small muted" for="chartPair">Contract</label><select class="field" id="chartPair"><option value="BTC_USDT">BTC_USDT</option></select><label class="small muted" for="chartInterval">Timeframe</label><select class="field" id="chartInterval"><option value="1m">1m</option><option value="5m">5m</option><option value="15m">15m</option><option value="30m">30m</option><option value="1h" selected>1H</option><option value="4h">4H</option><option value="8h">8H</option><option value="1d">1D</option><option value="1w">1W</option></select><span id="chartStatus" class="api-pill"><span class="dot loading"></span>Waiting</span></div></div>
-  <div id="chartAlert" class="notice mb hidden"></div>
-  <div class="panel">
-    <div class="flex-between mb"><div><div class="panel-title" id="chartHeading">BTC_USDT · 1H</div><div class="panel-note">Candlestick chart</div></div><div class="small muted" id="chartLastPrice">Last close: —</div></div>
-    <div class="chart-controls" aria-label="Chart indicator controls">
-      <label class="chart-toggle"><input type="checkbox" id="showEMA20" checked> EMA 20</label>
-      <label class="chart-toggle"><input type="checkbox" id="showEMA50" checked> EMA 50</label>
-      <label class="chart-toggle"><input type="checkbox" id="showSupportResistance" checked> Support / Resistance</label>
-      <label class="chart-toggle"><input type="checkbox" id="showRSI" checked> RSI (14)</label>
-      <label class="chart-toggle"><input type="checkbox" id="showMACD" checked> MACD (12, 26, 9)</label>
+  <div class="ep-grid">
+    <div class="ep-card">
+      <span>Entry Price</span>
+      <strong id="epEntry">—</strong>
     </div>
-    <div id="priceChart" class="chart-box"></div>
-    <div class="panel-note" style="margin:10px 0">Volume</div><div id="volumeChart" class="volume-box"></div>
-    <div id="rsiPane"><div class="panel-note" style="margin:14px 0 5px">Relative Strength Index (RSI 14) · 30 / 70 levels</div><div id="rsiChart" class="indicator-chart"></div></div>
-    <div id="macdPane"><div class="panel-note" style="margin:14px 0 5px">Moving Average Convergence Divergence (MACD 12, 26, 9)</div><div id="macdChart" class="indicator-chart"></div></div>
-    <div class="panel-note mt" id="chartCandleInfo">Candle data: —</div>
-  </div>
-  <div class="grid-3 mt">
-    <div class="metric-box"><div class="metric-label">RSI</div><div class="metric-value" id="indicatorRSI">—</div><div class="panel-note" id="indicatorRSINote">Not available yet</div></div>
-    <div class="metric-box"><div class="metric-label">MACD</div><div class="metric-value" id="indicatorMACD">—</div><div class="panel-note" id="indicatorMACDNote">Not available yet</div></div>
-    <div class="metric-box"><div class="metric-label">Moving Average</div><div class="metric-value" id="indicatorMA">—</div><div class="panel-note" id="indicatorMANote">Not available yet</div></div>
-    <div class="metric-box"><div class="metric-label">Support</div><div class="metric-value" id="indicatorSupport">—</div></div>
-    <div class="metric-box"><div class="metric-label">Resistance</div><div class="metric-value" id="indicatorResistance">—</div></div>
-    <div class="metric-box"><div class="metric-label">Analysis Status</div><div class="metric-value" id="indicatorStatus" style="font-size:15px">Waiting</div><div class="panel-note">Not a guarantee of future price direction</div></div>
-  </div>
-</section>
 
-<section class="view hidden" id="view-scanner">
-  <div class="flex-between mb" style="align-items:flex-start;flex-wrap:wrap"><div><div class="page-title">Market Scanner</div><div class="subtitle">Search, filter, and sort available contracts.</div></div><button type="button" class="btn btn-primary" id="scannerRefresh"><i class="fa-solid fa-rotate"></i> Refresh</button></div>
-  <div class="panel mb"><div class="toolbar">
-    <input class="field" id="marketSearch" placeholder="Search symbol, e.g. BTC..." style="flex:1;min-width:180px">
-    <select class="field" id="changeFilter"><option value="all">All changes</option><option value="gainers">Gainers only</option><option value="losers">Losers only</option></select>
-    <select class="field" id="sortBy"><option value="turnover">Sort: Turnover</option><option value="change">Sort: 24H Change</option><option value="price">Sort: Price</option><option value="volume">Sort: Volume</option><option value="symbol">Sort: Symbol</option></select>
-    <select class="field" id="sortDirection"><option value="desc">Descending</option><option value="asc">Ascending</option></select>
-  </div></div>
-  <div class="panel">
-    <div class="flex-between mb"><div><div class="panel-title">Futures Contracts</div><div class="panel-note" id="scannerCount">Waiting for market data...</div></div><span class="tag">API data</span></div>
-    <div class="table-wrap"><table><thead><tr><th>Contract</th><th>Last Price</th><th>24H Change</th><th>Volume 24H</th><th>Turnover 24H</th><th>Funding</th><th>Open Interest</th><th>Actions</th></tr></thead><tbody id="marketTable"><tr><td colspan="8"><div class="empty">Loading...</div></td></tr></tbody></table></div>
-    <div class="flex-between mt" style="flex-wrap:wrap"><div class="small muted" id="pageInfo">Page 1</div><div class="toolbar"><select class="field" id="pageSize"><option value="20">20 / page</option><option value="50">50 / page</option><option value="100">100 / page</option></select><button type="button" class="btn" id="prevPage"><i class="fa-solid fa-chevron-left"></i> Previous</button><button type="button" class="btn" id="nextPage">Next <i class="fa-solid fa-chevron-right"></i></button></div></div>
-  </div>
-</section>
-
-<section class="view hidden" id="view-detail">
-  <div class="flex-between mb" style="align-items:flex-start;flex-wrap:wrap"><div><div class="page-title">Market Detail</div><div class="subtitle">Contract information and technical indicators.</div></div><button type="button" class="btn btn-primary" id="detailOpenChart"><i class="fa-solid fa-chart-column"></i> Open Live Chart</button></div>
-  <div class="panel mb"><div class="toolbar"><label class="small muted" for="detailPair">Contract</label><select class="field" id="detailPair"><option value="BTC_USDT">BTC_USDT</option></select><button type="button" class="btn" id="detailRefresh"><i class="fa-solid fa-rotate"></i> Refresh detail</button></div></div>
-  <div id="detailAlert" class="notice mb hidden"></div>
-  <div class="flex-between mb"><div><div class="page-title" style="font-size:22px" id="detailSymbol">BTC_USDT</div><div class="subtitle" id="detailName">Perpetual contract</div></div><div style="text-align:right"><div class="small muted">Last Price</div><div class="page-title" id="detailPrice">—</div><div id="detailChange" class="small">—</div></div></div>
-  <div class="stat-grid">
-    <div class="metric-box"><div class="metric-label">24H Volume</div><div class="metric-value" id="detailVolume">—</div></div>
-    <div class="metric-box"><div class="metric-label">24H Turnover</div><div class="metric-value" id="detailTurnover">—</div></div>
-    <div class="metric-box"><div class="metric-label">Funding Rate</div><div class="metric-value" id="detailFunding">—</div></div>
-    <div class="metric-box"><div class="metric-label">Open Interest</div><div class="metric-value" id="detailOI">—</div></div>
-    <div class="metric-box"><div class="metric-label">24H High</div><div class="metric-value" id="detailHigh">—</div></div>
-    <div class="metric-box"><div class="metric-label">24H Low</div><div class="metric-value" id="detailLow">—</div></div>
-    <div class="metric-box"><div class="metric-label">Index Price</div><div class="metric-value" id="detailIndex">—</div></div>
-    <div class="metric-box"><div class="metric-label">Fair / Mark Price</div><div class="metric-value" id="detailMark">—</div></div>
-  </div>
-  <div class="grid-2 mt">
-    <div class="panel"><div class="panel-title">Technical Snapshot</div><div class="panel-note">Indicators provided by the backend, when available.</div>
-      <div class="mt"><div class="settings-row"><span class="small muted">RSI</span><strong id="detailRSI">—</strong></div><div class="settings-row"><span class="small muted">MACD</span><strong id="detailMACD">—</strong></div><div class="settings-row"><span class="small muted">Moving Average</span><strong id="detailMA">—</strong></div><div class="settings-row"><span class="small muted">Support</span><strong id="detailSupport">—</strong></div><div class="settings-row"><span class="small muted">Resistance</span><strong id="detailResistance">—</strong></div></div>
-      <button type="button" class="btn mt" id="detailLoadTechnical">Load technical analysis</button>
+    <div class="ep-card">
+      <span>Stop Loss</span>
+      <strong id="epSL">—</strong>
     </div>
-    <div class="panel"><div class="panel-title">Data Status</div><div class="panel-note">Endpoint status and last update time.</div>
-      <div class="mt"><div class="settings-row"><span class="small muted">Ticker endpoint</span><span id="detailTickerStatus" class="tag">Not requested</span></div><div class="settings-row"><span class="small muted">Technical endpoint</span><span id="detailTechnicalStatus" class="tag">Not requested</span></div><div class="settings-row"><span class="small muted">Last refresh</span><strong id="detailUpdated" class="small">—</strong></div></div>
-      <div class="notice mt">Fields unavailable from the API are shown as dashes rather than treated as zero.</div>
+
+    <div class="ep-card">
+      <span>Take Profit 1</span>
+      <strong id="epTP1">—</strong>
+    </div>
+
+    <div class="ep-card">
+      <span>Take Profit 2</span>
+      <strong id="epTP2">—</strong>
+    </div>
+
+    <div class="ep-card">
+      <span>Take Profit 3</span>
+      <strong id="epTP3">—</strong>
+    </div>
+
+    <div class="ep-card">
+      <span>Risk / Reward</span>
+      <strong id="epRR">—</strong>
     </div>
   </div>
-</section>
 
-<section class="view hidden" id="view-settings">
-  <div class="mb"><div class="page-title">Settings</div><div class="subtitle">Configure dashboard appearance and behavior.</div></div>
-  <div class="panel">
-    <div class="panel-title">Appearance & Preferences</div>
-    <div class="settings-row"><div><div class="small" style="font-weight:700">Theme</div><div class="panel-note">Your theme preference is saved in your browser.</div></div><select class="field" id="themeSelect"><option value="light">Light</option><option value="dark">Dark</option></select></div>
-    <div class="settings-row"><div><div class="small" style="font-weight:700">Auto-refresh market</div><div class="panel-note">Automatically refresh market data at regular intervals.</div></div><input type="checkbox" class="switch" id="autoRefresh" checked></div>
-    <div class="settings-row"><div><div class="small" style="font-weight:700">Refresh interval</div><div class="panel-note">Time between market API requests.</div></div><select class="field" id="refreshInterval"><option value="15">15 seconds</option><option value="30" selected>30 seconds</option><option value="60">60 seconds</option><option value="120">120 seconds</option></select></div>
-    <div class="settings-row"><div><div class="small" style="font-weight:700">Default timeframe</div><div class="panel-note">Initial timeframe for the Live Chart.</div></div><select class="field" id="defaultInterval"><option value="1m">1m</option><option value="5m">5m</option><option value="15m">15m</option><option value="30m">30m</option><option value="1h">1H</option><option value="4h">4H</option><option value="8h">8H</option><option value="1d">1D</option><option value="1w">1W</option></select></div>
-    <div class="settings-row"><div><div class="small" style="font-weight:700">Default contract</div><div class="panel-note">Initial contract used by the dashboard.</div></div><select class="field" id="defaultPair"><option value="BTC_USDT">BTC_USDT</option></select></div>
-    <div class="settings-row"><div><div class="small" style="font-weight:700">Market API</div><div class="panel-note">Uses this website’s origin.</div></div><span class="tag">Same-origin</span></div>
-    <div class="toolbar mt"><button type="button" class="btn btn-primary" id="saveSettings"><i class="fa-solid fa-check"></i> Save settings</button><button type="button" class="btn" id="resetSettings">Reset defaults</button></div>
+  <div class="ep-confidence">
+    <div class="ep-confidence-label">
+      <span>Heuristic Confidence Score</span>
+      <strong id="epConfidence">—</strong>
+    </div>
+
+    <div class="ep-progress">
+      <div id="epConfidenceBar"></div>
+    </div>
+
+    <div class="ep-summary" id="epSummary">
+      Waiting for sufficient candle data.
+    </div>
   </div>
-  <div class="panel mt"><div class="panel-title">Connection Diagnostics</div><div class="panel-note">Test the market API endpoint.</div><div class="settings-row"><span class="small muted">Website origin</span><code class="small" id="originText"></code></div><div class="settings-row"><span class="small muted">Market endpoint</span><code class="small">/api/market?page=1&amp;limit=20</code></div><div class="settings-row"><span class="small muted">Last API error</span><span class="small" id="lastApiError">None</span></div><button type="button" class="btn mt" id="testConnection"><i class="fa-solid fa-plug"></i> Test connection</button></div>
+
+  <div class="ep-factors">
+    <div class="ep-factor">
+      <span>EMA Trend</span>
+      <strong id="epEMA">—</strong>
+    </div>
+
+    <div class="ep-factor">
+      <span>RSI (14)</span>
+      <strong id="epRSI">—</strong>
+    </div>
+
+    <div class="ep-factor">
+      <span>MACD Momentum</span>
+      <strong id="epMACD">—</strong>
+    </div>
+
+    <div class="ep-factor">
+      <span>Volume</span>
+      <strong id="epVolume">—</strong>
+    </div>
+
+    <div class="ep-factor">
+      <span>Support</span>
+      <strong id="epSupport">—</strong>
+    </div>
+
+    <div class="ep-factor">
+      <span>Resistance</span>
+      <strong id="epResistance">—</strong>
+    </div>
+  </div>
+
+  <div class="ep-disclaimer">
+    Technical estimate only. The confidence score is not a statistically
+    calibrated probability of profit. Entry is based on the latest candle
+    close. Confirm candle completion and account for fees, slippage,
+    liquidity, leverage, and position sizing before trading.
+  </div>
 </section>
-
-
-</div>
-</main>
-</div>
-<div id="toast" class="toast hidden" role="status"></div>
 
 <script>
-(() => {
 "use strict";
 
-const API_BASE = window.location.origin;
-const $ = id => document.getElementById(id);
-const DEFAULTS = {
-  autoRefresh:true,
-  refreshInterval:30,
-  defaultInterval:"1h",
-  defaultPair:"BTC_USDT",
-  theme:"light"
+/* =========================================================
+   CONFIGURATION
+   ========================================================= */
+
+const ENTRY_PREDICTION_CONFIG = {
+  emaFast: 20,
+  emaSlow: 50,
+  rsiPeriod: 14,
+  macdFast: 12,
+  macdSlow: 26,
+  macdSignal: 9,
+  atrPeriod: 14,
+  supportResistanceLookback: 20,
+
+  minimumCandles: 60,
+  minimumScore: 4,
+  minimumScoreDifference: 2,
+
+  stopAtrMultiplier: 1.5,
+  supportStopBufferAtr: 0.1,
+  maximumSupportStopDistanceAtr: 2,
+
+  takeProfitRiskMultiples: [1, 2, 3],
+
+  rsiOverbought: 75,
+  rsiOversold: 25
 };
 
-const state = {
-  view:"overview",
-  market:[],
-  selectedSymbol:"BTC_USDT",
-  page:1,
-  pageSize:20,
-  marketError:"",
-  lastUpdated:null,
-  chart:null,
-  volumeChart:null,
-  candleSeries:null,
-  volumeSeries:null,
-  ema20Series:null,
-  ema50Series:null,
-  supportSeries:null,
-  resistanceSeries:null,
-  rsiChart:null,
-  rsiSeries:null,
-  macdChart:null,
-  macdLineSeries:null,
-  macdSignalSeries:null,
-  macdHistogramSeries:null,
-  chartSymbol:"",
-  chartInterval:"",
-  chartRequest:0,
-  detailRequest:0,
-  refreshTimer:null,
-  refreshBusy:false,
-  toastTimer:null,
-  resizeObserver:null,
-  settings:{...DEFAULTS}
-};
+/* =========================================================
+   GENERAL HELPERS
+   ========================================================= */
 
-function esc(v) {
-  return String(v ?? "").replace(/[&<>"']/g, c => ({
-    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-  }[c]));
+function epElement(id) {
+  return document.getElementById(id);
 }
 
-function num(v) {
-  if (v === null || v === undefined || v === "") return null;
-  const n = Number(v);
-  return Number.isFinite(n) ? n : null;
+function epSetText(id, value) {
+  const element = epElement(id);
+  if (element) element.textContent = value;
 }
 
-function first(o, keys) {
-  for (const k of keys) {
-    if (o && o[k] !== undefined && o[k] !== null && o[k] !== "") {
-      return o[k];
-    }
-  }
-  return null;
+function epAverage(values) {
+  if (!values.length) return NaN;
+
+  return values.reduce((sum, value) => sum + value, 0)
+    / values.length;
 }
 
-function fmtPrice(v) {
-  const n = num(v);
-  return n === null ? "—" : n.toLocaleString("en-US", {
-    maximumFractionDigits:n >= 1000 ? 2 : n >= 1 ? 5 : 8
+function epFormatPrice(value) {
+  if (!Number.isFinite(value)) return "—";
+
+  return value.toLocaleString("en-US", {
+    maximumFractionDigits:
+      value >= 1000 ? 2 :
+      value >= 1 ? 5 : 8
   });
 }
 
-function fmtCompact(v) {
-  const n = num(v);
-  if (n === null) return "—";
-  const a = Math.abs(n);
-  if (a >= 1e12) return (n/1e12).toFixed(2)+"T";
-  if (a >= 1e9) return (n/1e9).toFixed(2)+"B";
-  if (a >= 1e6) return (n/1e6).toFixed(2)+"M";
-  if (a >= 1e3) return (n/1e3).toFixed(2)+"K";
-  return n.toLocaleString("en-US",{maximumFractionDigits:4});
+function epClamp(value, minimum, maximum) {
+  return Math.max(minimum, Math.min(maximum, value));
 }
 
-function fmtPercent(v) {
-  const n = num(v);
-  return n === null ? "—" : (n > 0 ? "+" : "")+n.toFixed(2)+"%";
-}
-
-function fmtRate(v) {
-  const n = num(v);
-  return n === null ? "—" : (n*100).toFixed(5)+"%";
-}
-
-function fmtDate(v) {
-  const d = v instanceof Date ? v : new Date(v);
-  return Number.isFinite(d.getTime()) ? d.toLocaleString() : "—";
-}
-
-function symbolOf(x) {
-  return String(first(x,[
-    "contract_symbol","symbol","contractCode","contract"
-  ]) || "").trim().toUpperCase();
-}
-
-function changeOf(x) {
-  return num(first(x,[
-    "change_24h_percent","priceChangePercent","changePercent",
-    "change24h","change_24h"
-  ]));
-}
-
-function priceOf(x) {
-  return first(x,["price","price_usd","lastPrice","last","last_price"]);
-}
-
-function volumeOf(x) {
-  return first(x,["volume_24h","volume24","volume","amount24"]);
-}
-
-function turnoverOf(x) {
-  return first(x,["turnover_24h","turnover24","turnover","quoteVolume"]);
-}
-
-function fundingOf(x) {
-  return first(x,["funding_rate","fundingRate","funding"]);
-}
-
-function oiOf(x) {
-  return first(x,["open_interest","holdVol","openInterest","open_interest_value"]);
-}
-
-function toast(message) {
-  const el = $("toast");
-  el.textContent = message;
-  el.classList.remove("hidden");
-  clearTimeout(state.toastTimer);
-  state.toastTimer = setTimeout(() => el.classList.add("hidden"),4500);
-}
-
-function applyTheme(theme, save=true) {
-  theme = theme === "dark" ? "dark" : "light";
-  document.documentElement.dataset.theme = theme;
-  state.settings.theme = theme;
-
-  const icon = $("themeToggleIcon");
-  const label = $("themeToggleText");
-  const select = $("themeSelect");
-
-  if (icon) icon.className = theme === "light"
-    ? "fa-solid fa-moon" : "fa-solid fa-sun";
-  if (label) label.textContent = theme === "light" ? "Dark Mode" : "Light Mode";
-  if (select) select.value = theme;
-
-  const meta = document.querySelector('meta[name="theme-color"]');
-  if (meta) meta.content = theme === "light" ? "#f4f7fb" : "#090d16";
-
-  if (save) {
-    try { localStorage.setItem("blobsignal-theme",theme); } catch(e) {}
-  }
-
-  updateChartTheme();
-}
-
-function updateChartTheme() {
-  if (!state.chart || !state.volumeChart) return;
-
-  const light = document.documentElement.dataset.theme === "light";
-  const opts = {
-    layout:{
-      background:{color:light ? "#ffffff" : "#101725"},
-      textColor:light ? "#69788e" : "#91a0b8"
-    },
-    grid:{
-      vertLines:{color:light ? "#edf1f7" : "#1c2839"},
-      horzLines:{color:light ? "#edf1f7" : "#1c2839"}
-    },
-    rightPriceScale:{borderColor:light ? "#dfe6f0" : "#29364a"},
-    timeScale:{borderColor:light ? "#dfe6f0" : "#29364a"}
-  };
-
-  state.chart.applyOptions(opts);
-  state.volumeChart.applyOptions(opts);
-}
-
-function setApiStatus(status,message) {
-  const cls = status === "ok" ? "ok" : status === "error" ? "error" : "loading";
-  $("sideApiDot").className = "dot "+cls;
-  $("topApiDot").className = "dot "+cls;
-  $("sideApiText").textContent = message;
-  $("topApiText").textContent =
-    status === "ok" ? "API Connected" :
-    status === "error" ? "API Error" : "Connecting";
-}
-
-function notice(id,message,type="info") {
-  const el = $(id);
-  if (!el) return;
-  if (!message) {
-    el.classList.add("hidden");
-    el.textContent = "";
-    return;
-  }
-  el.className = "notice "+(type === "error" ? "error" : "")+" mb";
-  el.textContent = message;
-  el.classList.remove("hidden");
-}
-
-async function apiFetch(path) {
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(),15000);
-
-  try {
-    const r = await fetch(API_BASE+path,{
-      headers:{Accept:"application/json"},
-      cache:"no-store",
-      signal:controller.signal
-    });
-
-    const raw = await r.text();
-    let data;
-
-    try {
-      data = raw ? JSON.parse(raw) : {};
-    } catch {
-      throw new Error("API returned non-JSON response (HTTP "+r.status+").");
-    }
-
-    if (!r.ok) {
-      throw new Error(first(data,["error","message","msg"]) || "HTTP "+r.status);
-    }
-
-    if (data && data.success === false) {
-      throw new Error(first(data,["error","message","msg"]) || "API request failed.");
-    }
-
-    return data;
-  } catch(e) {
-    if (e.name === "AbortError") {
-      throw new Error("Request timed out after 15 seconds.");
-    }
-    throw e;
-  } finally {
-    clearTimeout(timer);
-  }
-}
-
-function normalizeMarket(payload) {
-  let rows = Array.isArray(payload)
-    ? payload
-    : first(payload,["data","market","markets","contracts","result"]);
-
-  if (rows && !Array.isArray(rows) && typeof rows === "object") {
-    rows = first(rows,["data","list","rows","contracts"]);
-  }
-
-  return Array.isArray(rows)
-    ? rows.filter(x => x && typeof x === "object" && symbolOf(x))
-    : [];
-}
-
-function coinCell(x) {
-  const symbol = symbolOf(x);
-  const name = first(x,["name","baseCoin","base_currency"]) ||
-    symbol.replace(/[_-]?USDT$/,"");
-  const logo = first(x,["logo_url","logoUrl","icon"]);
-
-  return `<div class="coin-cell">
-    <div class="coin-icon">${
-      logo
-        ? `<img src="${esc(logo)}" alt="" loading="lazy" onerror="this.style.display='none'">`
-        : esc(String(name).slice(0,3))
-    }</div>
-    <div><div class="coin-name">${esc(symbol)}</div>
-    <div class="coin-sub">${esc(name)}</div></div>
-  </div>`;
-}
-
-function actions(symbol) {
-  return `<div class="toolbar" style="justify-content:flex-end;flex-wrap:nowrap">
-    <button type="button" class="btn" data-detail="${esc(symbol)}" title="Market detail"><i class="fa-solid fa-list"></i></button>
-    <button type="button" class="btn btn-primary" data-chart="${esc(symbol)}" title="Open chart"><i class="fa-solid fa-chart-line"></i></button>
-  </div>`;
-}
-
-function marketRow(x,mode="scanner") {
-  const c = changeOf(x);
-  const cls = c === null ? "muted" : c >= 0 ? "green" : "red";
-
-  const common = `<td>${coinCell(x)}</td>
-    <td>${fmtPrice(priceOf(x))}</td>
-    <td class="${cls}" style="font-weight:700">${fmtPercent(c)}</td>
-    <td>${fmtCompact(volumeOf(x))}</td>
-    <td>${fmtCompact(turnoverOf(x))}</td>`;
-
-  return mode === "overview"
-    ? `<tr>${common}<td>${actions(symbolOf(x))}</td></tr>`
-    : `<tr>${common}<td>${fmtRate(fundingOf(x))}</td>
-       <td>${fmtCompact(oiOf(x))}</td><td>${actions(symbolOf(x))}</td></tr>`;
-}
-
-function leaders(items,positive) {
-  const valid = items.filter(x => changeOf(x) !== null);
-  const sorted = [...valid].sort((a,b) =>
-    positive ? changeOf(b)-changeOf(a) : changeOf(a)-changeOf(b)
-  ).slice(0,5);
-
-  if (!sorted.length) {
-    return '<div class="empty">Price change data is unavailable.</div>';
-  }
-
-  return sorted.map(x => `
-    <div class="flex-between" style="padding:11px 0;border-bottom:1px solid var(--border);gap:10px">
-      <div>${coinCell(x)}</div>
-      <div style="text-align:right">
-        <div class="${positive ? "green" : "red"}" style="font-weight:750">${fmtPercent(changeOf(x))}</div>
-        <div class="panel-note">${fmtPrice(priceOf(x))}</div>
-      </div>
-      <button type="button" class="btn" data-detail="${esc(symbolOf(x))}"><i class="fa-solid fa-arrow-up-right-from-square"></i></button>
-    </div>`).join("");
-}
-
-function renderOverview() {
-  const rows = state.market;
-  $("statContracts").textContent = rows.length ? rows.length.toLocaleString() : "—";
-
-  if (!rows.length) {
-    ["statGainers","statLosers","statTurnover"].forEach(id => $(id).textContent="—");
-    $("overviewTable").innerHTML = `<tr><td colspan="6"><div class="empty">${esc(state.marketError || "No market data is available.")}</div></td></tr>`;
-    $("topGainers").innerHTML = `<div class="empty">${esc(state.marketError || "Data is not available yet.")}</div>`;
-    $("topLosers").innerHTML = `<div class="empty">${esc(state.marketError || "Data is not available yet.")}</div>`;
-    notice("overviewAlert",state.marketError ? "Market API error: "+state.marketError : "No valid market contracts were returned by the API.","error");
-    return;
-  }
-
-  notice("overviewAlert","");
-  const g = rows.filter(x => changeOf(x) !== null && changeOf(x) > 0);
-  const l = rows.filter(x => changeOf(x) !== null && changeOf(x) < 0);
-
-  $("statGainers").textContent = g.length.toLocaleString();
-  $("statLosers").textContent = l.length.toLocaleString();
-  $("statTurnover").textContent = fmtCompact(rows.reduce((s,x) => s+(num(turnoverOf(x)) || 0),0));
-  $("topGainers").innerHTML = leaders(g,true);
-  $("topLosers").innerHTML = leaders(l,false);
-  $("overviewTable").innerHTML = [...rows]
-    .sort((a,b) => (num(turnoverOf(b)) || 0)-(num(turnoverOf(a)) || 0))
-    .slice(0,10).map(x => marketRow(x,"overview")).join("");
-}
-
-function filteredMarket() {
-  const search = $("marketSearch").value.trim().toUpperCase();
-  const filter = $("changeFilter").value;
-  const sort = $("sortBy").value;
-  const dir = $("sortDirection").value === "asc" ? 1 : -1;
-
-  let arr = state.market.filter(x => {
-    const sym = symbolOf(x);
-    const name = String(first(x,["name","baseCoin"]) || "").toUpperCase();
-    const c = changeOf(x);
-
-    if (search && !sym.includes(search) && !name.includes(search)) return false;
-    if (filter === "gainers" && !(c !== null && c > 0)) return false;
-    if (filter === "losers" && !(c !== null && c < 0)) return false;
-    return true;
-  });
-
-  const get = {
-    turnover:x => num(turnoverOf(x)),
-    volume:x => num(volumeOf(x)),
-    price:x => num(priceOf(x)),
-    change:x => changeOf(x),
-    symbol:x => symbolOf(x).toLowerCase()
-  }[sort] || (x => num(turnoverOf(x)));
-
-  arr.sort((a,b) => {
-    const av = get(a), bv = get(b);
-    if (av == null) return 1;
-    if (bv == null) return -1;
-    return (typeof av === "string" ? av.localeCompare(bv) : av-bv)*dir;
-  });
-
-  return arr;
-}
-
-function renderScanner() {
-  const items = filteredMarket();
-  state.pageSize = Number($("pageSize").value) || 20;
-  const pages = Math.max(1,Math.ceil(items.length/state.pageSize));
-  state.page = Math.min(Math.max(1,state.page),pages);
-  const visible = items.slice((state.page-1)*state.pageSize,state.page*state.pageSize);
-
-  $("scannerCount").textContent = `${items.length} matching contracts · ${state.market.length} total`;
-  $("pageInfo").textContent = `Page ${state.page} of ${pages}`;
-  $("prevPage").disabled = state.page <= 1;
-  $("nextPage").disabled = state.page >= pages;
-  $("marketTable").innerHTML = visible.length
-    ? visible.map(x => marketRow(x)).join("")
-    : `<tr><td colspan="8"><div class="empty">${esc(state.marketError || "No matching contracts found.")}</div></td></tr>`;
-}
-
-function updatePairSelectors() {
-  const symbols = [...new Set(state.market.map(symbolOf).filter(Boolean))];
-
-  for (const [id,current] of [
-    ["chartPair",state.chartSymbol || state.settings.defaultPair],
-    ["detailPair",state.selectedSymbol],
-    ["defaultPair",state.settings.defaultPair]
-  ]) {
-    const el = $(id);
-    const opts = [...new Set([...symbols,current || "BTC_USDT"])].sort();
-    el.innerHTML = opts.map(s => `<option value="${esc(s)}">${esc(s)}</option>`).join("");
-    el.value = opts.includes(current) ? current : opts[0];
-  }
-}
-
-async function refreshMarket(manual=false) {
-  if (state.refreshBusy) return;
-  state.refreshBusy = true;
-  setApiStatus("loading","Loading market data");
-
-  try {
-    const payload = await apiFetch("/api/market?page=1&limit=500");
-    const rows = normalizeMarket(payload);
-    if (!rows.length) {
-      throw new Error("API returned no recognizable market contracts. Check /api/market response.");
-    }
-
-    state.market = rows;
-    state.marketError = "";
-    state.lastUpdated = new Date();
-    $("lastUpdated").textContent = "Last update: "+fmtDate(state.lastUpdated);
-    $("lastApiError").textContent = "None";
-    setApiStatus("ok",rows.length+" contracts");
-    updatePairSelectors();
-    renderOverview();
-    renderScanner();
-
-    if (manual) toast("Market data updated: "+rows.length+" contracts.");
-  } catch(e) {
-    state.marketError = e.message || "Unknown API error";
-    $("lastApiError").textContent = state.marketError;
-    setApiStatus("error",state.marketError);
-    renderOverview();
-    renderScanner();
-    if (manual) toast("Market API error: "+state.marketError);
-  } finally {
-    state.refreshBusy = false;
-  }
-}
-
-function switchView(name) {
-  const allowed = ["overview","chart","scanner","detail","settings"];
-  if (!allowed.includes(name)) return;
-
-  state.view = name;
-  document.querySelectorAll(".view").forEach(el => el.classList.add("hidden"));
-  $("view-"+name).classList.remove("hidden");
-
-  document.querySelectorAll(".nav-btn[data-view]").forEach(el => {
-    el.classList.toggle("active",el.dataset.view === name);
-  });
-
-  $("sidebar").classList.remove("open");
-
-  const labels = {
-    overview:"Overview",chart:"Live Chart",scanner:"Market Scanner",
-    detail:"Market Detail",settings:"Settings"
-  };
-
-  $("breadcrumb").textContent = labels[name];
-  $("headerPair").textContent = name === "chart"
-    ? (state.chartSymbol || state.settings.defaultPair)
-    : name === "detail" ? state.selectedSymbol : "Market intelligence";
-
-  if (name === "chart") {
-    requestAnimationFrame(() => {
-      resizeCharts();
-      loadChart();
-      requestAnimationFrame(resizeCharts);
-    });
-  }
-
-  if (name === "detail") loadDetail();
-  if (name === "scanner") renderScanner();
-  if (name === "overview") renderOverview();
-  if (name === "settings") {
-    $("themeSelect").value = state.settings.theme;
-  }
-}
-
-function chartOptions(el,height) {
-  const light = document.documentElement.dataset.theme === "light";
-  return {
-    width:Math.max(1,el.clientWidth),height:height || el.clientHeight || 180,
-    layout:{background:{color:light ? "#ffffff" : "#101725"},textColor:light ? "#69788e" : "#91a0b8"},
-    grid:{vertLines:{color:light ? "#edf1f7" : "#1c2839"},horzLines:{color:light ? "#edf1f7" : "#1c2839"}},
-    rightPriceScale:{borderColor:light ? "#dfe6f0" : "#29364a"},
-    timeScale:{borderColor:light ? "#dfe6f0" : "#29364a",timeVisible:true,secondsVisible:false},
-    handleScroll:true,handleScale:true
-  };
-}
-
-function initCharts() {
-  if (state.chart && state.volumeChart && state.candleSeries && state.volumeSeries && state.rsiChart && state.macdChart) return true;
-  if (!window.LightweightCharts) {
-    notice("chartAlert","The chart library failed to load. Check your CDN connection or browser.","error");
-    return false;
-  }
-  const ids = ["priceChart","volumeChart","rsiChart","macdChart"];
-  const els = ids.map($);
-  if (els.some(el => !el)) return false;
-  try {
-    state.chart = LightweightCharts.createChart(els[0],chartOptions(els[0],390));
-    state.candleSeries = state.chart.addCandlestickSeries({upColor:"#35b989",downColor:"#e65c72",borderUpColor:"#35b989",borderDownColor:"#e65c72",wickUpColor:"#35b989",wickDownColor:"#e65c72"});
-    state.ema20Series = state.chart.addLineSeries({color:"#e3a33b",lineWidth:2,title:"EMA 20",lastValueVisible:true,priceLineVisible:false});
-    state.ema50Series = state.chart.addLineSeries({color:"#8b6be8",lineWidth:2,title:"EMA 50",lastValueVisible:true,priceLineVisible:false});
-    state.supportSeries = state.chart.addLineSeries({color:"#22a879",lineWidth:1,lineStyle:2,title:"Support",lastValueVisible:true,priceLineVisible:false});
-    state.resistanceSeries = state.chart.addLineSeries({color:"#df5268",lineWidth:1,lineStyle:2,title:"Resistance",lastValueVisible:true,priceLineVisible:false});
-
-    state.volumeChart = LightweightCharts.createChart(els[1],chartOptions(els[1],120));
-    state.volumeSeries = state.volumeChart.addHistogramSeries({priceFormat:{type:"volume"},priceScaleId:"",lastValueVisible:false,priceLineVisible:false});
-    state.volumeChart.priceScale("").applyOptions({scaleMargins:{top:.1,bottom:0}});
-
-    state.rsiChart = LightweightCharts.createChart(els[2],chartOptions(els[2],170));
-    state.rsiSeries = state.rsiChart.addLineSeries({color:"#4b80ed",lineWidth:2,title:"RSI 14",lastValueVisible:true,priceLineVisible:false});
-    state.rsiSeries.createPriceLine({price:70,color:"#df5268",lineWidth:1,lineStyle:2,axisLabelVisible:true,title:"70"});
-    state.rsiSeries.createPriceLine({price:30,color:"#22a879",lineWidth:1,lineStyle:2,axisLabelVisible:true,title:"30"});
-    state.rsiChart.priceScale("right").applyOptions({autoScale:false,scaleMargins:{top:.08,bottom:.08}});
-
-    state.macdChart = LightweightCharts.createChart(els[3],chartOptions(els[3],170));
-    state.macdHistogramSeries = state.macdChart.addHistogramSeries({title:"Histogram",lastValueVisible:false,priceLineVisible:false});
-    state.macdLineSeries = state.macdChart.addLineSeries({color:"#4b80ed",lineWidth:2,title:"MACD",lastValueVisible:true,priceLineVisible:false});
-    state.macdSignalSeries = state.macdChart.addLineSeries({color:"#e3a33b",lineWidth:2,title:"Signal",lastValueVisible:true,priceLineVisible:false});
-
-    if (window.ResizeObserver) {
-      state.resizeObserver = new ResizeObserver(() => { if (state.view === "chart") resizeCharts(); });
-      els.forEach(el => state.resizeObserver.observe(el));
-    }
-    return true;
-  } catch(e) {
-    console.error("Chart initialization failed:",e);
-    notice("chartAlert","Chart initialization failed: "+e.message,"error");
-    state.chart = state.volumeChart = state.rsiChart = state.macdChart = null;
-    state.candleSeries = state.volumeSeries = state.rsiSeries = null;
-    return false;
-  }
-}
-
-function resizeCharts() {
-  if (state.view !== "chart") return;
-  [[state.chart,"priceChart"],[state.volumeChart,"volumeChart"],[state.rsiChart,"rsiChart"],[state.macdChart,"macdChart"]].forEach(([chart,id]) => {
-    const el = $(id);
-    if (!chart || !el || el.closest(".hidden")) return;
-    const width = Math.floor(el.getBoundingClientRect().width);
-    if (width > 0) chart.applyOptions({width});
-  });
-}
-
-function normalizeCandles(payload) {
-  function findRows(obj,depth=0) {
-    if (!obj || depth > 6) return [];
-
-    if (Array.isArray(obj)) {
-      if (!obj.length) return [];
-      if (Array.isArray(obj[0]) ||
-          (obj[0] && typeof obj[0] === "object")) return obj;
-      return [];
-    }
-
-    if (typeof obj !== "object") return [];
-
-    const keys = [
-      "candles","chartCandles","klines","kline",
-      "list","rows","records","items"
-    ];
-
-    for (const key of keys) {
-      if (Array.isArray(obj[key]) && obj[key].length) return obj[key];
-    }
-
-    for (const key of ["data","result","payload"]) {
-      if (obj[key] && typeof obj[key] === "object") {
-        const found = findRows(obj[key],depth+1);
-        if (found.length) return found;
-      }
-    }
-
+/* =========================================================
+   EXPONENTIAL MOVING AVERAGE
+   ========================================================= */
+
+function epEMA(values, period) {
+  if (!Array.isArray(values) || values.length < period) {
     return [];
   }
 
-  const rows = findRows(payload);
-  const candles = [];
+  const result = [];
+  const multiplier = 2 / (period + 1);
 
-  for (const c of rows) {
-    if (!c) continue;
+  let previous = epAverage(values.slice(0, period));
 
-    let t,o,h,l,cl,v;
+  result[period - 1] = previous;
 
-    if (Array.isArray(c)) {
-      [t,o,h,l,cl,v] = c;
+  for (let i = period; i < values.length; i++) {
+    previous =
+      values[i] * multiplier +
+      previous * (1 - multiplier);
+
+    result[i] = previous;
+  }
+
+  return result;
+}
+
+/* =========================================================
+   RELATIVE STRENGTH INDEX
+   ========================================================= */
+
+function epCalculateRSI(values, period = 14) {
+  if (values.length <= period) return NaN;
+
+  let gains = 0;
+  let losses = 0;
+
+  for (let i = 1; i <= period; i++) {
+    const change = values[i] - values[i - 1];
+
+    if (change > 0) {
+      gains += change;
     } else {
-      t = first(c,["time","timestamp","t","ts","openTime","startTime","start"]);
-      o = first(c,["open","o"]);
-      h = first(c,["high","h"]);
-      l = first(c,["low","l"]);
-      cl = first(c,["close","c"]);
-      v = first(c,["volume","vol","v","amount"]);
+      losses -= change;
     }
+  }
 
-    o = num(o); h = num(h); l = num(l); cl = num(cl); v = num(v) ?? 0;
-    if ([o,h,l,cl].some(x => x === null)) continue;
+  let averageGain = gains / period;
+  let averageLoss = losses / period;
 
-    if (typeof t === "string" && !/^\d+(\.\d+)?$/.test(t)) {
-      const parsed = Date.parse(t);
-      if (!Number.isFinite(parsed)) continue;
-      t = Math.floor(parsed/1000);
-    } else {
-      t = Number(t);
-      if (!Number.isFinite(t)) continue;
-      t = t > 1e12 ? Math.floor(t/1000) : Math.floor(t);
+  for (let i = period + 1; i < values.length; i++) {
+    const change = values[i] - values[i - 1];
+
+    const gain = Math.max(change, 0);
+    const loss = Math.max(-change, 0);
+
+    averageGain =
+      (averageGain * (period - 1) + gain) / period;
+
+    averageLoss =
+      (averageLoss * (period - 1) + loss) / period;
+  }
+
+  if (averageLoss === 0) {
+    return averageGain === 0 ? 50 : 100;
+  }
+
+  const relativeStrength = averageGain / averageLoss;
+
+  return 100 - 100 / (1 + relativeStrength);
+}
+
+/* =========================================================
+   MACD
+   ========================================================= */
+
+function epCalculateMACD(values) {
+  const config = ENTRY_PREDICTION_CONFIG;
+
+  const fastEMA = epEMA(values, config.macdFast);
+  const slowEMA = epEMA(values, config.macdSlow);
+
+  if (!fastEMA.length || !slowEMA.length) {
+    return {
+      macd: NaN,
+      signal: NaN,
+      histogram: NaN
+    };
+  }
+
+  const macdSeries = [];
+
+  for (let i = 0; i < values.length; i++) {
+    if (
+      Number.isFinite(fastEMA[i]) &&
+      Number.isFinite(slowEMA[i])
+    ) {
+      macdSeries[i] = fastEMA[i] - slowEMA[i];
     }
+  }
 
-    if (t <= 0) continue;
+  const validValues = macdSeries.filter(Number.isFinite);
 
-    candles.push({
-      time:t,open:o,high:h,low:l,close:cl,volume:v
+  const signalSeries = epEMA(
+    validValues,
+    config.macdSignal
+  );
+
+  const macd = macdSeries.at(-1);
+  const signal = signalSeries.at(-1);
+
+  return {
+    macd,
+    signal,
+    histogram: macd - signal
+  };
+}
+
+/* =========================================================
+   AVERAGE TRUE RANGE
+   ========================================================= */
+
+function epCalculateATR(candles, period = 14) {
+  if (candles.length < period + 1) return NaN;
+
+  const trueRanges = [];
+
+  for (let i = 1; i < candles.length; i++) {
+    const current = candles[i];
+    const previous = candles[i - 1];
+
+    const trueRange = Math.max(
+      current.high - current.low,
+      Math.abs(current.high - previous.close),
+      Math.abs(current.low - previous.close)
+    );
+
+    trueRanges.push(trueRange);
+  }
+
+  if (trueRanges.length < period) return NaN;
+
+  let atr = epAverage(trueRanges.slice(0, period));
+
+  for (let i = period; i < trueRanges.length; i++) {
+    atr =
+      (atr * (period - 1) + trueRanges[i]) / period;
+  }
+
+  return atr;
+}
+
+/* =========================================================
+   NORMALIZE CANDLE DATA
+   Expected fields:
+   time, open, high, low, close, volume
+   ========================================================= */
+
+function epNormalizeCandles(input) {
+  if (!Array.isArray(input)) return [];
+
+  return input
+    .map(candle => ({
+      time: candle.time ?? candle.timestamp,
+      open: Number(candle.open),
+      high: Number(candle.high),
+      low: Number(candle.low),
+      close: Number(candle.close),
+      volume: Number(candle.volume ?? 0)
+    }))
+    .filter(candle =>
+      Number.isFinite(candle.open) &&
+      Number.isFinite(candle.high) &&
+      Number.isFinite(candle.low) &&
+      Number.isFinite(candle.close) &&
+      candle.close > 0 &&
+      candle.high >= candle.low
+    )
+    .sort((a, b) => {
+      const timeA = Number(a.time);
+      const timeB = Number(b.time);
+
+      if (
+        Number.isFinite(timeA) &&
+        Number.isFinite(timeB)
+      ) {
+        return timeA - timeB;
+      }
+
+      return 0;
     });
+}
+
+/* =========================================================
+   SUPPORT AND RESISTANCE
+   Uses recent candle highs and lows.
+   ========================================================= */
+
+function epCalculateSupportResistance(candles) {
+  const lookback =
+    ENTRY_PREDICTION_CONFIG.supportResistanceLookback;
+
+  const recent = candles.slice(-lookback);
+
+  return {
+    support: Math.min(...recent.map(candle => candle.low)),
+    resistance: Math.max(...recent.map(candle => candle.high))
+  };
+}
+
+/* =========================================================
+   LONG / SHORT ENTRY PREDICTION ENGINE
+   ========================================================= */
+
+function calculateEntryPrediction(inputCandles) {
+  const config = ENTRY_PREDICTION_CONFIG;
+  const candles = epNormalizeCandles(inputCandles);
+
+  if (candles.length < config.minimumCandles) {
+    return {
+      valid: false,
+      status: "INSUFFICIENT DATA",
+      message:
+        `At least ${config.minimumCandles} valid candles are required. ` +
+        `Received ${candles.length}.`
+    };
   }
 
-  candles.sort((a,b) => a.time-b.time);
+  const closes = candles.map(candle => candle.close);
+  const current = candles[candles.length - 1];
 
-  const unique = [];
-  for (const candle of candles) {
-    if (!unique.length || candle.time > unique[unique.length-1].time) {
-      unique.push(candle);
+  const ema20Series = epEMA(closes, config.emaFast);
+  const ema50Series = epEMA(closes, config.emaSlow);
+
+  const ema20 = ema20Series.at(-1);
+  const ema50 = ema50Series.at(-1);
+  const previousEMA20 = ema20Series.at(-2);
+
+  const rsi = epCalculateRSI(
+    closes,
+    config.rsiPeriod
+  );
+
+  const macd = epCalculateMACD(closes);
+
+  const atr = epCalculateATR(
+    candles,
+    config.atrPeriod
+  );
+
+  const levels = epCalculateSupportResistance(candles);
+
+  const requiredValues = [
+    ema20,
+    ema50,
+    previousEMA20,
+    rsi,
+    macd.macd,
+    macd.signal,
+    macd.histogram,
+    atr
+  ];
+
+  if (
+    !requiredValues.every(Number.isFinite) ||
+    atr <= 0
+  ) {
+    return {
+      valid: false,
+      status: "INDICATOR ERROR",
+      message: "Technical indicators could not be calculated."
+    };
+  }
+
+  const previousCandles = candles.slice(-21, -1);
+
+  const averageVolume = epAverage(
+    previousCandles.map(candle => candle.volume)
+  );
+
+  const volumeRatio =
+    averageVolume > 0
+      ? current.volume / averageVolume
+      : NaN;
+
+  let longScore = 0;
+  let shortScore = 0;
+
+  const reasons = [];
+
+  /* 1. EMA trend */
+
+  if (ema20 > ema50) {
+    longScore += 2;
+    reasons.push("EMA 20 is above EMA 50");
+  } else if (ema20 < ema50) {
+    shortScore += 2;
+    reasons.push("EMA 20 is below EMA 50");
+  }
+
+  if (ema20 > previousEMA20) {
+    longScore += 1;
+  } else if (ema20 < previousEMA20) {
+    shortScore += 1;
+  }
+
+  if (current.close > ema20) {
+    longScore += 1;
+  } else if (current.close < ema20) {
+    shortScore += 1;
+  }
+
+  /* 2. RSI momentum */
+
+  if (
+    rsi >= 50 &&
+    rsi < config.rsiOverbought
+  ) {
+    longScore += 1;
+    reasons.push("RSI supports bullish momentum");
+  } else if (
+    rsi < 50 &&
+    rsi > config.rsiOversold
+  ) {
+    shortScore += 1;
+    reasons.push("RSI supports bearish momentum");
+  }
+
+  /* 3. MACD confirmation */
+
+  if (
+    macd.histogram > 0 &&
+    macd.macd > macd.signal
+  ) {
+    longScore += 2;
+    reasons.push("MACD momentum is bullish");
+  } else if (
+    macd.histogram < 0 &&
+    macd.macd < macd.signal
+  ) {
+    shortScore += 2;
+    reasons.push("MACD momentum is bearish");
+  }
+
+  /* 4. Volume confirmation */
+
+  if (
+    Number.isFinite(volumeRatio) &&
+    volumeRatio >= 1.2
+  ) {
+    if (current.close > current.open) {
+      longScore += 1;
+      reasons.push("Bullish candle has elevated volume");
+    } else if (current.close < current.open) {
+      shortScore += 1;
+      reasons.push("Bearish candle has elevated volume");
     }
   }
 
-  return unique;
-}
+  /* 5. Support / resistance context */
 
-function emaValues(values,period) {
-  const out = Array(values.length).fill(null);
-  if (values.length < period) return out;
-  const k = 2/(period+1);
-  let prev = values.slice(0,period).reduce((a,b)=>a+b,0)/period;
-  out[period-1] = prev;
-  for (let i=period;i<values.length;i++) { prev = values[i]*k+prev*(1-k); out[i]=prev; }
-  return out;
-}
+  const distanceFromSupport =
+    current.close - levels.support;
 
-function computeTechnicals(candles) {
-  const closes = candles.map(c=>c.close), ema20=emaValues(closes,20), ema50=emaValues(closes,50);
-  const rsi=Array(closes.length).fill(null), macd=Array(closes.length).fill(null), signal=Array(closes.length).fill(null), hist=Array(closes.length).fill(null);
-  if (closes.length > 14) {
-    let gains=0,losses=0;
-    for(let i=1;i<=14;i++){const d=closes[i]-closes[i-1];if(d>=0)gains+=d;else losses-=d;}
-    let avgGain=gains/14,avgLoss=losses/14;
-    rsi[14]=avgLoss===0?100:100-(100/(1+avgGain/avgLoss));
-    for(let i=15;i<closes.length;i++){const d=closes[i]-closes[i-1];avgGain=(avgGain*13+Math.max(0,d))/14;avgLoss=(avgLoss*13+Math.max(0,-d))/14;rsi[i]=avgLoss===0?100:100-(100/(1+avgGain/avgLoss));}
+  const distanceFromResistance =
+    levels.resistance - current.close;
+
+  if (
+    distanceFromSupport >= 0 &&
+    distanceFromSupport <= atr * 0.5 &&
+    rsi < 65
+  ) {
+    longScore += 1;
+    reasons.push("Price is near recent support");
   }
-  const e12=emaValues(closes,12),e26=emaValues(closes,26);
-  for(let i=0;i<closes.length;i++) if(e12[i]!==null&&e26[i]!==null) macd[i]=e12[i]-e26[i];
-  const validMacd=macd.map((v,i)=>v===null?null:{i,v}).filter(Boolean);
-  if(validMacd.length>=9){const sigVals=emaValues(validMacd.map(x=>x.v),9);validMacd.forEach((x,j)=>{signal[x.i]=sigVals[j];if(sigVals[j]!==null)hist[x.i]=x.v-sigVals[j];});}
-  const lows=candles.slice(-20).map(c=>c.low), highs=candles.slice(-20).map(c=>c.high);
-  return {ema20,ema50,rsi,macd,signal,hist,support:lows.length?Math.min(...lows):null,resistance:highs.length?Math.max(...highs):null};
-}
 
-function lineData(candles,values){return candles.map((c,i)=>({time:c.time,value:values[i]})).filter(x=>Number.isFinite(x.value));}
-
-function renderComputedTechnicals(candles) {
-  const t=computeTechnicals(candles), last=candles.length-1, close=candles[last]?.close;
-  state.ema20Series.setData(lineData(candles,t.ema20));
-  state.ema50Series.setData(lineData(candles,t.ema50));
-  state.supportSeries.setData(t.support===null?[]:candles.map(c=>({time:c.time,value:t.support})));
-  state.resistanceSeries.setData(t.resistance===null?[]:candles.map(c=>({time:c.time,value:t.resistance})));
-  state.rsiSeries.setData(lineData(candles,t.rsi));
-  state.macdLineSeries.setData(lineData(candles,t.macd));
-  state.macdSignalSeries.setData(lineData(candles,t.signal));
-  state.macdHistogramSeries.setData(candles.map((c,i)=>({time:c.time,value:t.hist[i]})).filter(x=>Number.isFinite(x.value)).map(x=>({...x,color:x.value>=0?"#35b98999":"#e65c7299"})));
-  const r=t.rsi[last], m=t.macd[last], ms=t.signal[last], e20=t.ema20[last], e50=t.ema50[last];
-  $("indicatorRSI").textContent=r===null||r===undefined?"—":r.toFixed(2);
-  $("indicatorRSINote").textContent=r==null?"Insufficient candle history":r>=70?"Overbought zone (≥ 70)":r<=30?"Oversold zone (≤ 30)":"Within the 30–70 range";
-  $("indicatorMACD").textContent=m==null?"—":fmtPrice(m);
-  $("indicatorMACDNote").textContent=m==null?"Insufficient candle history":`Signal: ${ms==null?"—":fmtPrice(ms)} · Histogram: ${t.hist[last]==null?"—":fmtPrice(t.hist[last])}`;
-  $("indicatorMA").textContent=e20==null||e50==null?"—":`EMA20 ${fmtPrice(e20)} / EMA50 ${fmtPrice(e50)}`;
-  $("indicatorMANote").textContent=e20==null||e50==null?"Need at least 50 candles":close>e20&&e20>e50?"Price above bullish EMA alignment":close<e20&&e20<e50?"Price below bearish EMA alignment":"Mixed moving-average structure";
-  $("indicatorSupport").textContent=fmtPrice(t.support);
-  $("indicatorResistance").textContent=fmtPrice(t.resistance);
-  const status=e20==null||e50==null||r==null?"Insufficient data":close>e20&&e20>e50&&r<70?"Bullish bias":close<e20&&e20<e50&&r>30?"Bearish bias":"Neutral / mixed";
-  $("indicatorStatus").textContent=status;
-  $("detailRSI").textContent=r==null?"—":r.toFixed(2);
-  $("detailMACD").textContent=m==null?"—":fmtPrice(m);
-  $("detailMA").textContent=e20==null||e50==null?"—":`EMA20 ${fmtPrice(e20)} / EMA50 ${fmtPrice(e50)}`;
-  $("detailSupport").textContent=fmtPrice(t.support);
-  $("detailResistance").textContent=fmtPrice(t.resistance);
-  $("ema20Legend") && ($("ema20Legend").textContent=fmtPrice(e20));
-  $("ema50Legend") && ($("ema50Legend").textContent=fmtPrice(e50));
-  $("showEMA20").dispatchEvent(new Event("change",{bubbles:false}));
-  $("showEMA50").dispatchEvent(new Event("change",{bubbles:false}));
-  $("showSupportResistance").dispatchEvent(new Event("change",{bubbles:false}));
-  $("rsiPane").classList.toggle("hidden",!$("showRSI").checked);
-  $("macdPane").classList.toggle("hidden",!$("showMACD").checked);
-  return t;
-}
-
-function bindIndicatorControls() {
-  ["showEMA20","showEMA50","showSupportResistance"].forEach(id=>$(id).addEventListener("change",()=>{
-    if(!state.chart)return;
-    const vis=id==="showEMA20"?$(id).checked:id==="showEMA50"?$(id).checked:$(id).checked;
-    if(id==="showEMA20")state.ema20Series.applyOptions({visible:vis});
-    if(id==="showEMA50")state.ema50Series.applyOptions({visible:vis});
-    if(id==="showSupportResistance"){state.supportSeries.applyOptions({visible:vis});state.resistanceSeries.applyOptions({visible:vis});}
-  }));
-  ["showRSI","showMACD"].forEach(id=>$(id).addEventListener("change",()=>{
-    $(id==="showRSI"?"rsiPane":"macdPane").classList.toggle("hidden",!$(id).checked);
-    requestAnimationFrame(resizeCharts);
-  }));
-}
-
-function analysisOf(payload) {
-  return first(payload,["analysis","technicals","indicators","technicalAnalysis"]) || {};
-}
-
-function indicator(a,keys) {
-  for (const k of keys) {
-    let v = a && a[k];
-    if (v === undefined || v === null || v === "") continue;
-    if (typeof v === "object") {
-      v = first(v,["value","current","latest","result"]);
-      if (v === null) continue;
-    }
-    return v;
+  if (
+    distanceFromResistance >= 0 &&
+    distanceFromResistance <= atr * 0.5 &&
+    rsi > 35
+  ) {
+    shortScore += 1;
+    reasons.push("Price is near recent resistance");
   }
-  return null;
-}
 
-function indicatorText(v) {
-  if (v === null) return "—";
-  if (typeof v === "object") return JSON.stringify(v);
-  return fmtPrice(v);
-}
+  /* 6. Determine directional bias */
 
-function renderAnalysis(a) {
-  const rsi = indicator(a,["rsi","RSI","rsi14"]);
-  const macd = indicator(a,["macd","MACD"]);
-  const ma = indicator(a,["ma","movingAverage","moving_average","ema","EMA"]);
-  const support = indicator(a,["support","supportLevel","support_level"]);
-  const resistance = indicator(a,["resistance","resistanceLevel","resistance_level"]);
-  const signal = indicator(a,["signal","trend","bias","recommendation","summary"]);
+  const rsiExtreme =
+    rsi >= config.rsiOverbought ||
+    rsi <= config.rsiOversold;
 
-  $("indicatorRSI").textContent = indicatorText(rsi);
-  $("indicatorRSINote").textContent = rsi === null
-    ? "Value not returned by the API"
-    : (num(rsi) >= 70 ? "Conventional overbought zone" :
-       num(rsi) <= 30 ? "Conventional oversold zone" : "Value provided by the backend");
+  let direction = "WAIT";
+  let status = "NO CLEAR SETUP";
 
-  $("indicatorMACD").textContent = indicatorText(macd);
-  $("indicatorMACDNote").textContent = macd === null ? "Value not returned by the API" : "Value provided by the backend";
-  $("indicatorMA").textContent = indicatorText(ma);
-  $("indicatorMANote").textContent = ma === null ? "Value not returned by the API" : "Value provided by the backend";
-  $("indicatorSupport").textContent = indicatorText(support);
-  $("indicatorResistance").textContent = indicatorText(resistance);
-  $("indicatorStatus").textContent = signal === null ? "Unavailable" :
-    typeof signal === "object" ? JSON.stringify(signal) : String(signal);
-
-  $("detailRSI").textContent = indicatorText(rsi);
-  $("detailMACD").textContent = indicatorText(macd);
-  $("detailMA").textContent = indicatorText(ma);
-  $("detailSupport").textContent = indicatorText(support);
-  $("detailResistance").textContent = indicatorText(resistance);
-}
-
-async function loadChart() {
-  const symbol = $("chartPair").value || state.settings.defaultPair;
-  const interval = $("chartInterval").value || state.settings.defaultInterval;
-  const id = ++state.chartRequest;
-
-  state.chartSymbol = symbol;
-  state.chartInterval = interval;
-  state.selectedSymbol = symbol;
-  $("chartHeading").textContent = symbol+" · "+interval.toUpperCase();
-  $("chartStatus").innerHTML = '<span class="dot loading"></span> Loading';
-  $("chartCandleInfo").textContent = "Requesting technical data...";
-  $("chartLastPrice").textContent = "Last close: —";
-  notice("chartAlert","");
-
-  if (!initCharts()) return;
-
-  try {
-    const p = await apiFetch("/api/technicals?"+new URLSearchParams({
-      symbol,interval,limit:"250"
-    }));
-
-    if (id !== state.chartRequest) return;
-
-    const candles = normalizeCandles(p);
-
-    console.log("[BlobSignal] Technical response:",p);
-    console.log("[BlobSignal] Normalized candle count:",candles.length);
-
-    if (!candles.length) {
-      console.error("[BlobSignal] No candles recognized. Response:",p);
-      throw new Error("The API request succeeded, but no candles were recognized. Check the JSON structure in the console.");
-    }
-
-    state.candleSeries.setData(candles.map(c => ({
-      time:c.time,
-      open:c.open,
-      high:c.high,
-      low:c.low,
-      close:c.close
-    })));
-
-    state.volumeSeries.setData(candles.map(c => ({
-      time:c.time,
-      value:c.volume,
-      color:c.close >= c.open ? "#35b98988" : "#e65c7288"
-    })));
-    renderComputedTechnicals(candles);
-
-    resizeCharts();
-    state.chart.timeScale().fitContent();
-    state.volumeChart.timeScale().fitContent();
-    state.rsiChart.timeScale().fitContent();
-    state.macdChart.timeScale().fitContent();
-
-    const last = candles[candles.length-1];
-    $("chartLastPrice").textContent = "Last close: "+fmtPrice(last.close);
-    $("chartCandleInfo").textContent =
-      `${candles.length} candles · Last: ${fmtDate(last.time*1000)} · `+
-      `O ${fmtPrice(last.open)} / H ${fmtPrice(last.high)} / `+
-      `L ${fmtPrice(last.low)} / C ${fmtPrice(last.close)}`;
-
-    $("chartStatus").innerHTML = '<span class="dot ok"></span> Data loaded';
-    notice("chartAlert","");
-    $("headerPair").textContent = symbol;
-  } catch(e) {
-    if (id !== state.chartRequest) return;
-
-    console.error("[BlobSignal] Chart error:",e);
-    $("chartStatus").innerHTML = '<span class="dot error"></span> Error';
-    $("chartCandleInfo").textContent = "Chart data unavailable.";
-    notice("chartAlert","Technical API error: "+e.message,"error");
-    $("indicatorStatus").textContent = "Unavailable";
+  if (
+    longScore >= config.minimumScore &&
+    longScore - shortScore >= config.minimumScoreDifference &&
+    !rsiExtreme
+  ) {
+    direction = "LONG";
+    status = "LONG SETUP";
+  } else if (
+    shortScore >= config.minimumScore &&
+    shortScore - longScore >= config.minimumScoreDifference &&
+    !rsiExtreme
+  ) {
+    direction = "SHORT";
+    status = "SHORT SETUP";
+  } else if (rsiExtreme) {
+    status = "EXTREME RSI — WAIT";
+    reasons.push("RSI is extreme; avoid chasing price");
+  } else {
+    reasons.push("Indicator confirmation is mixed");
   }
-}
 
-async function loadDetail() {
-  const symbol = $("detailPair").value || state.selectedSymbol || "BTC_USDT";
-  const id = ++state.detailRequest;
+  /*
+    This score is a heuristic.
+    It is NOT a measured win probability.
+  */
 
-  state.selectedSymbol = symbol;
-  $("detailSymbol").textContent = symbol;
-  $("detailName").textContent = "Loading contract data...";
-  $("detailTickerStatus").textContent = "Loading";
-  notice("detailAlert","");
+  const winningScore =
+    direction === "LONG"
+      ? longScore
+      : direction === "SHORT"
+        ? shortScore
+        : Math.max(longScore, shortScore);
 
-  const local = state.market.find(x => symbolOf(x) === symbol);
-  if (local) renderDetail(local);
+  const scoreDifference =
+    Math.abs(longScore - shortScore);
 
-  try {
-    const p = await apiFetch("/api/ticker?symbol="+encodeURIComponent(symbol));
-    if (id !== state.detailRequest) return;
+  const confidence = epClamp(
+    Math.round(
+      (winningScore / 10) * 70 +
+      (scoreDifference / 10) * 30
+    ),
+    0,
+    95
+  );
 
-    const ticker = first(p,["data","ticker","result"]) || p;
-    if (ticker && typeof ticker === "object") {
-      renderDetail({...local,...ticker});
+  /* 7. Calculate stop loss and targets */
+
+  let stopLoss = null;
+  let takeProfits = [];
+  let riskReward = null;
+
+  if (direction === "LONG") {
+    const atrStop =
+      current.close - atr * config.stopAtrMultiplier;
+
+    const validSupport =
+      levels.support < current.close &&
+      current.close - levels.support <=
+        atr * config.maximumSupportStopDistanceAtr;
+
+    const supportStop = validSupport
+      ? levels.support - atr * config.supportStopBufferAtr
+      : atrStop;
+
+    stopLoss = Math.min(atrStop, supportStop);
+
+    const risk = current.close - stopLoss;
+
+    if (risk > 0) {
+      takeProfits =
+        config.takeProfitRiskMultiples.map(
+          multiple => current.close + risk * multiple
+        );
+
+      riskReward =
+        Math.abs(takeProfits[0] - current.close) / risk;
     }
-
-    $("detailTickerStatus").textContent = "Loaded";
-    $("detailUpdated").textContent = fmtDate(new Date());
-  } catch(e) {
-    if (id !== state.detailRequest) return;
-    $("detailTickerStatus").textContent = "Error";
-    $("detailUpdated").textContent = fmtDate(new Date());
-    notice("detailAlert","Ticker API error: "+e.message+
-      (local ? " Showing fields available in market list." : ""),"error");
   }
-}
 
-function renderDetail(x) {
-  $("detailSymbol").textContent = symbolOf(x) || state.selectedSymbol;
-  $("detailName").textContent = first(x,["name","description"]) || "Perpetual contract";
-  $("detailPrice").textContent = fmtPrice(priceOf(x));
+  if (direction === "SHORT") {
+    const atrStop =
+      current.close + atr * config.stopAtrMultiplier;
 
-  const c = changeOf(x);
-  $("detailChange").textContent = fmtPercent(c);
-  $("detailChange").className = "small "+(c === null ? "muted" : c >= 0 ? "green" : "red");
+    const validResistance =
+      levels.resistance > current.close &&
+      levels.resistance - current.close <=
+        atr * config.maximumSupportStopDistanceAtr;
 
-  $("detailVolume").textContent = fmtCompact(volumeOf(x));
-  $("detailTurnover").textContent = fmtCompact(turnoverOf(x));
-  $("detailFunding").textContent = fmtRate(fundingOf(x));
-  $("detailOI").textContent = fmtCompact(oiOf(x));
-  $("detailHigh").textContent = fmtPrice(first(x,["high_24h","high24Price","high24","highPrice","high"]));
-  $("detailLow").textContent = fmtPrice(first(x,["low_24h","lower24Price","low24","lowPrice","low"]));
-  $("detailIndex").textContent = fmtPrice(first(x,["index_price","indexPrice"]));
-  $("detailMark").textContent = fmtPrice(first(x,["mark_price","fair_price","fairPrice","markPrice"]));
-}
+    const resistanceStop = validResistance
+      ? levels.resistance +
+        atr * config.supportStopBufferAtr
+      : atrStop;
 
-async function loadDetailTechnical() {
-  const symbol = $("detailPair").value || state.selectedSymbol;
-  $("detailTechnicalStatus").textContent = "Loading";
+    stopLoss = Math.max(atrStop, resistanceStop);
 
-  try {
-    const p = await apiFetch("/api/technicals?"+new URLSearchParams({
-      symbol,interval:$("chartInterval").value || state.settings.defaultInterval,limit:"250"
-    }));
+    const risk = stopLoss - current.close;
 
-    renderAnalysis(analysisOf(p));
-    $("detailTechnicalStatus").textContent = "Loaded";
-    toast("Technical snapshot loaded.");
-  } catch(e) {
-    $("detailTechnicalStatus").textContent = "Error";
-    notice("detailAlert","Technical API error: "+e.message,"error");
+    if (risk > 0) {
+      takeProfits =
+        config.takeProfitRiskMultiples.map(
+          multiple => current.close - risk * multiple
+        );
+
+      riskReward =
+        Math.abs(current.close - takeProfits[0]) / risk;
+    }
   }
+
+  return {
+    valid: true,
+    direction,
+    status,
+    confidence,
+
+    entry: current.close,
+    stopLoss,
+    takeProfits,
+    riskReward,
+
+    atr,
+    rsi,
+    ema20,
+    ema50,
+
+    macd: macd.macd,
+    macdSignal: macd.signal,
+    macdHistogram: macd.histogram,
+
+    volumeRatio,
+
+    support: levels.support,
+    resistance: levels.resistance,
+
+    longScore,
+    shortScore,
+    reasons,
+
+    candleCount: candles.length,
+    lastCandleTime: current.time
+  };
 }
 
-function applySettingsUI() {
-  $("autoRefresh").checked = state.settings.autoRefresh;
-  $("refreshInterval").value = String(state.settings.refreshInterval);
-  $("defaultInterval").value = state.settings.defaultInterval;
-  $("originText").textContent = API_BASE;
+/* =========================================================
+   RENDER PREDICTION INTO THE DASHBOARD
+   ========================================================= */
 
-  updatePairSelectors();
+function renderEntryPrediction(inputCandles) {
+  const result = calculateEntryPrediction(inputCandles);
 
-  $("defaultPair").value = state.settings.defaultPair;
-  $("chartInterval").value = state.settings.defaultInterval;
-  $("chartPair").value = state.settings.defaultPair;
-  $("detailPair").value = state.settings.defaultPair;
-  $("themeSelect").value = state.settings.theme;
+  const statusElement = epElement("epStatus");
+  const directionElement = epElement("epDirection");
+  const confidenceBar = epElement("epConfidenceBar");
 
-  applyTheme(state.settings.theme,false);
-}
+  if (!result.valid) {
+    if (statusElement) {
+      statusElement.textContent = result.status;
+      statusElement.className = "ep-status wait";
+    }
 
-function startRefreshTimer() {
-  clearInterval(state.refreshTimer);
-  state.refreshTimer = null;
+    if (directionElement) {
+      directionElement.textContent =
+        "WAIT — NO CONFIRMED ENTRY";
 
-  if (state.settings.autoRefresh) {
-    state.refreshTimer = setInterval(() => {
-      if (document.visibilityState === "visible") refreshMarket(false);
-    },state.settings.refreshInterval*1000);
+      directionElement.className = "ep-direction wait";
+    }
+
+    epSetText("epEntry", "—");
+    epSetText("epSL", "—");
+    epSetText("epTP1", "—");
+    epSetText("epTP2", "—");
+    epSetText("epTP3", "—");
+    epSetText("epRR", "—");
+    epSetText("epConfidence", "—");
+    epSetText("epSummary", result.message);
+
+    [
+      "epEMA",
+      "epRSI",
+      "epMACD",
+      "epVolume",
+      "epSupport",
+      "epResistance"
+    ].forEach(id => epSetText(id, "—"));
+
+    if (confidenceBar) {
+      confidenceBar.style.width = "0%";
+    }
+
+    return result;
   }
+
+  const directionClass =
+    result.direction === "LONG"
+      ? "long"
+      : result.direction === "SHORT"
+        ? "short"
+        : "wait";
+
+  if (statusElement) {
+    statusElement.textContent = result.status;
+    statusElement.className =
+      "ep-status " + directionClass;
+  }
+
+  if (directionElement) {
+    directionElement.textContent =
+      result.direction === "WAIT"
+        ? "WAIT — NO CONFIRMED ENTRY"
+        : result.direction + " SETUP";
+
+    directionElement.className =
+      "ep-direction " + directionClass;
+  }
+
+  epSetText("epEntry", epFormatPrice(result.entry));
+
+  epSetText(
+    "epSL",
+    result.stopLoss == null
+      ? "—"
+      : epFormatPrice(result.stopLoss)
+  );
+
+  epSetText(
+    "epTP1",
+    result.takeProfits[0] == null
+      ? "—"
+      : epFormatPrice(result.takeProfits[0])
+  );
+
+  epSetText(
+    "epTP2",
+    result.takeProfits[1] == null
+      ? "—"
+      : epFormatPrice(result.takeProfits[1])
+  );
+
+  epSetText(
+    "epTP3",
+    result.takeProfits[2] == null
+      ? "—"
+      : epFormatPrice(result.takeProfits[2])
+  );
+
+  epSetText(
+    "epRR",
+    result.riskReward == null
+      ? "—"
+      : "1:" + result.riskReward.toFixed(2)
+  );
+
+  epSetText(
+    "epConfidence",
+    result.confidence + "% heuristic score"
+  );
+
+  epSetText(
+    "epSummary",
+    [
+      `Long score: ${result.longScore}/10.`,
+      `Short score: ${result.shortScore}/10.`,
+      ...result.reasons
+    ].join(" ")
+  );
+
+  epSetText(
+    "epEMA",
+    result.ema20 > result.ema50
+      ? "Bullish · EMA20 > EMA50"
+      : result.ema20 < result.ema50
+        ? "Bearish · EMA20 < EMA50"
+        : "Neutral"
+  );
+
+  epSetText("epRSI", result.rsi.toFixed(2));
+
+  epSetText(
+    "epMACD",
+    result.macdHistogram > 0
+      ? "Bullish histogram"
+      : result.macdHistogram < 0
+        ? "Bearish histogram"
+        : "Neutral"
+  );
+
+  epSetText(
+    "epVolume",
+    Number.isFinite(result.volumeRatio)
+      ? result.volumeRatio.toFixed(2) + "x average"
+      : "Unavailable"
+  );
+
+  epSetText("epSupport", epFormatPrice(result.support));
+  epSetText("epResistance", epFormatPrice(result.resistance));
+
+  if (confidenceBar) {
+    confidenceBar.style.width =
+      result.confidence + "%";
+
+    confidenceBar.style.background =
+      result.direction === "LONG"
+        ? "var(--green, #0b9b70)"
+        : result.direction === "SHORT"
+          ? "var(--red, #dc4058)"
+          : "var(--blue, #4169e1)";
+  }
+
+  return result;
 }
 
-function saveSettings() {
-  state.settings.autoRefresh = $("autoRefresh").checked;
-  state.settings.refreshInterval = Number($("refreshInterval").value) || 30;
-  state.settings.defaultInterval = $("defaultInterval").value || "1h";
-  state.settings.defaultPair = $("defaultPair").value || "BTC_USDT";
-  state.selectedSymbol = state.settings.defaultPair;
-  state.chartSymbol = state.settings.defaultPair;
+/* =========================================================
+   CONNECT TO THE EXISTING LIVE CHART
+   ========================================================= */
 
-  $("chartPair").value = state.settings.defaultPair;
-  $("chartInterval").value = state.settings.defaultInterval;
-  $("detailPair").value = state.settings.defaultPair;
+/*
+  In your existing loadChart() function, locate the line:
 
-  applyTheme($("themeSelect").value || "light",true);
-  startRefreshTimer();
+      renderComputedTechnicals(candles);
 
-  try {
-    localStorage.setItem("blobsignal-settings",JSON.stringify(state.settings));
-  } catch(e) {}
+  Immediately after it, add:
 
-  toast("Settings saved.");
-}
+      renderEntryPrediction(candles);
 
-function resetSettings() {
-  state.settings = {...DEFAULTS};
-  applySettingsUI();
-  startRefreshTimer();
-  toast("Settings reset to defaults.");
-}
+  The `candles` array must contain:
+      time, open, high, low, close, volume
 
-function bindEvents() {
-  bindIndicatorControls();
-  $("navigation").addEventListener("click",e => {
-    const target = e.target instanceof Element
-      ? e.target.closest("[data-view]")
-      : null;
+  Example:
 
-    if (!target || !$("navigation").contains(target)) return;
-    e.preventDefault();
-    switchView(target.dataset.view);
-  });
+      renderComputedTechnicals(candles);
+      renderEntryPrediction(candles);
 
-  document.addEventListener("click",e => {
-    const target = e.target instanceof Element ? e.target : null;
-    if (!target) return;
-
-    const go = target.closest("[data-goto]");
-    if (go) switchView(go.dataset.goto);
-
-    const d = target.closest("[data-detail]");
-    if (d) {
-      state.selectedSymbol = d.dataset.detail;
-      $("detailPair").value = d.dataset.detail;
-      switchView("detail");
-    }
-
-    const c = target.closest("[data-chart]");
-    if (c) {
-      state.chartSymbol = c.dataset.chart;
-      state.selectedSymbol = c.dataset.chart;
-      updatePairSelectors();
-      $("chartPair").value = c.dataset.chart;
-      switchView("chart");
-    }
-  });
-
-  $("mobileMenu").addEventListener("click",() => $("sidebar").classList.toggle("open"));
-
-  $("globalRefresh").addEventListener("click",() => refreshMarket(true));
-  $("sideRefresh").addEventListener("click",() => refreshMarket(true));
-  $("scannerRefresh").addEventListener("click",() => refreshMarket(true));
-  $("chartRefresh").addEventListener("click",loadChart);
-  $("detailRefresh").addEventListener("click",loadDetail);
-  $("detailLoadTechnical").addEventListener("click",loadDetailTechnical);
-
-  $("chartPair").addEventListener("change",loadChart);
-  $("chartInterval").addEventListener("change",loadChart);
-
-  $("detailPair").addEventListener("change",() => {
-    state.selectedSymbol = $("detailPair").value;
-    loadDetail();
-  });
-
-  $("detailOpenChart").addEventListener("click",() => {
-    state.chartSymbol = $("detailPair").value || state.selectedSymbol;
-    $("chartPair").value = state.chartSymbol;
-    switchView("chart");
-  });
-
-  ["marketSearch","changeFilter","sortBy","sortDirection","pageSize"].forEach(id => {
-    $(id).addEventListener(id === "marketSearch" ? "input" : "change",() => {
-      state.page = 1;
-      renderScanner();
-    });
-  });
-
-  $("prevPage").addEventListener("click",() => {
-    state.page = Math.max(1,state.page-1);
-    renderScanner();
-  });
-
-  $("nextPage").addEventListener("click",() => {
-    state.page++;
-    renderScanner();
-  });
-
-  $("themeToggle").addEventListener("click",() => {
-    applyTheme(document.documentElement.dataset.theme === "light" ? "dark" : "light",true);
-  });
-
-  $("themeSelect").addEventListener("change",() => {
-    applyTheme($("themeSelect").value,true);
-  });
-
-  $("saveSettings").addEventListener("click",saveSettings);
-  $("resetSettings").addEventListener("click",resetSettings);
-
-  $("testConnection").addEventListener("click",async() => {
-    try {
-      const p = await apiFetch("/api/market?page=1&limit=20");
-      toast("Connection successful. Contracts: "+normalizeMarket(p).length);
-    } catch(e) {
-      $("lastApiError").textContent = e.message;
-      toast("Connection failed: "+e.message);
-    }
-  });
-
-}
-
-async function init() {
-  try {
-    const saved = localStorage.getItem("blobsignal-settings");
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      state.settings = {...DEFAULTS,...parsed};
-    }
-  } catch(e) {}
-
-  try {
-    const savedTheme = localStorage.getItem("blobsignal-theme");
-    if (savedTheme === "light" || savedTheme === "dark") {
-      state.settings.theme = savedTheme;
-    }
-  } catch(e) {}
-
-  bindEvents();
-  applySettingsUI();
-  startRefreshTimer();
-  await refreshMarket(false);
-}
-
-window.App = {
-  refreshMarket,
-  loadChart,
-  switchView,
-  resizeCharts
-};
-
-init().catch(e => {
-  console.error("[BlobSignal] Startup error:",e);
-  toast("Startup error: "+e.message);
-});
-})();
-</script>
-</body>
-</html>
+  This recalculates the prediction whenever the selected
+  contract or timeframe is refreshed.
+*/
+</script>```
